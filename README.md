@@ -32,16 +32,6 @@ Linux Kernel recipe: linux-ti-staging
 U-Boot recipe: u-boot-ti-staging
 
 
-Distro/Images
--------------------------
-Besides the BSP, this layer also provides the distribution "poky-bytesatwork"
-and an image to get you started quickly:
-
-* devbase-image-bytesatwork: This image contains several essential
-  developer tools, such as editors (vim, nano) and debuggers (gdb,
-  valgrind).
-
-
 Reporting bugs
 -------------------------
 Send pull requests, patches, comments or questions to yocto@bytesatwork.ch

@@ -14,11 +14,11 @@ This layer depends on:
 	URI: git://git.yoctoproject.org/meta-ti
 	layer: meta-ti
 	branch: master
-	commit: 2f28749040692b2267cb72303365bf3d2a391fef
+	commit: 29219faf16b2fb36918a269beb0ed6fd55b3ea59
 
 	URI: git://git.openembedded.org/meta-openembedded
 	layers: meta-oe, meta-networking, meta-python
-	branch: thud
+	branch: warrior
 
 
 BSP

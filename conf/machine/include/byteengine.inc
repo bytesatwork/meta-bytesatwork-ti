@@ -6,7 +6,7 @@
 #@DESCRIPTION: byteENGINE by bytes at work AG
 
 SERIAL_CONSOLES = "115200;ttyO0"
-IMAGE_FSTYPES = "tar.bz2 bytesatwork-sdimg"
+IMAGE_FSTYPES = "tar.bz2 bytesatwork-ti-sdimg"
 
 KERNEL_IMAGETYPE = "uImage"
 PREFERRED_PROVIDER_virtual/kernel = "linux-ti-staging"

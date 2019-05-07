@@ -31,7 +31,7 @@ inherit image_types
 #
 
 # This image depends on the rootfs image
-IMAGE_TYPEDEP_bytesatwork-sdimg = "${SDIMG_ROOTFS_TYPE}"
+IMAGE_TYPEDEP_bytesatwork-ti-sdimg = "${SDIMG_ROOTFS_TYPE}"
 
 # Set kernel and boot loader
 IMAGE_BOOTLOADER ?= "u-boot-ti-staging"
@@ -58,7 +58,7 @@ IMAGE_ROOTFS_ALIGNMENT = "4096"
 SDIMG_ROOTFS_TYPE ?= "ext3"
 SDIMG_ROOTFS = "${IMGDEPLOYDIR}/${IMAGE_NAME}.rootfs.${SDIMG_ROOTFS_TYPE}"
 
-do_image_bytesatwork_sdimg[depends] += " \
+do_image_bytesatwork_ti_sdimg[depends] += " \
 	parted-native:do_populate_sysroot \
 	mtools-native:do_populate_sysroot \
 	dosfstools-native:do_populate_sysroot \
@@ -81,7 +81,7 @@ FATPAYLOAD ?= ""
 
 IMAGEDATESTAMP = "${@time.strftime('%Y.%m.%d',time.gmtime())}"
 
-IMAGE_CMD_bytesatwork-sdimg () {
+IMAGE_CMD_bytesatwork-ti-sdimg () {
 
 	# Define rootfs partition size as (sdcard_size - bootfs_size - 100MB):
 	# - sdcard_size: SDCARD_SIZE_TARGET in KiB

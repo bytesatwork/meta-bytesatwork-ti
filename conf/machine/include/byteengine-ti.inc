@@ -13,3 +13,7 @@ PREFERRED_PROVIDER_virtual/kernel = "linux-ti-staging"
 PREFERRED_PROVIDER_virtual/bootloader = "u-boot-ti-staging"
 PREFERRED_VERSION_linux-ti-staging = "4.19%"
 PREFERRED_VERSION_u-boot-ti-staging = "2018.01%"
+
+WKS_FILE = "beaglebone-yocto.wks"
+do_image_wic[depends] += "mtools-native:do_populate_sysroot dosfstools-native:do_populate_sysroot u-boot:do_deploy"
+IMAGE_BOOT_FILES = "u-boot.${UBOOT_SUFFIX} MLO ${KERNEL_IMAGETYPE} ${KERNEL_DEVICETREE}"

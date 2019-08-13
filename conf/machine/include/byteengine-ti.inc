@@ -6,7 +6,7 @@
 #@DESCRIPTION: byteENGINE by bytes at work AG
 
 SERIAL_CONSOLES = "115200;ttyO0"
-IMAGE_FSTYPES = "tar.bz2 wic"
+IMAGE_FSTYPES = "tar.bz2 wic.bmap wic.gz"
 
 KERNEL_IMAGETYPE = "uImage"
 PREFERRED_PROVIDER_virtual/kernel = "linux-ti-staging"

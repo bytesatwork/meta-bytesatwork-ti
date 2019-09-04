@@ -32,6 +32,25 @@ Linux Kernel recipe: linux-ti-staging
 U-Boot recipe: u-boot-ti-staging
 
 
+SD Card
+-------------------------
+SD card images are created using *wic*.
+The following example shows how to create a bootable SD card with the image
+`devbase-image-bytesatwork` from
+[meta-bytesatwork](https://github.com/bytesatwork/meta-bytesatwork.git) from a
+sourced Yocto environment:
+
+	cd $BUILDDIR
+	gunzip -c tmp/deploy/images/bytepanel/devbase-image-bytesatwork-bytepanel.wic.gz | dd of=/dev/sdX bs=1M && sync
+
+or using `bmap-tools`:
+
+	cd $BUILDDIR
+	bmaptool copy tmp/deploy/images/bytepanel/devbase-image-bytesatwork-bytepanel.wic.bmap /dev/sdX
+
+For more information on `bmap-tools`, follow [this](https://www.yoctoproject.org/docs/2.7/dev-manual/dev-manual.html#flashing-images-using-bmaptool) link.
+
+
 Reporting bugs
 -------------------------
 Send pull requests, patches, comments or questions to yocto@bytesatwork.ch

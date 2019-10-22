@@ -14,11 +14,11 @@ This layer depends on:
 	URI: git://git.yoctoproject.org/meta-ti
 	layer: meta-ti
 	branch: master
-	commit: 29219faf16b2fb36918a269beb0ed6fd55b3ea59
+	commit: f35a0fdd869110d268c14ba6925f589152791127
 
 	URI: git://git.openembedded.org/meta-openembedded
 	layers: meta-oe, meta-networking, meta-python
-	branch: warrior
+	branch: zeus
 
 
 BSP
@@ -48,7 +48,7 @@ or using `bmap-tools`:
 	cd $BUILDDIR
 	bmaptool copy tmp/deploy/images/bytepanel/devbase-image-bytesatwork-bytepanel.wic.bmap /dev/sdX
 
-For more information on `bmap-tools`, follow [this](https://www.yoctoproject.org/docs/2.7/dev-manual/dev-manual.html#flashing-images-using-bmaptool) link.
+For more information on `bmap-tools`, follow [this](https://www.yoctoproject.org/docs/3.0/dev-manual/dev-manual.html#flashing-images-using-bmaptool) link.
 
 
 Reporting bugs

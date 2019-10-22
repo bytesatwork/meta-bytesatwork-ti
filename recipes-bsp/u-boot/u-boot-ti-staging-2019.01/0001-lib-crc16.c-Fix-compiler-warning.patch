@@ -1,0 +1,27 @@
+From d84284436f3efab1367b12b90c14717b02997be7 Mon Sep 17 00:00:00 2001
+From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+Date: Wed, 13 Mar 2019 07:43:54 +0100
+Subject: [PATCH] lib/crc16.c: Fix compiler warning
+
+---
+ lib/crc16.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/lib/crc16.c b/lib/crc16.c
+index f46ba727c9..89d2cff131 100644
+--- a/lib/crc16.c
++++ b/lib/crc16.c
+@@ -67,7 +67,9 @@ static const uint16_t crc16_tab[] = {
+ 
+ uint16_t crc16_ccitt(uint16_t cksum, const unsigned char *buf, int len)
+ {
+-	for (int i = 0;  i < len;  i++)
++	int i;
++
++	for (i = 0;  i < len;  i++)
+ 		cksum = crc16_tab[((cksum>>8) ^ *buf++) & 0xff] ^ (cksum << 8);
+ 
+ 	return cksum;
+-- 
+2.11.0
+

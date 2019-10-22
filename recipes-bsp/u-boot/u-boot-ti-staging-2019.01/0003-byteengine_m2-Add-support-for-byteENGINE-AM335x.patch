@@ -1,126 +1,155 @@
-From e5155dffb7ac39217c1b1403441d2a184870710e Mon Sep 17 00:00:00 2001
+From 474cdecd67f73b1b5af3c0dd146270749367aa4b Mon Sep 17 00:00:00 2001
 From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 Date: Tue, 10 Jul 2018 11:00:42 +0200
-Subject: [PATCH 3/4] byteengine_m2: Add support byteENGINE AM335x
+Subject: [PATCH] byteengine_m2: Add support for byteENGINE AM335x
 
 ---
- arch/arm/dts/byteengine-m2-rev4.dts                | 276 ++++++++++++++++
- arch/arm/dts/byteengine-m2.dts                     | 304 ++++++++++++++++++
+ arch/arm/dts/am335x-bytedevkit-emmc.dts            |  34 ++
+ arch/arm/dts/am335x-bytedevkit-nand.dts            |  22 ++
+ arch/arm/dts/am335x-bytedevkit.dtsi                | 101 ++++++
+ arch/arm/dts/am335x-byteengine.dtsi                | 265 +++++++++++++++
  arch/arm/mach-omap2/Kconfig                        |   1 +
- arch/arm/mach-omap2/am33xx/Kconfig                 |  18 ++
- board/bytesatwork/byteengine_m2/Kconfig            |  74 +++++
- board/bytesatwork/byteengine_m2/MAINTAINERS        |   6 +
- board/bytesatwork/byteengine_m2/Makefile           |  23 ++
- board/bytesatwork/byteengine_m2/board.c            | 276 ++++++++++++++++
- board/bytesatwork/byteengine_m2/board.h            |  38 +++
- board/bytesatwork/byteengine_m2/ddr_defs_baw.h     |  60 ++++
- board/bytesatwork/byteengine_m2/m2config/README    |  68 ++++
- .../byteengine_m2/m2config/cmd_m2config.c          | 220 +++++++++++++
- .../bytesatwork/byteengine_m2/m2config/m2config.c  |  47 +++
- .../bytesatwork/byteengine_m2/m2config/m2config.h  |  81 +++++
- .../byteengine_m2/m2config/m2config_builtin.c      |  17 +
- .../byteengine_m2/m2config/m2config_builtin.h      |  23 ++
- .../byteengine_m2/m2config/m2config_eeprom.c       | 238 ++++++++++++++
- .../byteengine_m2/m2config/m2config_eeprom.h       |  38 +++
- .../byteengine_m2/m2config/m2config_get.c          |  38 +++
- .../byteengine_m2/m2config/m2config_get.h          |  15 +
- board/bytesatwork/byteengine_m2/mux.c              | 140 ++++++++
- board/bytesatwork/byteengine_m2/ram.c              | 354 +++++++++++++++++++++
- board/bytesatwork/byteengine_m2/u-boot.lds         | 158 +++++++++
- configs/byteengine_m2_defconfig                    |  62 ++++
- configs/byteengine_m2_rev4_defconfig               |  63 ++++
- include/configs/byteengine_m2.h                    | 214 +++++++++++++
- include/configs/byteengine_m2_rev4.h               | 173 ++++++++++
- 27 files changed, 3025 insertions(+)
- create mode 100644 arch/arm/dts/byteengine-m2-rev4.dts
- create mode 100644 arch/arm/dts/byteengine-m2.dts
- create mode 100644 board/bytesatwork/byteengine_m2/Kconfig
- create mode 100644 board/bytesatwork/byteengine_m2/MAINTAINERS
- create mode 100644 board/bytesatwork/byteengine_m2/Makefile
- create mode 100644 board/bytesatwork/byteengine_m2/board.c
- create mode 100644 board/bytesatwork/byteengine_m2/board.h
- create mode 100644 board/bytesatwork/byteengine_m2/ddr_defs_baw.h
- create mode 100644 board/bytesatwork/byteengine_m2/m2config/README
- create mode 100644 board/bytesatwork/byteengine_m2/m2config/cmd_m2config.c
- create mode 100644 board/bytesatwork/byteengine_m2/m2config/m2config.c
- create mode 100644 board/bytesatwork/byteengine_m2/m2config/m2config.h
- create mode 100644 board/bytesatwork/byteengine_m2/m2config/m2config_builtin.c
- create mode 100644 board/bytesatwork/byteengine_m2/m2config/m2config_builtin.h
- create mode 100644 board/bytesatwork/byteengine_m2/m2config/m2config_eeprom.c
- create mode 100644 board/bytesatwork/byteengine_m2/m2config/m2config_eeprom.h
- create mode 100644 board/bytesatwork/byteengine_m2/m2config/m2config_get.c
- create mode 100644 board/bytesatwork/byteengine_m2/m2config/m2config_get.h
- create mode 100644 board/bytesatwork/byteengine_m2/mux.c
- create mode 100644 board/bytesatwork/byteengine_m2/ram.c
- create mode 100644 board/bytesatwork/byteengine_m2/u-boot.lds
- create mode 100644 configs/byteengine_m2_defconfig
- create mode 100644 configs/byteengine_m2_rev4_defconfig
- create mode 100644 include/configs/byteengine_m2.h
- create mode 100644 include/configs/byteengine_m2_rev4.h
+ arch/arm/mach-omap2/am33xx/Kconfig                 |   9 +
+ board/bytesatwork/byteengine_am335x/Kconfig        |  44 +++
+ board/bytesatwork/byteengine_am335x/MAINTAINERS    |   7 +
+ board/bytesatwork/byteengine_am335x/Makefile       |  21 ++
+ board/bytesatwork/byteengine_am335x/board.c        | 149 +++++++++
+ board/bytesatwork/byteengine_am335x/board.h        |  37 +++
+ board/bytesatwork/byteengine_am335x/ddr_defs_baw.h |  59 ++++
+ .../bytesatwork/byteengine_am335x/m2config/README  |  68 ++++
+ .../byteengine_am335x/m2config/cmd_m2config.c      | 223 +++++++++++++
+ .../byteengine_am335x/m2config/m2config.c          |  45 +++
+ .../byteengine_am335x/m2config/m2config.h          |  79 +++++
+ .../byteengine_am335x/m2config/m2config_builtin.c  |  15 +
+ .../byteengine_am335x/m2config/m2config_builtin.h  |  21 ++
+ .../byteengine_am335x/m2config/m2config_eeprom.c   | 301 +++++++++++++++++
+ .../byteengine_am335x/m2config/m2config_eeprom.h   |  37 +++
+ .../byteengine_am335x/m2config/m2config_get.c      |  45 +++
+ .../byteengine_am335x/m2config/m2config_get.h      |  13 +
+ board/bytesatwork/byteengine_am335x/mux.c          | 144 +++++++++
+ board/bytesatwork/byteengine_am335x/ram.c          | 356 +++++++++++++++++++++
+ board/bytesatwork/byteengine_am335x/u-boot.lds     | 131 ++++++++
+ configs/am335x_bytedevkit_emmc_defconfig           |  65 ++++
+ configs/am335x_bytedevkit_nand_defconfig           |  52 +++
+ include/configs/byteengine_am335x.h                | 270 ++++++++++++++++
+ 28 files changed, 2614 insertions(+)
+ create mode 100644 arch/arm/dts/am335x-bytedevkit-emmc.dts
+ create mode 100644 arch/arm/dts/am335x-bytedevkit-nand.dts
+ create mode 100644 arch/arm/dts/am335x-bytedevkit.dtsi
+ create mode 100644 arch/arm/dts/am335x-byteengine.dtsi
+ create mode 100644 board/bytesatwork/byteengine_am335x/Kconfig
+ create mode 100644 board/bytesatwork/byteengine_am335x/MAINTAINERS
+ create mode 100644 board/bytesatwork/byteengine_am335x/Makefile
+ create mode 100644 board/bytesatwork/byteengine_am335x/board.c
+ create mode 100644 board/bytesatwork/byteengine_am335x/board.h
+ create mode 100644 board/bytesatwork/byteengine_am335x/ddr_defs_baw.h
+ create mode 100644 board/bytesatwork/byteengine_am335x/m2config/README
+ create mode 100644 board/bytesatwork/byteengine_am335x/m2config/cmd_m2config.c
+ create mode 100644 board/bytesatwork/byteengine_am335x/m2config/m2config.c
+ create mode 100644 board/bytesatwork/byteengine_am335x/m2config/m2config.h
+ create mode 100644 board/bytesatwork/byteengine_am335x/m2config/m2config_builtin.c
+ create mode 100644 board/bytesatwork/byteengine_am335x/m2config/m2config_builtin.h
+ create mode 100644 board/bytesatwork/byteengine_am335x/m2config/m2config_eeprom.c
+ create mode 100644 board/bytesatwork/byteengine_am335x/m2config/m2config_eeprom.h
+ create mode 100644 board/bytesatwork/byteengine_am335x/m2config/m2config_get.c
+ create mode 100644 board/bytesatwork/byteengine_am335x/m2config/m2config_get.h
+ create mode 100644 board/bytesatwork/byteengine_am335x/mux.c
+ create mode 100644 board/bytesatwork/byteengine_am335x/ram.c
+ create mode 100644 board/bytesatwork/byteengine_am335x/u-boot.lds
+ create mode 100644 configs/am335x_bytedevkit_emmc_defconfig
+ create mode 100644 configs/am335x_bytedevkit_nand_defconfig
+ create mode 100644 include/configs/byteengine_am335x.h
 
-diff --git a/arch/arm/dts/byteengine-m2-rev4.dts b/arch/arm/dts/byteengine-m2-rev4.dts
+diff --git a/arch/arm/dts/am335x-bytedevkit-emmc.dts b/arch/arm/dts/am335x-bytedevkit-emmc.dts
 new file mode 100644
-index 0000000000..839ee9f8d7
+index 0000000000..45fe239144
 --- /dev/null
-+++ b/arch/arm/dts/byteengine-m2-rev4.dts
-@@ -0,0 +1,276 @@
++++ b/arch/arm/dts/am335x-bytedevkit-emmc.dts
+@@ -0,0 +1,34 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2018 bytes at work AG
 + *
 + * Based on am335x-evm.dts
 + *
 + * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
 + */
 +
 +/dts-v1/;
 +
-+#include "am33xx.dtsi"
-+#include <dt-bindings/interrupt-controller/irq.h>
++#include "am335x-byteengine.dtsi"
++#include "am335x-bytedevkit.dtsi"
 +
 +/ {
-+	model = "bytesatwork byteENGINE AM335x";
-+	compatible = "bytesatwork,byteengine-m2", "ti,am33xx";
++	model = "bytesatwork byteDEVKIT with byteENGINE AM335x eMMC";
++	compatible = "bytesatwork,byteengine-am335x", "ti,am33xx";
++};
 +
++&mmc2 {
++	status = "okay";
++};
++
++&spi0 {
++	status = "okay";
++
++	flash@0 {
++		#address-cells = <1>;
++		#size-cells = <1>;
++		compatible = "st,m25pe40", "jedec,spi-nor";
++		spi-max-frequency = <20000000>;
++		reg = <0>;
++	};
++};
+diff --git a/arch/arm/dts/am335x-bytedevkit-nand.dts b/arch/arm/dts/am335x-bytedevkit-nand.dts
+new file mode 100644
+index 0000000000..4516117eb4
+--- /dev/null
++++ b/arch/arm/dts/am335x-bytedevkit-nand.dts
+@@ -0,0 +1,22 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2018 bytes at work AG
++ *
++ * Based on am335x-evm.dts
++ *
++ * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
++ */
++
++/dts-v1/;
++
++#include "am335x-byteengine.dtsi"
++#include "am335x-bytedevkit.dtsi"
++
++/ {
++	model = "bytesatwork byteDEVKIT with byteENGINE AM335x NAND";
++	compatible = "bytesatwork,byteengine-am335x", "ti,am33xx";
++};
++
++&gpmc {
++	status = "okay";
++};
+diff --git a/arch/arm/dts/am335x-bytedevkit.dtsi b/arch/arm/dts/am335x-bytedevkit.dtsi
+new file mode 100644
+index 0000000000..358d518fdb
+--- /dev/null
++++ b/arch/arm/dts/am335x-bytedevkit.dtsi
+@@ -0,0 +1,101 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2018 bytes at work AG
++ *
++ * Based on am335x-evm.dts
++ *
++ * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
++ */
++
++/ {
 +	chosen {
 +		stdout-path = &uart0;
-+		tick-timer = &timer2;
-+	};
-+
-+	cpus {
-+		cpu@0 {
-+			cpu0-supply = <&vdd1_reg>;
-+		};
-+	};
-+
-+	memory {
-+		device_type = "memory";
-+		reg = <0x80000000 0x10000000>; /* 256 MB */
-+	};
-+
-+	vbat: fixedregulator@0 {
-+		compatible = "regulator-fixed";
-+		regulator-name = "vbat";
-+		regulator-min-microvolt = <5000000>;
-+		regulator-max-microvolt = <5000000>;
-+		regulator-boot-on;
 +	};
 +};
 +
 +&am33xx_pinmux {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&clkout2_pin>;
-+
-+	i2c0_pins: pinmux_i2c0_pins {
-+		pinctrl-single,pins = <
-+			0x188 (PIN_INPUT_PULLUP | MUX_MODE0)	/* i2c0_sda.i2c0_sda */
-+			0x18c (PIN_INPUT_PULLUP | MUX_MODE0)	/* i2c0_scl.i2c0_scl */
-+		>;
-+	};
-+
 +	uart0_pins: pinmux_uart0_pins {
 +		pinctrl-single,pins = <
 +			0x170 (PIN_INPUT_PULLUP | MUX_MODE0)	/* uart0_rxd.uart0_rxd */
@@ -128,18 +157,15 @@ index 0000000000..839ee9f8d7
 +		>;
 +	};
 +
-+	uart1_pins: pinmux_uart1_pins {
++	mmc1_pins: pinmux_mmc1_pins {
 +		pinctrl-single,pins = <
-+			0x178 (PIN_INPUT | MUX_MODE0)		/* uart1_ctsn.uart1_ctsn */
-+			0x17C (PIN_OUTPUT_PULLDOWN | MUX_MODE0)	/* uart1_rtsn.uart1_rtsn */
-+			0x180 (PIN_INPUT_PULLUP | MUX_MODE0)	/* uart1_rxd.uart1_rxd */
-+			0x184 (PIN_OUTPUT_PULLDOWN | MUX_MODE0)	/* uart1_txd.uart1_txd */
-+		>;
-+	};
-+
-+	clkout2_pin: pinmux_clkout2_pin {
-+		pinctrl-single,pins = <
-+			0x1b4 (PIN_OUTPUT_PULLDOWN | MUX_MODE3)	/* xdma_event_intr1.clkout2 */
++			0x0f0 (PIN_INPUT | MUX_MODE0)		/* mmc0_dat0.mmc0_dat0 */
++			0x0f4 (PIN_INPUT | MUX_MODE0)		/* mmc0_dat1.mmc0_dat1 */
++			0x0f8 (PIN_INPUT | MUX_MODE0)		/* mmc0_dat2.mmc0_dat2 */
++			0x0fc (PIN_INPUT | MUX_MODE0)		/* mmc0_dat3.mmc0_dat3 */
++			0x100 (PIN_INPUT | MUX_MODE0)		/* mmc0_clk.mmc0_clk */
++			0x104 (PIN_INPUT | MUX_MODE0)		/* mmc0_cmd.mmc0_cmd */
++			0x160 (PIN_INPUT_PULLUP | MUX_MODE7)	/* spi0_cs1.gpio0_6 */
 +		>;
 +	};
 +
@@ -168,137 +194,24 @@ index 0000000000..839ee9f8d7
 +			0x14c (PIN_OUTPUT_PULLUP | MUX_MODE0)			/* mdio_clk.mdio_clk */
 +		>;
 +	};
-+
-+	mmc1_pins: pinmux_mmc1_pins {
-+		pinctrl-single,pins = <
-+			0x160 (PIN_INPUT | MUX_MODE7) /* spi0_cs1.gpio0_6 */
-+		>;
-+	};
-+
-+	mmc2_pins: pinmux_mmc2_pins {
-+		pinctrl-single,pins = <
-+			0x80 (PIN_INPUT_PULLUP | MUX_MODE2) /* gpmc_csn1.mmc1_clk */
-+			0x84 (PIN_INPUT_PULLUP | MUX_MODE2) /* gpmc_csn2.mmc1_cmd */
-+			0x00 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad0.mmc1_dat0 */
-+			0x04 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad1.mmc1_dat1 */
-+			0x08 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad2.mmc1_dat2 */
-+			0x0c (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad3.mmc1_dat3 */
-+			0x10 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad4.mmc1_dat4 */
-+			0x14 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad5.mmc1_dat5 */
-+			0x18 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad6.mmc1_dat6 */
-+			0x1c (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad7.mmc1_dat7 */
-+		>;
-+	};
 +};
 +
 +&uart0 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&uart0_pins>;
-+
 +	status = "okay";
++
++	u-boot,dm-spl;
 +};
 +
-+&i2c0 {
++&mmc1 {
 +	pinctrl-names = "default";
-+	pinctrl-0 = <&i2c0_pins>;
-+
++	pinctrl-0 = <&mmc1_pins>;
 +	status = "okay";
-+	clock-frequency = <400000>;
 +
-+	tps: tps@2d {
-+		reg = <0x2d>;
-+	};
-+};
-+
-+&cppi41dma  {
-+	status = "okay";
-+};
-+
-+&elm {
-+	status = "okay";
-+};
-+
-+&gpmc {
-+	status = "disabled";
-+};
-+
-+#include "tps65910.dtsi"
-+
-+&tps {
-+	vcc1-supply = <&vbat>;
-+	vcc2-supply = <&vbat>;
-+	vcc3-supply = <&vbat>;
-+	vcc4-supply = <&vbat>;
-+	vcc5-supply = <&vbat>;
-+	vcc6-supply = <&vbat>;
-+	vcc7-supply = <&vbat>;
-+	vccio-supply = <&vbat>;
-+
-+	regulators {
-+		vrtc_reg: regulator@0 {
-+			regulator-always-on;
-+		};
-+
-+		vio_reg: regulator@1 {
-+			regulator-always-on;
-+		};
-+
-+		vdd1_reg: regulator@2 {
-+			/* VDD_MPU voltage limits 0.95V - 1.26V with +/-4% tolerance */
-+			regulator-name = "vdd_mpu";
-+			regulator-min-microvolt = <912500>;
-+			regulator-max-microvolt = <1312500>;
-+			regulator-boot-on;
-+			regulator-always-on;
-+		};
-+
-+		vdd2_reg: regulator@3 {
-+			/* VDD_CORE voltage limits 0.95V - 1.1V with +/-4% tolerance */
-+			regulator-name = "vdd_core";
-+			regulator-min-microvolt = <912500>;
-+			regulator-max-microvolt = <1150000>;
-+			regulator-boot-on;
-+			regulator-always-on;
-+		};
-+
-+		vdd3_reg: regulator@4 {
-+			regulator-always-on;
-+		};
-+
-+		vdig1_reg: regulator@5 {
-+			regulator-always-on;
-+		};
-+
-+		vdig2_reg: regulator@6 {
-+			regulator-always-on;
-+		};
-+
-+		vpll_reg: regulator@7 {
-+			regulator-always-on;
-+		};
-+
-+		vdac_reg: regulator@8 {
-+			regulator-always-on;
-+		};
-+
-+		vaux1_reg: regulator@9 {
-+			regulator-always-on;
-+		};
-+
-+		vaux2_reg: regulator@10 {
-+			regulator-always-on;
-+		};
-+
-+		vaux33_reg: regulator@11 {
-+			regulator-always-on;
-+		};
-+
-+		vmmc_reg: regulator@12 {
-+			regulator-min-microvolt = <1800000>;
-+			regulator-max-microvolt = <3300000>;
-+			regulator-always-on;
-+		};
-+	};
++	vmmc-supply = <&vmmc_reg>;
++	bus-width = <0x4>;
++	cd-gpios = <&gpio0 6 GPIO_ACTIVE_LOW>;
 +};
 +
 +&mac {
@@ -316,59 +229,35 @@ index 0000000000..839ee9f8d7
 +&cpsw_emac0 {
 +	phy_id = <&davinci_mdio>, <0>;
 +	phy-mode = "rgmii-txid";
++	ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_25_NS>;
++	ti,tx-internal-delay = <DP83867_RGMIIDCTL_250_PS>;
++	ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_8_B_NIB>;
++	ti,min-output-impedance;
++	ti,dp83867-rxctrl-strap-quirk;
 +};
-+
-+&mmc1 {
-+	status = "okay";
-+	vmmc-supply = <&vmmc_reg>;
-+	bus-width = <4>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&mmc1_pins>;
-+	cd-gpios = <&gpio0 6 GPIO_ACTIVE_LOW>;
-+};
-+
-+&mmc2 {
-+	status = "okay";
-+	vmmc-supply = <&vmmc_reg>;
-+	bus-width = <8>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&mmc2_pins>;
-+	non-removable;
-+};
-+
-+&edma {
-+	ti,edma-xbar-event-map = /bits/ 16 <1 12
-+					    2 13>;
-+};
-diff --git a/arch/arm/dts/byteengine-m2.dts b/arch/arm/dts/byteengine-m2.dts
+diff --git a/arch/arm/dts/am335x-byteengine.dtsi b/arch/arm/dts/am335x-byteengine.dtsi
 new file mode 100644
-index 0000000000..c9599c7082
+index 0000000000..c16b80988d
 --- /dev/null
-+++ b/arch/arm/dts/byteengine-m2.dts
-@@ -0,0 +1,304 @@
++++ b/arch/arm/dts/am335x-byteengine.dtsi
+@@ -0,0 +1,265 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2018 bytes at work AG
 + *
 + * Based on am335x-evm.dts
 + *
 + * Copyright (C) 2012 Texas Instruments Incorporated - http://www.ti.com/
-+ *
-+ * This program is free software; you can redistribute it and/or modify
-+ * it under the terms of the GNU General Public License version 2 as
-+ * published by the Free Software Foundation.
 + */
-+
-+/dts-v1/;
 +
 +#include "am33xx.dtsi"
 +#include <dt-bindings/interrupt-controller/irq.h>
++#include <dt-bindings/net/ti-dp83867.h>
 +
 +/ {
-+	model = "bytesatwork byteENGINE AM335x";
-+	compatible = "bytesatwork,byteengine-m2", "ti,am33xx";
++	compatible = "bytesatwork,byteengine-am335x", "ti,am33xx";
 +
 +	chosen {
-+		stdout-path = &uart0;
 +		tick-timer = &timer2;
 +	};
 +
@@ -380,7 +269,6 @@ index 0000000000..c9599c7082
 +
 +	memory {
 +		device_type = "memory";
-+		reg = <0x80000000 0x10000000>; /* 256 MB */
 +	};
 +
 +	vbat: fixedregulator@0 {
@@ -400,22 +288,6 @@ index 0000000000..c9599c7082
 +		pinctrl-single,pins = <
 +			0x188 (PIN_INPUT_PULLUP | MUX_MODE0)	/* i2c0_sda.i2c0_sda */
 +			0x18c (PIN_INPUT_PULLUP | MUX_MODE0)	/* i2c0_scl.i2c0_scl */
-+		>;
-+	};
-+
-+	uart0_pins: pinmux_uart0_pins {
-+		pinctrl-single,pins = <
-+			0x170 (PIN_INPUT_PULLUP | MUX_MODE0)	/* uart0_rxd.uart0_rxd */
-+			0x174 (PIN_OUTPUT_PULLDOWN | MUX_MODE0)	/* uart0_txd.uart0_txd */
-+		>;
-+	};
-+
-+	uart1_pins: pinmux_uart1_pins {
-+		pinctrl-single,pins = <
-+			0x178 (PIN_INPUT | MUX_MODE0)		/* uart1_ctsn.uart1_ctsn */
-+			0x17C (PIN_OUTPUT_PULLDOWN | MUX_MODE0)	/* uart1_rtsn.uart1_rtsn */
-+			0x180 (PIN_INPUT_PULLUP | MUX_MODE0)	/* uart1_rxd.uart1_rxd */
-+			0x184 (PIN_OUTPUT_PULLDOWN | MUX_MODE0)	/* uart1_txd.uart1_txd */
 +		>;
 +	};
 +
@@ -445,55 +317,45 @@ index 0000000000..c9599c7082
 +		>;
 +	};
 +
-+	cpsw_default: cpsw_default {
++	mmc2_pins: pinmux_mmc2_pins {
 +		pinctrl-single,pins = <
-+			/* Slave 1 */
-+			0x114 (PIN_OUTPUT_PULLDOWN | MUX_MODE2)	/* mii1_txen.rgmii1_tctl */
-+			0x118 (PIN_INPUT_PULLDOWN | MUX_MODE2)	/* mii1_rxdv.rgmii1_rctl */
-+			0x11c (PIN_OUTPUT_PULLDOWN | MUX_MODE2)	/* mii1_txd3.rgmii1_td3 */
-+			0x120 (PIN_OUTPUT_PULLDOWN | MUX_MODE2)	/* mii1_txd2.rgmii1_td2 */
-+			0x124 (PIN_OUTPUT_PULLDOWN | MUX_MODE2)	/* mii1_txd1.rgmii1_td1 */
-+			0x128 (PIN_OUTPUT_PULLDOWN | MUX_MODE2)	/* mii1_txd0.rgmii1_td0 */
-+			0x12c (PIN_OUTPUT_PULLDOWN | MUX_MODE2)	/* mii1_txclk.rgmii1_tclk */
-+			0x130 (PIN_INPUT_PULLDOWN | MUX_MODE2)	/* mii1_rxclk.rgmii1_rclk */
-+			0x134 (PIN_INPUT_PULLDOWN | MUX_MODE2)	/* mii1_rxd3.rgmii1_rd3 */
-+			0x138 (PIN_INPUT_PULLDOWN | MUX_MODE2)	/* mii1_rxd2.rgmii1_rd2 */
-+			0x13c (PIN_INPUT_PULLDOWN | MUX_MODE2)	/* mii1_rxd1.rgmii1_rd1 */
-+			0x140 (PIN_INPUT_PULLDOWN | MUX_MODE2)	/* mii1_rxd0.rgmii1_rd0 */
++			0x80 (PIN_INPUT_PULLUP | MUX_MODE2) /* gpmc_csn1.mmc1_clk */
++			0x84 (PIN_INPUT_PULLUP | MUX_MODE2) /* gpmc_csn2.mmc1_cmd */
++			0x00 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad0.mmc1_dat0 */
++			0x04 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad1.mmc1_dat1 */
++			0x08 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad2.mmc1_dat2 */
++			0x0c (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad3.mmc1_dat3 */
++			0x10 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad4.mmc1_dat4 */
++			0x14 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad5.mmc1_dat5 */
++			0x18 (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad6.mmc1_dat6 */
++			0x1c (PIN_INPUT_PULLUP | MUX_MODE1) /* gpmc_ad7.mmc1_dat7 */
 +		>;
 +	};
 +
-+	davinci_mdio_default: davinci_mdio_default {
++	spi0_pins: pinmux_spi0_pins {
 +		pinctrl-single,pins = <
-+			/* MDIO */
-+			0x148 (PIN_INPUT_PULLUP | SLEWCTRL_FAST | MUX_MODE0)	/* mdio_data.mdio_data */
-+			0x14c (PIN_OUTPUT_PULLUP | MUX_MODE0)			/* mdio_clk.mdio_clk */
++			0x150 ( PIN_INPUT | MUX_MODE0 )		/* (A17) spi0_sclk.spi0_sclk */
++			0x154 ( PIN_INPUT | MUX_MODE0 )		/* (B17) spi0_d0.spi0_d0 */
++			0x158 ( PIN_OUTPUT | MUX_MODE0 )	/* (B16) spi0_d1.spi0_d1 */
++			0x15C ( PIN_OUTPUT | MUX_MODE0 )	/* (A16) spi0_cs0.spi0_cs0 */
 +		>;
 +	};
-+
-+	mmc1_pins: pinmux_mmc1_pins {
-+		pinctrl-single,pins = <
-+			0x160 (PIN_INPUT | MUX_MODE7) /* spi0_cs1.gpio0_6 */
-+		>;
-+	};
-+};
-+
-+&uart0 {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&uart0_pins>;
-+
-+	status = "okay";
 +};
 +
 +&i2c0 {
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&i2c0_pins>;
-+
 +	status = "okay";
++
 +	clock-frequency = <400000>;
 +
 +	tps: tps@2d {
 +		reg = <0x2d>;
++	};
++
++	eeprom: eeprom@50 {
++		compatible = "at,24c256";
++		reg = <0x50>;
 +	};
 +};
 +
@@ -506,9 +368,10 @@ index 0000000000..c9599c7082
 +};
 +
 +&gpmc {
-+	status = "okay";
 +	pinctrl-names = "default";
 +	pinctrl-0 = <&nandflash_pins_s0>;
++	status = "disabled";
++
 +	ranges = <0 0 0x08000000 0x10000000>;	/* CS0: 16MB for NAND */
 +	nand@0,0 {
 +		reg = <0 0 4>; /* CS0, offset 0, IO size 4 */
@@ -620,87 +483,71 @@ index 0000000000..c9599c7082
 +	};
 +};
 +
-+&mac {
++&mmc2 {
 +	pinctrl-names = "default";
-+	pinctrl-0 = <&cpsw_default>;
-+	status = "okay";
-+};
++	pinctrl-0 = <&mmc2_pins>;
++	status = "disabled";
 +
-+&davinci_mdio {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&davinci_mdio_default>;
-+	status = "okay";
-+};
-+
-+&cpsw_emac0 {
-+	phy_id = <&davinci_mdio>, <0>;
-+	phy-mode = "rgmii-txid";
-+};
-+
-+&mmc1 {
-+	status = "okay";
 +	vmmc-supply = <&vmmc_reg>;
-+	bus-width = <4>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&mmc1_pins>;
-+	cd-gpios = <&gpio0 6 GPIO_ACTIVE_LOW>;
++	bus-width = <8>;
++	non-removable;
 +};
 +
 +&edma {
-+	ti,edma-xbar-event-map = /bits/ 16 <1 12
-+					    2 13>;
++	status = "okay";
++};
++
++&gpio0 {
++	u-boot,dm-spl;
++};
++
++&spi0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&spi0_pins>;
++	status = "disabled";
 +};
 diff --git a/arch/arm/mach-omap2/Kconfig b/arch/arm/mach-omap2/Kconfig
-index 62c25c4044..b99136cf04 100644
+index d9bdcb355a..6e4d9fd13a 100644
 --- a/arch/arm/mach-omap2/Kconfig
 +++ b/arch/arm/mach-omap2/Kconfig
-@@ -176,6 +176,7 @@ source "board/ti/ti814x/Kconfig"
+@@ -199,6 +199,7 @@ source "board/ti/ti814x/Kconfig"
  source "board/ti/ti816x/Kconfig"
  source "board/ti/am43xx/Kconfig"
  source "board/ti/am335x/Kconfig"
-+source "board/bytesatwork/byteengine_m2/Kconfig"
++source "board/bytesatwork/byteengine_am335x/Kconfig"
  source "board/compulab/cm_t335/Kconfig"
  source "board/compulab/cm_t43/Kconfig"
  
 diff --git a/arch/arm/mach-omap2/am33xx/Kconfig b/arch/arm/mach-omap2/am33xx/Kconfig
-index fd473f118b..196497bbda 100644
+index 2dac97a530..0a987463dc 100644
 --- a/arch/arm/mach-omap2/am33xx/Kconfig
 +++ b/arch/arm/mach-omap2/am33xx/Kconfig
-@@ -112,6 +112,24 @@ config TARGET_BRPPT1
+@@ -118,6 +118,15 @@ config TARGET_BRPPT1
  	bool "Support BRPPT1"
  	select BOARD_LATE_INIT
  
-+config TARGET_BYTEENGINE_M2
-+	bool "Support byteengine_m2"
++config TARGET_BYTEENGINE_AM335X
++	bool "Support byteENGINE AM335x"
 +	select BOARD_LATE_INIT
 +	select DM
 +	select DM_SERIAL
 +	select DM_GPIO
 +	help
-+	  Support for the bytesatwork m2 module (with nand flash).
-+
-+config TARGET_BYTEENGINE_M2_REV4
-+	bool "Support byteengine m2 rev 4"
-+	select BOARD_LATE_INIT
-+	select DM
-+	select DM_SERIAL
-+	select DM_GPIO
-+	help
-+	  Support for the bytesatwork m2 module (with eMMC).
++	  Support for the bytesatwork byteENGINE AM335x
 +
  config TARGET_CHILIBOARD
  	bool "Grinn chiliBoard"
  	select AM33XX_CHILISOM
-diff --git a/board/bytesatwork/byteengine_m2/Kconfig b/board/bytesatwork/byteengine_m2/Kconfig
+diff --git a/board/bytesatwork/byteengine_am335x/Kconfig b/board/bytesatwork/byteengine_am335x/Kconfig
 new file mode 100644
-index 0000000000..bbac642fdf
+index 0000000000..02b90445e2
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/Kconfig
-@@ -0,0 +1,74 @@
-+if TARGET_BYTEENGINE_M2
++++ b/board/bytesatwork/byteengine_am335x/Kconfig
+@@ -0,0 +1,44 @@
++if TARGET_BYTEENGINE_AM335X
 +
 +config SYS_BOARD
-+	default "byteengine_m2"
++	default "byteengine_am335x"
 +
 +config SYS_VENDOR
 +	default "bytesatwork"
@@ -709,7 +556,7 @@ index 0000000000..bbac642fdf
 +	default "am33xx"
 +
 +config SYS_CONFIG_NAME
-+	default "byteengine_m2"
++	default "byteengine_am335x"
 +
 +config CONS_INDEX
 +	int "UART used for console"
@@ -720,10 +567,6 @@ index 0000000000..bbac642fdf
 +	  in documentation, etc) available to it.  Depending on your specific
 +	  board you may want something other than UART0 as for example the IDK
 +	  uses UART3 so enter 4 here.
-+
-+endif
-+
-+if TARGET_BYTEENGINE_M2 || TARGET_BYTEENGINE_M2_REV4
 +
 +config CMD_M2CONFIG
 +	bool "m2config command"
@@ -745,50 +588,26 @@ index 0000000000..bbac642fdf
 +	  Enable m2config builtin configuration functionality.
 +
 +endif
-+
-+if TARGET_BYTEENGINE_M2_REV4
-+
-+config SYS_BOARD
-+	default "byteengine_m2"
-+
-+config SYS_VENDOR
-+	default "bytesatwork"
-+
-+config SYS_SOC
-+	default "am33xx"
-+
-+config SYS_CONFIG_NAME
-+	default "byteengine_m2_rev4"
-+
-+config CONS_INDEX
-+	int "UART used for console"
-+	range 1 6
-+	default 1
-+	help
-+	  The AM335x SoC has a total of 6 UARTs (UART0 to UART5 as referenced
-+	  in documentation, etc) available to it.  Depending on your specific
-+	  board you may want something other than UART0 as for example the IDK
-+	  uses UART3 so enter 4 here.
-+
-+endif
-diff --git a/board/bytesatwork/byteengine_m2/MAINTAINERS b/board/bytesatwork/byteengine_m2/MAINTAINERS
+diff --git a/board/bytesatwork/byteengine_am335x/MAINTAINERS b/board/bytesatwork/byteengine_am335x/MAINTAINERS
 new file mode 100644
-index 0000000000..fc2c414fa7
+index 0000000000..13ba4d13f4
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/MAINTAINERS
-@@ -0,0 +1,6 @@
-+BYTEENGINE_M2
++++ b/board/bytesatwork/byteengine_am335x/MAINTAINERS
+@@ -0,0 +1,7 @@
++BYTEENGINE_AM335X
 +M:	Markus Kappeler <markus.kappeler@bytesatwork.ch>
 +S:	Maintained
-+F:	board/bytesatwork/byteengine_m2/
-+F:	include/configs/byteengine_m2.h
-+F:	configs/byteengine_m2_defconfig
-diff --git a/board/bytesatwork/byteengine_m2/Makefile b/board/bytesatwork/byteengine_m2/Makefile
++F:	board/bytesatwork/byteengine_am335x/
++F:	include/configs/byteengine_am335x.h
++F:	configs/am335x_bytedevkit_emmc_defconfig
++F:	configs/am335x_bytedevkit_nand_defconfig
+diff --git a/board/bytesatwork/byteengine_am335x/Makefile b/board/bytesatwork/byteengine_am335x/Makefile
 new file mode 100644
-index 0000000000..22549a2c88
+index 0000000000..b925750c0a
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/Makefile
-@@ -0,0 +1,23 @@
++++ b/board/bytesatwork/byteengine_am335x/Makefile
+@@ -0,0 +1,21 @@
++# SPDX-License-Identifier: GPL-2.0+
 +#
 +# Makefile
 +#
@@ -797,9 +616,6 @@ index 0000000000..22549a2c88
 +# Based on board/ti/am335x/Makefile
 +#
 +# Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/
-+#
-+# SPDX-License-Identifier:	GPL-2.0+
-+#
 +
 +ifeq ($(CONFIG_SKIP_LOWLEVEL_INIT),)
 +obj-y	:= mux.o
@@ -812,67 +628,55 @@ index 0000000000..22549a2c88
 +obj-$(CONFIG_M2CONFIG_EEPROM)	+= m2config/m2config_eeprom.o
 +obj-$(CONFIG_M2CONFIG_BUILTIN)	+= m2config/m2config_builtin.o
 +obj-$(CONFIG_CMD_M2CONFIG)	+= m2config/cmd_m2config.o
-diff --git a/board/bytesatwork/byteengine_m2/board.c b/board/bytesatwork/byteengine_m2/board.c
+diff --git a/board/bytesatwork/byteengine_am335x/board.c b/board/bytesatwork/byteengine_am335x/board.c
 new file mode 100644
-index 0000000000..ca26fb5ce6
+index 0000000000..397159d32b
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/board.c
-@@ -0,0 +1,276 @@
++++ b/board/bytesatwork/byteengine_am335x/board.c
+@@ -0,0 +1,149 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 bytes at work AG
-+ *
-+ * Based on board/ti/am335x/board.c
-+ *
-+ * Board functions for TI AM335X based boards
-+ *
-+ * Copyright (C) 2011, Texas Instruments, Incorporated - http://www.ti.com/
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
 + */
 +
 +#include <common.h>
-+#include <dm.h>
-+#include <errno.h>
-+#include <spl.h>
-+#include <serial.h>
 +#include <asm/arch/cpu.h>
 +#include <asm/arch/hardware.h>
 +#include <asm/arch/omap.h>
-+#include <asm/arch/clock.h>
-+#include <asm/arch/clk_synthesizer.h>
-+#include <asm/arch/gpio.h>
-+#include <asm/arch/mmc_host_def.h>
-+#include <asm/arch/sys_proto.h>
 +#include <asm/arch/mem.h>
-+#include <asm/io.h>
++#include <asm/arch/clock.h>
++#include <asm/arch/mmc_host_def.h>
++#include <asm/arch/mux.h>
++#include <asm-generic/gpio.h>
++#include <asm/arch/sys_proto.h>
 +#include <asm/emif.h>
-+#include <asm/gpio.h>
-+#include <asm/omap_common.h>
-+#include <asm/omap_sec_common.h>
-+#include <asm/omap_mmc.h>
-+#include <i2c.h>
-+#include <miiphy.h>
++#include <asm/io.h>
 +#include <cpsw.h>
-+#include <power/tps65217.h>
 +#include <power/tps65910.h>
 +#include <environment.h>
++#include <errno.h>
++#include <miiphy.h>
++#include <spl.h>
 +#include <watchdog.h>
-+#include <environment.h>
 +#include "board.h"
++#include "m2config/m2config_eeprom.h"
 +
 +DECLARE_GLOBAL_DATA_PTR;
 +
-+static struct ctrl_dev *cdev = (struct ctrl_dev *)CTRL_DEVICE_BASE;
++static __maybe_unused struct ctrl_dev *cdev =
++	(struct ctrl_dev *)CTRL_DEVICE_BASE;
 +
-+#ifndef CONFIG_DM_SERIAL
-+struct serial_device *default_serial_console(void)
++void set_uart_mux_conf(void)
 +{
-+	return &eserial1_device;
++	enable_uart0_pin_mux();
 +}
-+#endif
++
++void set_mux_conf_regs(void)
++{
++	enable_board_pin_mux();
++}
 +
 +#ifndef CONFIG_SKIP_LOWLEVEL_INIT
-+
 +void am33xx_spl_board_init(void)
 +{
 +	int mpu_vdd;
@@ -906,17 +710,6 @@ index 0000000000..ca26fb5ce6
 +	/* Set MPU Frequency to what we detected now that voltages are set */
 +	do_setup_dpll(&dpll_mpu_regs, &dpll_mpu_opp100);
 +}
-+
-+void set_uart_mux_conf(void)
-+{
-+	enable_uart0_pin_mux();
-+}
-+
-+void set_mux_conf_regs(void)
-+{
-+	enable_board_pin_mux();
-+}
-+
 +#endif
 +
 +/*
@@ -924,102 +717,36 @@ index 0000000000..ca26fb5ce6
 + */
 +int board_init(void)
 +{
-+#if defined(CONFIG_HW_WATCHDOG)
++	m2config_eeprom_init();
++#ifdef CONFIG_HW_WATCHDOG
 +	hw_watchdog_init();
 +#endif
 +
 +	gd->bd->bi_boot_params = CONFIG_SYS_SDRAM_BASE + 0x100;
-+#if defined(CONFIG_NOR) || defined(CONFIG_NAND)
++#ifdef CONFIG_NAND
 +	gpmc_init();
 +#endif
 +
 +	return 0;
 +}
 +
++int ft_board_setup(void *blob, bd_t *bd)
++{
++	return 0;
++}
++
 +#ifdef CONFIG_BOARD_LATE_INIT
 +int board_late_init(void)
 +{
-+#if defined(CONFIG_NAND)
-+	omap_nand_switch_ecc(1, 1);
-+#endif
-+	return 0;
-+}
-+#endif
++#ifndef CONFIG_SPL_BUILD
++	u8 mac_addr[6];
++	u32 mac_hi, mac_lo;
 +
-+#ifndef CONFIG_DM_ETH
-+
-+#if (defined(CONFIG_DRIVER_TI_CPSW) && !defined(CONFIG_SPL_BUILD)) || \
-+	(defined(CONFIG_SPL_ETH_SUPPORT) && defined(CONFIG_SPL_BUILD))
-+static void cpsw_control(int enabled)
-+{
-+	/* VTP can be added here */
-+
-+	return;
-+}
-+
-+static struct cpsw_slave_data cpsw_slaves[] = {
-+	{
-+		.slave_reg_ofs	= 0x208,
-+		.sliver_reg_ofs	= 0xd80,
-+		.phy_addr	= 0,
-+	},
-+	{
-+		.slave_reg_ofs	= 0x308,
-+		.sliver_reg_ofs	= 0xdc0,
-+		.phy_addr	= 1,
-+	},
-+};
-+
-+static struct cpsw_platform_data cpsw_data = {
-+	.mdio_base		= CPSW_MDIO_BASE,
-+	.cpsw_base		= CPSW_BASE,
-+	.mdio_div		= 0xff,
-+	.channels		= 8,
-+	.cpdma_reg_ofs		= 0x800,
-+	.slaves			= 1,
-+	.slave_data		= cpsw_slaves,
-+	.ale_reg_ofs		= 0xd00,
-+	.ale_entries		= 1024,
-+	.host_port_reg_ofs	= 0x108,
-+	.hw_stats_reg_ofs	= 0x900,
-+	.bd_ram_ofs		= 0x2000,
-+	.mac_control		= (1 << 5),
-+	.control		= cpsw_control,
-+	.host_port_num		= 0,
-+	.version		= CPSW_CTRL_VERSION_2,
-+};
-+#endif
-+
-+#endif /* CONFIG_DM_ETH */
-+
-+#ifdef CONFIG_SPL_LOAD_FIT
-+int board_fit_config_name_match(const char *name)
-+{
-+	return -1;
-+}
-+#endif
-+
-+/*
-+ * This function will:
-+ * Read the eFuse for MAC addresses, and set ethaddr/eth1addr/usbnet_devaddr
-+ * in the environment
-+ * Perform fixups to the PHY present on certain boards.  We only need this
-+ * function in:
-+ * - SPL with either CPSW or USB ethernet support
-+ * - Full U-Boot, with either CPSW or USB ethernet
-+ * Build in only these cases to avoid warnings about unused variables
-+ * when we build an SPL that has neither option but full U-Boot will.
-+ */
-+#if ((defined(CONFIG_SPL_ETH_SUPPORT) || defined(CONFIG_SPL_USBETH_SUPPORT)) \
-+	&& defined(CONFIG_SPL_BUILD)) || \
-+	((defined(CONFIG_DRIVER_TI_CPSW) || \
-+	  defined(CONFIG_USB_ETHER) && defined(CONFIG_MUSB_GADGET)) && \
-+	 !defined(CONFIG_SPL_BUILD))
-+int board_eth_init(bd_t *bis)
-+{
-+	int rv, n = 0;
-+	uint8_t mac_addr[6];
-+	uint32_t mac_hi, mac_lo;
++	/* Reset PHY */
++	gpio_request(13, "PHY_RESET");
++	gpio_direction_output(13, 0);
++	udelay(100 * 1000);
++	gpio_set_value(13, 1);
 +
 +	/* try reading mac address from efuse */
 +	mac_lo = readl(&cdev->macid0l);
@@ -1031,16 +758,12 @@ index 0000000000..ca26fb5ce6
 +	mac_addr[4] = mac_lo & 0xFF;
 +	mac_addr[5] = (mac_lo & 0xFF00) >> 8;
 +
-+#if (defined(CONFIG_DRIVER_TI_CPSW) && !defined(CONFIG_SPL_BUILD)) || \
-+	(defined(CONFIG_SPL_ETH_SUPPORT) && defined(CONFIG_SPL_BUILD))
 +	if (!env_get("ethaddr")) {
 +		printf("<ethaddr> not set. Validating first E-fuse MAC\n");
 +
 +		if (is_valid_ethaddr(mac_addr))
 +			eth_env_set_enetaddr("ethaddr", mac_addr);
 +	}
-+
-+#ifdef CONFIG_DRIVER_TI_CPSW
 +
 +	mac_lo = readl(&cdev->macid1l);
 +	mac_hi = readl(&cdev->macid1h);
@@ -1055,51 +778,18 @@ index 0000000000..ca26fb5ce6
 +		if (is_valid_ethaddr(mac_addr))
 +			eth_env_set_enetaddr("eth1addr", mac_addr);
 +	}
-+
-+	writel(MII_MODE_ENABLE, &cdev->miisel);
-+	cpsw_slaves[0].phy_if = cpsw_slaves[1].phy_if =
-+				PHY_INTERFACE_MODE_MII;
-+
-+	rv = cpsw_register(&cpsw_data);
-+	if (rv < 0)
-+		printf("Error %d registering CPSW switch\n", rv);
-+	else
-+		n += rv;
 +#endif
 +
-+	/*
-+	 *
-+	 * CPSW RGMII Internal Delay Mode is not supported in all PVT
-+	 * operating points.  So we must set the TX clock delay feature
-+	 * in the AR8051 PHY.  Since we only support a single ethernet
-+	 * device in U-Boot, we only do this for the first instance.
-+	 */
-+#define AR8051_PHY_DEBUG_ADDR_REG	0x1d
-+#define AR8051_PHY_DEBUG_DATA_REG	0x1e
-+#define AR8051_DEBUG_RGMII_CLK_DLY_REG	0x5
-+#define AR8051_RGMII_TX_CLK_DLY		0x100
-+
-+#endif
-+#if defined(CONFIG_USB_ETHER) && \
-+	(!defined(CONFIG_SPL_BUILD) || defined(CONFIG_SPL_USBETH_SUPPORT))
-+	if (is_valid_ethaddr(mac_addr))
-+		eth_setenv_enetaddr("usbnet_devaddr", mac_addr);
-+
-+	rv = usb_eth_initialize(bis);
-+	if (rv < 0)
-+		printf("Error %d registering USB_ETHER\n", rv);
-+	else
-+		n += rv;
-+#endif
-+	return n;
++	return 0;
 +}
 +#endif
-diff --git a/board/bytesatwork/byteengine_m2/board.h b/board/bytesatwork/byteengine_m2/board.h
+diff --git a/board/bytesatwork/byteengine_am335x/board.h b/board/bytesatwork/byteengine_am335x/board.h
 new file mode 100644
-index 0000000000..732586497d
+index 0000000000..2fe6169886
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/board.h
-@@ -0,0 +1,38 @@
++++ b/board/bytesatwork/byteengine_am335x/board.h
+@@ -0,0 +1,37 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2018 bytes at work AG
 + *
@@ -1108,8 +798,6 @@ index 0000000000..732586497d
 + * TI AM335x boards information header
 + *
 + * Copyright (C) 2011, Texas Instruments, Incorporated - http://www.ti.com/
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
 + */
 +
 +#ifndef BOARD_H
@@ -1126,7 +814,7 @@ index 0000000000..732586497d
 + * AM335x.
 + */
 +#define EMIF_OCP_CONFIG				EMIF1_BASE + 0x54
-+#define EMIF_OCP_CONFIG_BYTEENGINE_M2		0x00383838
++#define EMIF_OCP_CONFIG_BYTEENGINE_AM335X	0x00383838
 +
 +/*
 + * We have three pin mux functions that must exist.  We must be able to enable
@@ -1138,18 +826,17 @@ index 0000000000..732586497d
 +void enable_i2c0_pin_mux(void);
 +void enable_board_pin_mux(void);
 +#endif
-diff --git a/board/bytesatwork/byteengine_m2/ddr_defs_baw.h b/board/bytesatwork/byteengine_m2/ddr_defs_baw.h
+diff --git a/board/bytesatwork/byteengine_am335x/ddr_defs_baw.h b/board/bytesatwork/byteengine_am335x/ddr_defs_baw.h
 new file mode 100644
-index 0000000000..a212adebc4
+index 0000000000..817bafad5b
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/ddr_defs_baw.h
-@@ -0,0 +1,60 @@
++++ b/board/bytesatwork/byteengine_am335x/ddr_defs_baw.h
+@@ -0,0 +1,59 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * ddr definitions for chips used by bytes at work
 + *
-+ * Copyright (C) 2018, bytes at work AG
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
++ * Copyright (C) 2018 bytes at work AG
 + */
 +
 +#ifndef DDR_DEFS_BAW_H
@@ -1204,11 +891,11 @@ index 0000000000..a212adebc4
 +#define MT41K512M16HA107_IOCTRL_VALUE		0x18B
 +
 +#endif
-diff --git a/board/bytesatwork/byteengine_m2/m2config/README b/board/bytesatwork/byteengine_m2/m2config/README
+diff --git a/board/bytesatwork/byteengine_am335x/m2config/README b/board/bytesatwork/byteengine_am335x/m2config/README
 new file mode 100644
 index 0000000000..f82ef75ac3
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/m2config/README
++++ b/board/bytesatwork/byteengine_am335x/m2config/README
 @@ -0,0 +1,68 @@
 +
 +Configuration options:
@@ -1278,17 +965,15 @@ index 0000000000..f82ef75ac3
 + 16    UID
 +
 +Magic is 0x6e4a. CRC is the native u-boot crc32.
-diff --git a/board/bytesatwork/byteengine_m2/m2config/cmd_m2config.c b/board/bytesatwork/byteengine_m2/m2config/cmd_m2config.c
+diff --git a/board/bytesatwork/byteengine_am335x/m2config/cmd_m2config.c b/board/bytesatwork/byteengine_am335x/m2config/cmd_m2config.c
 new file mode 100644
-index 0000000000..080df29aee
+index 0000000000..e1bfdedc31
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/m2config/cmd_m2config.c
-@@ -0,0 +1,220 @@
++++ b/board/bytesatwork/byteengine_am335x/m2config/cmd_m2config.c
+@@ -0,0 +1,223 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
-+ * (C) Copyright 2015
-+ * bytes at work AG
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
++ * Copyright (C) 2015 bytes at work AG
 + */
 +
 +#include <common.h>
@@ -1299,9 +984,12 @@ index 0000000000..080df29aee
 +
 +static void print_config(const struct m2config *config)
 +{
-+	printf("PCB:   %u (%s)\n", config->pcb, m2config_get_pcb_name(config->pcb));
-+	printf("RAM:   %u (%s)\n", config->ram, m2config_get_ram_name(config->ram));
-+	printf("Flash: %u (%s)\n", config->flash, m2config_get_flash_name(config->flash));
++	printf("PCB:   %u (%s)\n", config->pcb,
++	       m2config_get_pcb_name(config->pcb));
++	printf("RAM:   %u (%s)\n", config->ram,
++	       m2config_get_ram_name(config->ram));
++	printf("Flash: %u (%s)\n", config->flash,
++	       m2config_get_flash_name(config->flash));
 +
 +	if (config->ext_avail == 1) {
 +		printf("\n");
@@ -1322,10 +1010,10 @@ index 0000000000..080df29aee
 +#if defined(CONFIG_M2CONFIG_BUILTIN)
 +static enum command_ret_t cmd_builtin(int argc, char * const argv[])
 +{
++	struct m2config config;
++
 +	if (argc != 0)
 +		return CMD_RET_USAGE;
-+
-+	struct m2config config;
 +
 +	if (m2config_builtin(&config) != 0) {
 +		printf("could not get built-in configuration\n");
@@ -1401,10 +1089,10 @@ index 0000000000..080df29aee
 +#if defined(CONFIG_M2CONFIG_BUILTIN)
 +static enum command_ret_t cmd_builtin2eeprom(int argc, char * const argv[])
 +{
++	struct m2config config;
++
 +	if (argc != 0)
 +		return CMD_RET_USAGE;
-+
-+	struct m2config config;
 +
 +	if (m2config_builtin(&config) != 0) {
 +		printf("could not get built-in configuration\n");
@@ -1441,12 +1129,12 @@ index 0000000000..080df29aee
 +	{ NULL, NULL }
 +};
 +
-+static const struct m2config_cmd_struct *findCmd(const char *name)
++static const struct m2config_cmd_struct *get_cmd(const char *name)
 +{
 +	const struct m2config_cmd_struct *cmd;
 +
-+	for (cmd = m2config_cmd; cmd->name != NULL; cmd++)
-+		if (strcmp (name, cmd->name) == 0)
++	for (cmd = m2config_cmd; cmd->name; cmd++)
++		if (strcmp(name, cmd->name) == 0)
 +			return cmd;
 +
 +	return NULL;
@@ -1456,7 +1144,7 @@ index 0000000000..080df29aee
 +{
 +	const struct m2config_name_pair *itr;
 +
-+	for (itr = map; itr->name != NULL; itr++)
++	for (itr = map; itr->name; itr++)
 +		printf("  %u (%s)\n", itr->config, itr->name);
 +}
 +
@@ -1472,13 +1160,14 @@ index 0000000000..080df29aee
 +	return CMD_RET_SUCCESS;
 +}
 +
-+enum command_ret_t do_m2config(cmd_tbl_t *cmdtp, int flag, int argc, char * const argv[])
++enum command_ret_t do_m2config(cmd_tbl_t *cmdtp, int flag, int argc,
++			       char * const argv[])
 +{
 +	if (argc >= 2) {
-+		const struct m2config_cmd_struct *cmd = findCmd(argv[1]);
++		const struct m2config_cmd_struct *cmd = get_cmd(argv[1]);
 +
-+		if (cmd != NULL)
-+			return cmd->func(argc-2, &argv[2]);
++		if (cmd)
++			return cmd->func(argc - 2, &argv[2]);
 +		else
 +			return CMD_RET_USAGE;
 +	}
@@ -1496,7 +1185,8 @@ index 0000000000..080df29aee
 +#if defined(CONFIG_M2CONFIG_EEPROM)
 +	"read     - read configuration from EEPROM\n"
 +	"erase    - erase configuration from EEPROM\n"
-+	"write <PCB> <RAM> <Flash>\n"
++	"write <PCB> <RAM> <Flash> <Article number> <Lot> <Lot sequence number>\n"
++	"      <Production date> <Flash date> <Flash user> <MAC address> <UID>\n"
 +	"         - write configuration to EEPROM\n"
 +#if defined(CONFIG_M2CONFIG_BUILTIN)
 +	"builtin2eeprom\n"
@@ -1504,17 +1194,15 @@ index 0000000000..080df29aee
 +#endif
 +#endif
 +);
-diff --git a/board/bytesatwork/byteengine_m2/m2config/m2config.c b/board/bytesatwork/byteengine_m2/m2config/m2config.c
+diff --git a/board/bytesatwork/byteengine_am335x/m2config/m2config.c b/board/bytesatwork/byteengine_am335x/m2config/m2config.c
 new file mode 100644
-index 0000000000..ddbb63d9f5
+index 0000000000..202e888382
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/m2config/m2config.c
-@@ -0,0 +1,47 @@
++++ b/board/bytesatwork/byteengine_am335x/m2config/m2config.c
+@@ -0,0 +1,45 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
-+ * (C) Copyright 2015
-+ * bytes at work AG
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
++ * Copyright (C) 2015 bytes at work AG
 + */
 +
 +#include "m2config.h"
@@ -1547,27 +1235,25 @@ index 0000000000..ddbb63d9f5
 +	{ -1, NULL },
 +};
 +
-+const char *m2config_get_name(uint32_t config, const struct m2config_name_pair *map)
++const char *m2config_get_name(u32 config, const struct m2config_name_pair *map)
 +{
 +	const struct m2config_name_pair *itr;
 +
-+	for (itr = map; itr->name != NULL; itr++)
++	for (itr = map; itr->name; itr++)
 +		if (itr->config == config)
 +			return itr->name;
 +
 +	return "unknown";
 +}
-diff --git a/board/bytesatwork/byteengine_m2/m2config/m2config.h b/board/bytesatwork/byteengine_m2/m2config/m2config.h
+diff --git a/board/bytesatwork/byteengine_am335x/m2config/m2config.h b/board/bytesatwork/byteengine_am335x/m2config/m2config.h
 new file mode 100644
-index 0000000000..6e84f79477
+index 0000000000..4ef104b379
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/m2config/m2config.h
-@@ -0,0 +1,81 @@
++++ b/board/bytesatwork/byteengine_am335x/m2config/m2config.h
+@@ -0,0 +1,79 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
-+ * (C) Copyright 2015
-+ * bytes at work AG
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
++ * Copyright (C) 2015 bytes at work AG
 + */
 +
 +#ifndef M2CONFIG_H
@@ -1606,9 +1292,9 @@ index 0000000000..6e84f79477
 +	m2config_ram_t		ram;
 +	m2config_flash_t	flash;
 +	bool			ext_avail;
-+	uint32_t		artno;
-+	uint32_t		lot;
-+	uint8_t			lotseq;
++	u32		artno;
++	u32		lot;
++	u8			lotseq;
 +	char			proddate[12];
 +	char			flashdate[6];
 +	char			flashuser[6];
@@ -1618,7 +1304,7 @@ index 0000000000..6e84f79477
 +};
 +
 +struct m2config_name_pair {
-+	uint32_t	config;
++	u32	config;
 +	const char	*name;
 +};
 +
@@ -1626,7 +1312,7 @@ index 0000000000..6e84f79477
 +extern const struct m2config_name_pair m2config_ram_name[];
 +extern const struct m2config_name_pair m2config_flash_name[];
 +
-+const char *m2config_get_name(uint32_t config, const struct m2config_name_pair *map);
++const char *m2config_get_name(u32 config, const struct m2config_name_pair *map);
 +
 +static inline const char *m2config_get_pcb_name(m2config_pcb_t config)
 +{
@@ -1644,17 +1330,15 @@ index 0000000000..6e84f79477
 +}
 +
 +#endif
-diff --git a/board/bytesatwork/byteengine_m2/m2config/m2config_builtin.c b/board/bytesatwork/byteengine_m2/m2config/m2config_builtin.c
+diff --git a/board/bytesatwork/byteengine_am335x/m2config/m2config_builtin.c b/board/bytesatwork/byteengine_am335x/m2config/m2config_builtin.c
 new file mode 100644
-index 0000000000..932e5eb37f
+index 0000000000..ccce010797
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/m2config/m2config_builtin.c
-@@ -0,0 +1,17 @@
++++ b/board/bytesatwork/byteengine_am335x/m2config/m2config_builtin.c
+@@ -0,0 +1,15 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
-+ * (C) Copyright 2015
-+ * bytes at work AG
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
++ * Copyright (C) 2015 bytes at work AG
 + */
 +
 +#include "m2config.h"
@@ -1667,17 +1351,15 @@ index 0000000000..932e5eb37f
 +	config->flash  = M2CONFIG_BUILTIN_FLASH;
 +	return 0;
 +}
-diff --git a/board/bytesatwork/byteengine_m2/m2config/m2config_builtin.h b/board/bytesatwork/byteengine_m2/m2config/m2config_builtin.h
+diff --git a/board/bytesatwork/byteengine_am335x/m2config/m2config_builtin.h b/board/bytesatwork/byteengine_am335x/m2config/m2config_builtin.h
 new file mode 100644
-index 0000000000..e41bf7bf88
+index 0000000000..09b59265f4
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/m2config/m2config_builtin.h
-@@ -0,0 +1,23 @@
++++ b/board/bytesatwork/byteengine_am335x/m2config/m2config_builtin.h
+@@ -0,0 +1,21 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
-+ * (C) Copyright 2015
-+ * bytes at work AG
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
++ * Copyright (C) 2015 bytes at work AG
 + */
 +
 +#ifndef M2CONFIG_BUILTIN_H
@@ -1686,7 +1368,7 @@ index 0000000000..e41bf7bf88
 +#include "m2config.h"
 +#include <config.h>
 +
-+#if defined(M2CONFIG_BUILTIN)
++#if defined(CONFIG_M2CONFIG_BUILTIN)
 +int m2config_builtin(struct m2config *config);
 +#else
 +static inline int m2config_builtin(struct m2config *config)
@@ -1696,17 +1378,15 @@ index 0000000000..e41bf7bf88
 +#endif
 +
 +#endif
-diff --git a/board/bytesatwork/byteengine_m2/m2config/m2config_eeprom.c b/board/bytesatwork/byteengine_m2/m2config/m2config_eeprom.c
+diff --git a/board/bytesatwork/byteengine_am335x/m2config/m2config_eeprom.c b/board/bytesatwork/byteengine_am335x/m2config/m2config_eeprom.c
 new file mode 100644
-index 0000000000..d283d42562
+index 0000000000..4aebac3c5a
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/m2config/m2config_eeprom.c
-@@ -0,0 +1,238 @@
++++ b/board/bytesatwork/byteengine_am335x/m2config/m2config_eeprom.c
+@@ -0,0 +1,301 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
-+ * (C) Copyright 2015
-+ * bytes at work AG
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
++ * Copyright (C) 2015 bytes at work AG
 + */
 +
 +#include "m2config_eeprom.h"
@@ -1714,70 +1394,95 @@ index 0000000000..d283d42562
 +#include "m2config.h"
 +
 +#include <common.h>
++#include <dm/uclass.h>
 +#include <i2c.h>
++#include <hexdump.h>
 +
-+#define EEPROM_ADDRESS	0x50
-+#define EEPROM_MAXWRITE	64	/* max. page size for writes */
-+#define MAGIC  0x6268
-+#define EEPROM_EXT_OFFSET 0x14
-+#define MAGIC_EXT 0x6235
-+#define EEPROM_TRACK_OFFSET 0x3d
-+#define MAGIC_TRACK 0x6e4a
++#define EEPROM_ADDRESS		0x50
++#define EEPROM_MAXWRITE		64	/* max. page size for writes */
++#define MAGIC			0x6268
++#define EEPROM_EXT_OFFSET	0x14
++#define MAGIC_EXT		0x6235
++#define EEPROM_TRACK_OFFSET	0x3d
++#define MAGIC_TRACK		0x6e4a
++
++struct udevice *m2config_dev, *busp;
 +
 +struct eeprom_header {
-+	uint16_t magic;
-+	uint16_t length;
-+} __attribute__ ((packed));
++	u16 magic;
++	u16 length;
++} __packed;
 +
 +struct eeprom_content {
-+	uint32_t	pcb;
-+	uint32_t	ram;
-+	uint32_t	flash;
-+} __attribute__ ((packed));
++	u32	pcb;
++	u32	ram;
++	u32	flash;
++} __packed;
 +
 +struct eeprom_content_ext {
-+	uint32_t	artno;
-+	uint32_t	lot;
-+	uint8_t		lotseq;
++	u32	artno;
++	u32	lot;
++	u8		lotseq;
 +	char		proddate[12];
 +	char		flashdate[6];
 +	char		flashuser[6];
-+} __attribute__ ((packed));
++} __packed;
 +
 +struct eeprom_content_track {
 +	char		macaddr[18];
 +	char		uid[16];	/* enable use of characters */
-+} __attribute__ ((packed));
++} __packed;
 +
 +struct eeprom_data {
 +	struct eeprom_header	header;
 +	struct eeprom_content	content;
-+	uint32_t		crc;
-+} __attribute__ ((packed));
++	u32			crc;
++} __packed;
 +
 +struct eeprom_data_ext {
 +	struct eeprom_header		header;
-+	uint32_t			crc;
++	u32				crc;
 +	struct eeprom_content_ext	content;
-+} __attribute__ ((packed));
++} __packed;
 +
 +struct eeprom_data_track {
 +	struct eeprom_header		header;
-+	uint32_t			crc;
++	u32				crc;
 +	struct eeprom_content_track	content;
-+} __attribute__ ((packed));
++} __packed;
 +
 +struct eeprom_write_frame {
 +	struct eeprom_data		content;
 +	struct eeprom_data_ext		content_ext;
 +	struct eeprom_data_track	content_track;
-+} __attribute__ ((packed));
++} __packed;
 +
 +struct eeprom_read_frame {
 +	struct eeprom_data		content;
 +	struct eeprom_data_ext		content_ext;
 +	struct eeprom_data_track	content_track;
-+} __attribute__ ((packed));
++} __packed;
++
++int m2config_eeprom_init(void)
++{
++#ifdef CONFIG_DM_I2C
++	int ret;
++
++	ret = uclass_get_device_by_seq(UCLASS_I2C, 0, &busp);
++	if (ret)
++		return ret;
++
++	ret = dm_i2c_probe(busp, EEPROM_ADDRESS, 0, &m2config_dev);
++	if (ret)
++		return ret;
++
++	ret = i2c_set_chip_offset_len(m2config_dev, 2);
++	if (ret)
++		return ret;
++
++#endif
++	return 0;
++}
 +
 +static int i2c_write_rdy(void)
 +{
@@ -1786,17 +1491,19 @@ index 0000000000..d283d42562
 +	 * 5 ms. Poll with empty write.
 +	 */
 +	int i, ret = -5;
-+	uint8_t dummy = 0xff;	/* i2c_write doesn't like to write NULL pointers */
++	u8 dummy = 0xff; /* i2c_write doesn't like to write NULL pointers */
 +
 +	for (i = 0; ret < 0 && i < 10; ++i) {
-+		if (i2c_write(EEPROM_ADDRESS, 0, 2, &dummy, 0) != 0) {
++#ifndef CONFIG_DM_I2C
++		ret = i2c_write(EEPROM_ADDRESS, 0, 2, &dummy, 0);
++#else
++		ret = dm_i2c_write(m2config_dev, 0, &dummy, 0);
++#endif
++		if (ret != 0)
 +			udelay(500);
-+		} else {
-+			ret = 0;
-+			break;
-+		}
 +	}
-+	if (ret)
++
++	if (ret != 0)
 +		printf("Error: eeprom busy, giving up.\n");
 +
 +	return ret;
@@ -1804,28 +1511,49 @@ index 0000000000..d283d42562
 +
 +int i2c_long_write(struct eeprom_write_frame frame, int len)
 +{
-+	int wlen, off = 0;
++	int wlen, ret, off = 0;
 +
 +	while (len > 0) {
 +		if (len >= EEPROM_MAXWRITE)
 +			wlen = EEPROM_MAXWRITE;
 +		else
 +			wlen = len;
-+		if (i2c_write_rdy() || i2c_write(EEPROM_ADDRESS, off, 2, (uint8_t *)(&frame) + off, wlen) != 0)
-+			return -30;
++
++		if (i2c_write_rdy() != 0) {
++			ret = -EIO;
++			break;
++		}
++#ifndef CONFIG_DM_I2C
++		ret = i2c_write(EEPROM_ADDRESS, off, 2, (u8 *)(&frame) + off,
++				wlen);
++#else
++		ret = dm_i2c_write(m2config_dev, off, (u8 *)(&frame) + off,
++				   wlen);
++#endif
++
++		if (ret != 0) {
++			ret = -EIO;
++			break;
++		}
++
 +		len -= wlen;
 +		off += wlen;
 +	}
 +
-+	return 0;
++	return ret;
 +}
 +
 +int m2config_eeprom_read(struct m2config *config)
 +{
 +	struct eeprom_read_frame frame;
 +
-+	if (i2c_read(EEPROM_ADDRESS, 0, 2, (uint8_t *)&frame, sizeof(frame)) != 0)
++#ifndef CONFIG_DM_I2C
++	if (i2c_read(EEPROM_ADDRESS, 0, 2, (u8 *)&frame, sizeof(frame)) != 0)
 +		return -3;
++#else
++	if (dm_i2c_read(m2config_dev, 0, (u8 *)&frame, sizeof(frame)))
++		return -12;
++#endif
 +
 +	if (frame.content.header.magic != MAGIC)
 +		return -4;
@@ -1833,8 +1561,9 @@ index 0000000000..d283d42562
 +	if (frame.content.header.length != sizeof(frame.content.content))
 +		return -5;
 +
-+	/* Cast crc32 value to uint8_t because of legacy code */
-+	if (frame.content.crc != (uint8_t)crc32(0, (uint8_t *)&frame.content.content, sizeof(frame.content.content)))
++	/* Cast crc32 value to u8 because of legacy code */
++	if (frame.content.crc != (u8)crc32(0, (u8 *)&frame.content.content,
++			sizeof(frame.content.content)))
 +		return -6;
 +
 +	config->pcb    = frame.content.content.pcb;
@@ -1852,7 +1581,8 @@ index 0000000000..d283d42562
 +		return 0;
 +	}
 +
-+	if (frame.content_ext.crc != crc32(0, (uint8_t *)&frame.content_ext.content, sizeof(frame.content_ext.content))) {
++	if (frame.content_ext.crc != crc32(0, (u8 *)&frame.content_ext.content,
++			sizeof(frame.content_ext.content))) {
 +		printf("ext crc wrong\n");
 +		return 0;
 +	}
@@ -1861,9 +1591,12 @@ index 0000000000..d283d42562
 +	config->lot = frame.content_ext.content.lot;
 +	config->lotseq = frame.content_ext.content.lotseq;
 +
-+	strlcpy(config->proddate, frame.content_ext.content.proddate, sizeof(config->proddate));
-+	strlcpy(config->flashdate, frame.content_ext.content.flashdate, sizeof(config->flashdate));
-+	strlcpy(config->flashuser, frame.content_ext.content.flashuser, sizeof(config->flashuser));
++	strlcpy(config->proddate, frame.content_ext.content.proddate,
++		sizeof(config->proddate));
++	strlcpy(config->flashdate, frame.content_ext.content.flashdate,
++		sizeof(config->flashdate));
++	strlcpy(config->flashuser, frame.content_ext.content.flashuser,
++		sizeof(config->flashuser));
 +
 +	config->ext_avail = 1;
 +
@@ -1873,18 +1606,22 @@ index 0000000000..d283d42562
 +		return 0;
 +	}
 +
-+	if (frame.content_track.header.length != sizeof(frame.content_track.content)) {
++	if (frame.content_track.header.length !=
++			sizeof(frame.content_track.content)) {
 +		printf("track len wrong\n");
 +		return 0;
 +	}
 +
-+	if (frame.content_track.crc != crc32(0, (uint8_t *)&frame.content_track.content, sizeof(frame.content_track.content))) {
++	if (frame.content_track.crc != crc32(0, (u8 *)&frame.content_track.content,
++			sizeof(frame.content_track.content))) {
 +		printf("track crc wrong\n");
 +		return 0;
 +	}
 +
-+	strlcpy(config->macaddr, frame.content_track.content.macaddr, sizeof(config->macaddr));
-+	strlcpy(config->uid, frame.content_track.content.uid, sizeof(config->uid));
++	strlcpy(config->macaddr, frame.content_track.content.macaddr,
++		sizeof(config->macaddr));
++	strlcpy(config->uid, frame.content_track.content.uid,
++		sizeof(config->uid));
 +
 +	config->track_avail = 1;
 +
@@ -1902,24 +1639,32 @@ index 0000000000..d283d42562
 +	frame.content.content.pcb = config->pcb;
 +	frame.content.content.ram = config->ram;
 +	frame.content.content.flash = config->flash;
-+	/* Cast crc32 value to uint8_t because of legacy code */
-+	frame.content.crc = (uint8_t)crc32(0, (const uint8_t *)&frame.content.content, sizeof(frame.content.content));
++	/* Cast crc32 value to u8 because of legacy code */
++	frame.content.crc = (u8)crc32(0, (const u8 *)&frame.content.content,
++			sizeof(frame.content.content));
 +
 +	frame.content_ext.header.magic = MAGIC_EXT;
 +	frame.content_ext.header.length = sizeof(frame.content_ext.content);
 +	frame.content_ext.content.artno = config->artno;
 +	frame.content_ext.content.lot = config->lot;
 +	frame.content_ext.content.lotseq = config->lotseq;
-+	strlcpy(frame.content_ext.content.proddate, config->proddate, sizeof(frame.content_ext.content.proddate));
-+	strlcpy(frame.content_ext.content.flashdate, config->flashdate, sizeof(frame.content_ext.content.flashdate));
-+	strlcpy(frame.content_ext.content.flashuser, config->flashuser, sizeof(frame.content_ext.content.flashuser));
-+	frame.content_ext.crc = crc32(0, (uint8_t *)&frame.content_ext.content, sizeof(frame.content_ext.content));
++	strlcpy(frame.content_ext.content.proddate, config->proddate,
++		sizeof(frame.content_ext.content.proddate));
++	strlcpy(frame.content_ext.content.flashdate, config->flashdate,
++		sizeof(frame.content_ext.content.flashdate));
++	strlcpy(frame.content_ext.content.flashuser, config->flashuser,
++		sizeof(frame.content_ext.content.flashuser));
++	frame.content_ext.crc = crc32(0, (u8 *)&frame.content_ext.content,
++		sizeof(frame.content_ext.content));
 +
 +	frame.content_track.header.magic = MAGIC_TRACK;
 +	frame.content_track.header.length = sizeof(frame.content_track.content);
-+	strlcpy(frame.content_track.content.macaddr, config->macaddr, sizeof(frame.content_track.content.macaddr));
-+	strlcpy(frame.content_track.content.uid, config->uid, sizeof(frame.content_track.content.uid));
-+	frame.content_track.crc = crc32(0, (uint8_t *)&frame.content_track.content, sizeof(frame.content_track.content));
++	strlcpy(frame.content_track.content.macaddr, config->macaddr,
++		sizeof(frame.content_track.content.macaddr));
++	strlcpy(frame.content_track.content.uid, config->uid,
++		sizeof(frame.content_track.content.uid));
++	frame.content_track.crc = crc32(0, (u8 *)&frame.content_track.content,
++		sizeof(frame.content_track.content));
 +
 +	if (i2c_long_write(frame, sizeof(frame)) != 0)
 +		return -7;
@@ -1940,17 +1685,15 @@ index 0000000000..d283d42562
 +}
 +
 +#endif
-diff --git a/board/bytesatwork/byteengine_m2/m2config/m2config_eeprom.h b/board/bytesatwork/byteengine_m2/m2config/m2config_eeprom.h
+diff --git a/board/bytesatwork/byteengine_am335x/m2config/m2config_eeprom.h b/board/bytesatwork/byteengine_am335x/m2config/m2config_eeprom.h
 new file mode 100644
-index 0000000000..7bcba7d3e9
+index 0000000000..8d9e832be2
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/m2config/m2config_eeprom.h
-@@ -0,0 +1,38 @@
++++ b/board/bytesatwork/byteengine_am335x/m2config/m2config_eeprom.h
+@@ -0,0 +1,37 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
-+ * (C) Copyright 2015
-+ * bytes at work AG
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
++ * Copyright (C) 2015 bytes at work AG
 + */
 +
 +#ifndef M2CONFIG_EEPROM_H
@@ -1961,6 +1704,7 @@ index 0000000000..7bcba7d3e9
 +
 +#if defined(CONFIG_M2CONFIG_EEPROM)
 +int m2config_eeprom_read(struct m2config *config);
++int m2config_eeprom_init(void);
 +#else
 +static inline int m2config_eeprom_read(struct m2config *config)
 +{
@@ -1984,17 +1728,15 @@ index 0000000000..7bcba7d3e9
 +#endif
 +
 +#endif
-diff --git a/board/bytesatwork/byteengine_m2/m2config/m2config_get.c b/board/bytesatwork/byteengine_m2/m2config/m2config_get.c
+diff --git a/board/bytesatwork/byteengine_am335x/m2config/m2config_get.c b/board/bytesatwork/byteengine_am335x/m2config/m2config_get.c
 new file mode 100644
-index 0000000000..3f405fca75
+index 0000000000..60386ecb89
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/m2config/m2config_get.c
-@@ -0,0 +1,38 @@
++++ b/board/bytesatwork/byteengine_am335x/m2config/m2config_get.c
+@@ -0,0 +1,45 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
-+ * (C) Copyright 2015
-+ * bytes at work AG
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
++ * Copyright (C) 2015 bytes at work AG
 + */
 +
 +#include <asm/arch/ddr_defs.h>
@@ -2008,37 +1750,44 @@ index 0000000000..3f405fca75
 +
 +void m2config_get(struct m2config *config)
 +{
-+	uint8_t reg = 0;
++	u8 __attribute__((unused)) reg = 0;
 +
 +	if (m2config_eeprom_read(config) == 0)
 +		return;
 +
++#ifdef CONFIG_SPL_BUILD
 +	if (i2c_read(PMIC_ADDRESS, 0x20, 1, &reg, 1) != 0) {
 +		printf("Error: PMIC read failed\n");
++		goto default_config;
++	} else {
++		if (reg == 0x05) {
++			config->ram = M2_RAM_MT47H128M16RT25E;	/* set DDR2 */
++			printf("DDR2 detected\n");
++		} else if (reg == 0x01) {
++			config->ram = M2_RAM_K4B2G1646EBIH9;	/* set legacy DDR3 */
++			printf("DDR3 detected\n");
++		} else {
++			goto default_config;
++		}
 +	}
 +
-+	if (reg == 0x05) {
-+		config->ram = M2_RAM_MT47H128M16RT25E;	/* set DDR2 */
-+		printf("DDR2 detected\n");
-+	} else if (reg == 0x01) {
-+		config->ram = M2_RAM_K4B2G1646EBIH9;	/* set legacy DDR3 */
-+		printf("DDR3 detected\n");
-+	} else {
-+		config->ram = M2_RAM_K4B2G1646EBIH9;	/* set default to legacy DDR3 */
-+		printf("Error: no RAM configuration found, trying fallback configuration %u\n", config->ram);
-+	}
++	return;
++
++default_config:
++#endif
++
++	config->ram = M2_RAM_K4B2G1646EBIH9;	/* set default to legacy DDR3 */
++	printf("Error: no RAM configuration found, trying fallback configuration %u\n", config->ram);
 +}
-diff --git a/board/bytesatwork/byteengine_m2/m2config/m2config_get.h b/board/bytesatwork/byteengine_m2/m2config/m2config_get.h
+diff --git a/board/bytesatwork/byteengine_am335x/m2config/m2config_get.h b/board/bytesatwork/byteengine_am335x/m2config/m2config_get.h
 new file mode 100644
-index 0000000000..56fcfd417e
+index 0000000000..bca128fb05
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/m2config/m2config_get.h
-@@ -0,0 +1,15 @@
++++ b/board/bytesatwork/byteengine_am335x/m2config/m2config_get.h
+@@ -0,0 +1,13 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
-+ * (C) Copyright 2015
-+ * bytes at work AG
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
++ * Copyright (C) 2015 bytes at work AG
 + */
 +
 +#ifndef M2CONFIG_GET_H
@@ -2049,27 +1798,19 @@ index 0000000000..56fcfd417e
 +void m2config_get(struct m2config *config);
 +
 +#endif
-diff --git a/board/bytesatwork/byteengine_m2/mux.c b/board/bytesatwork/byteengine_m2/mux.c
+diff --git a/board/bytesatwork/byteengine_am335x/mux.c b/board/bytesatwork/byteengine_am335x/mux.c
 new file mode 100644
-index 0000000000..587dc43ec7
+index 0000000000..a1aa777fc8
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/mux.c
-@@ -0,0 +1,140 @@
++++ b/board/bytesatwork/byteengine_am335x/mux.c
+@@ -0,0 +1,144 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2018 bytes at work AG
 + *
 + * Based on board/ti/am335x/mux.c
 + *
 + * Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation version 2.
-+ *
-+ * This program is distributed "as is" WITHOUT ANY WARRANTY of any
-+ * kind, whether express or implied; without even the implied warranty
-+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
 + */
 +
 +#include <common.h>
@@ -2093,11 +1834,10 @@ index 0000000000..587dc43ec7
 +	{OFFSET(mmc0_dat0), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_DAT0 */
 +	{OFFSET(mmc0_clk), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_CLK */
 +	{OFFSET(mmc0_cmd), (MODE(0) | RXACTIVE | PULLUP_EN)},	/* MMC0_CMD */
-+	{OFFSET(spi0_cs1), (MODE(5) | RXACTIVE | PULLUP_EN)},	/* MMC0_CD */
 +	{-1},
 +};
 +
-+#ifdef CONFIG_TARGET_BYTEENGINE_M2_REV4
++#ifdef CONFIG_SPI_FLASH
 +static struct module_pin_mux mmc1_pin_mux[] = {
 +	{OFFSET(gpmc_ad7), (MODE(1) | RXACTIVE | PULLUP_EN)},	/* MMC1_DAT7 */
 +	{OFFSET(gpmc_ad6), (MODE(1) | RXACTIVE | PULLUP_EN)},	/* MMC1_DAT6 */
@@ -2133,39 +1873,55 @@ index 0000000000..587dc43ec7
 +#endif
 +
 +static struct module_pin_mux i2c0_pin_mux[] = {
-+	{OFFSET(i2c0_sda), (MODE(0) | RXACTIVE |
-+			PULLUDEN | SLEWCTRL)}, /* I2C_DATA */
-+	{OFFSET(i2c0_scl), (MODE(0) | RXACTIVE |
-+			PULLUDEN | SLEWCTRL)}, /* I2C_SCLK */
++	{OFFSET(i2c0_sda), (MODE(0) | RXACTIVE | PULLUDEN | SLEWCTRL)},	/* I2C_DATA */
++	{OFFSET(i2c0_scl), (MODE(0) | RXACTIVE | PULLUDEN | SLEWCTRL)},	/* I2C_SCLK */
 +	{-1},
 +};
 +
 +static struct module_pin_mux mii1_pin_mux[] = {
-+	{OFFSET(mii1_rxerr), MODE(0) | RXACTIVE},	/* MII1_RXERR */
-+	{OFFSET(mii1_txen), MODE(0)},			/* MII1_TXEN */
-+	{OFFSET(mii1_rxdv), MODE(0) | RXACTIVE},	/* MII1_RXDV */
-+	{OFFSET(mii1_txd3), MODE(0)},			/* MII1_TXD3 */
-+	{OFFSET(mii1_txd2), MODE(0)},			/* MII1_TXD2 */
-+	{OFFSET(mii1_txd1), MODE(0)},			/* MII1_TXD1 */
-+	{OFFSET(mii1_txd0), MODE(0)},			/* MII1_TXD0 */
-+	{OFFSET(mii1_txclk), MODE(0) | RXACTIVE},	/* MII1_TXCLK */
-+	{OFFSET(mii1_rxclk), MODE(0) | RXACTIVE},	/* MII1_RXCLK */
-+	{OFFSET(mii1_rxd3), MODE(0) | RXACTIVE},	/* MII1_RXD3 */
-+	{OFFSET(mii1_rxd2), MODE(0) | RXACTIVE},	/* MII1_RXD2 */
-+	{OFFSET(mii1_rxd1), MODE(0) | RXACTIVE},	/* MII1_RXD1 */
-+	{OFFSET(mii1_rxd0), MODE(0) | RXACTIVE},	/* MII1_RXD0 */
-+	{OFFSET(mdio_data), MODE(0) | RXACTIVE | PULLUP_EN}, /* MDIO_DATA */
-+	{OFFSET(mdio_clk), MODE(0) | PULLUP_EN},	/* MDIO_CLK */
++	{OFFSET(mii1_txen), MODE(2)},			/* MII1_TXEN */
++	{OFFSET(mii1_rxdv), MODE(2) | RXACTIVE},	/* MII1_RXDV */
++	{OFFSET(mii1_txd3), MODE(2)},			/* MII1_TXD3 */
++	{OFFSET(mii1_txd2), MODE(2)},			/* MII1_TXD2 */
++	{OFFSET(mii1_txd1), MODE(2)},			/* MII1_TXD1 */
++	{OFFSET(mii1_txd0), MODE(2)},			/* MII1_TXD0 */
++	{OFFSET(mii1_txclk), MODE(2)},			/* MII1_TXCLK */
++	{OFFSET(mii1_rxclk), MODE(2) | RXACTIVE},	/* MII1_RXCLK */
++	{OFFSET(mii1_rxd3), MODE(2) | RXACTIVE},	/* MII1_RXD3 */
++	{OFFSET(mii1_rxd2), MODE(2) | RXACTIVE},	/* MII1_RXD2 */
++	{OFFSET(mii1_rxd1), MODE(2) | RXACTIVE},	/* MII1_RXD1 */
++	{OFFSET(mii1_rxd0), MODE(2) | RXACTIVE},	/* MII1_RXD0 */
++	{OFFSET(mdio_data), MODE(0) | RXACTIVE | PULLUP_EN},	/* MDIO_DATA */
++	{OFFSET(mdio_clk), MODE(0) | PULLUP_EN},		/* MDIO_CLK */
++	{OFFSET(uart1_rtsn), (MODE(7) | RXACTIVE | PULLUP_EN)},	/* PHY Reset */
++	{OFFSET(gpmc_ad11), (MODE(7) | RXACTIVE | PULLUP_EN)},	/* PHY INT */
 +	{-1},
 +};
 +
++#ifdef CONFIG_SPI_FLASH
 +static struct module_pin_mux spi0_pin_mux[] = {
-+	{OFFSET(spi0_sclk), (MODE(0) | RXACTIVE | PULLUDEN)},   /* SPI0_SCLK */
-+	{OFFSET(spi0_d0), (MODE(0) | RXACTIVE |
-+			PULLUDEN | PULLUP_EN)},                 /* SPI0_D0 */
-+	{OFFSET(spi0_d1), (MODE(0) | RXACTIVE | PULLUDEN)},     /* SPI0_D1 */
-+	{OFFSET(spi0_cs0), (MODE(0) | RXACTIVE |
-+			PULLUDEN | PULLUP_EN)},                 /* SPI0_CS0 */
++	{OFFSET(spi0_sclk), (MODE(0) | RXACTIVE | PULLUDEN)},			/* SPI0_SCLK */
++	{OFFSET(spi0_d0), (MODE(0) | RXACTIVE | PULLUDEN | PULLUP_EN)},		/* SPI0_D0 */
++	{OFFSET(spi0_d1), (MODE(0) | RXACTIVE | PULLUDEN)},			/* SPI0_D1 */
++	{OFFSET(spi0_cs0), (MODE(0) | RXACTIVE | PULLUDEN | PULLUP_EN)},	/* SPI0_CS0 */
++	{-1},
++};
++#endif
++
++/* GPIO Muxing for Production Test */
++static struct module_pin_mux gpio_pin_mux[] = {
++	{OFFSET(gpmc_ad14), (MODE(7) | RXACTIVE)},
++	{OFFSET(gpmc_ad12), (MODE(7) | RXACTIVE)},
++	{OFFSET(gpmc_ad13), (MODE(7) | RXACTIVE)},
++	{OFFSET(gpmc_ad10), (MODE(7) | RXACTIVE)},
++	{OFFSET(gpmc_ad9), (MODE(7) | RXACTIVE)},
++	{OFFSET(gpmc_ad8), (MODE(7) | RXACTIVE)},
++	{OFFSET(uart1_ctsn), (MODE(7) | RXACTIVE)},
++	{OFFSET(emu0), (MODE(7) | RXACTIVE)},
++	{OFFSET(emu1), (MODE(7) | RXACTIVE)},
++	{OFFSET(spi0_cs1), (MODE(7) | RXACTIVE)},
++	{OFFSET(mcasp0_aclkx), (MODE(7) | RXACTIVE)},
++	{OFFSET(uart0_ctsn), (MODE(7) | RXACTIVE)},
 +	{-1},
 +};
 +
@@ -2182,31 +1938,27 @@ index 0000000000..587dc43ec7
 +void enable_board_pin_mux(void)
 +{
 +	configure_module_pin_mux(mii1_pin_mux);
-+	configure_module_pin_mux(spi0_pin_mux);
-+
-+#ifdef CONFIG_SPL_BUILD		/* no driver model (DM) support in SPL yet */
 +	configure_module_pin_mux(mmc0_pin_mux);
-+#ifdef CONFIG_TARGET_BYTEENGINE_M2_REV4
-+	configure_module_pin_mux(mmc1_pin_mux);
-+#endif
-+#endif
++	configure_module_pin_mux(gpio_pin_mux);
 +
-+#ifdef CONFIG_TARGET_BYTEENGINE_M2
++#ifdef CONFIG_SPI_FLASH
++	configure_module_pin_mux(spi0_pin_mux);
++	configure_module_pin_mux(mmc1_pin_mux);
++#else
 +	configure_module_pin_mux(nand_pin_mux);
 +#endif
 +}
-diff --git a/board/bytesatwork/byteengine_m2/ram.c b/board/bytesatwork/byteengine_m2/ram.c
+diff --git a/board/bytesatwork/byteengine_am335x/ram.c b/board/bytesatwork/byteengine_am335x/ram.c
 new file mode 100644
-index 0000000000..cc44b69bb2
+index 0000000000..2db217d1b5
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/ram.c
-@@ -0,0 +1,354 @@
++++ b/board/bytesatwork/byteengine_am335x/ram.c
+@@ -0,0 +1,356 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
-+ * RAM initialization for byteENGINE M2
++ * RAM initialization for byteENGINE AM335x
 + *
 + * Copyright (C) 2015 bytes at work AG
-+ *
-+ * SPDX-License-Identifier:	GPL-2.0+
 + */
 +
 +#include <asm/arch/ddr_defs.h>
@@ -2217,12 +1969,13 @@ index 0000000000..cc44b69bb2
 +#include "ddr_defs_baw.h"
 +#include "m2config/m2config.h"
 +#include "m2config/m2config_get.h"
++#include "m2config/m2config_eeprom.h"
 +
 +DECLARE_GLOBAL_DATA_PTR;
 +
 +#define OSC	(V_OSCK / 1000000)
 +
-+/* 256 MB DDR2 -------------------------------------------------------------- */
++/* 256 MB DDR2 ------------------------------------------------------------- */
 +
 +static const struct ctrl_ioregs MT47H128M16RT25E_ctrl_ioregs = {
 +	.cm0ioctl		= MT47H128M16RT25E_IOCTRL_VALUE,
@@ -2258,15 +2011,15 @@ index 0000000000..cc44b69bb2
 +static void init_MT47H128M16RT25E(void)
 +{
 +	config_ddr(MT47H128M16RT25E_CLOCK_MHZ,
-+		&MT47H128M16RT25E_ctrl_ioregs,
-+		&MT47H128M16RT25E_ddr_data,
-+		&MT47H128M16RT25E_cmd_control,
-+		&MT47H128M16RT25E_emif_regs,
-+		0);
++		   &MT47H128M16RT25E_ctrl_ioregs,
++		   &MT47H128M16RT25E_ddr_data,
++		   &MT47H128M16RT25E_cmd_control,
++		   &MT47H128M16RT25E_emif_regs,
++		   0);
 +}
 +
 +static const struct dpll_params MT47H128M16RT25E_dpll = {
-+	MT47H128M16RT25E_CLOCK_MHZ, OSC-1,
++	MT47H128M16RT25E_CLOCK_MHZ, OSC - 1,
 +	1, -1, -1, -1, -1
 +};
 +
@@ -2313,11 +2066,11 @@ index 0000000000..cc44b69bb2
 +static void init_K4B2G1646EBIH9(void)
 +{
 +	config_ddr(K4B2G1646EBIH9_CLOCK_MHZ,
-+		&K4B2G1646EBIH9_ctrl_ioregs,
-+		&K4B2G1646EBIH9_ddr_data,
-+		&K4B2G1646EBIH9_cmd_control,
-+		&K4B2G1646EBIH9_emif_regs,
-+		0);
++		   &K4B2G1646EBIH9_ctrl_ioregs,
++		   &K4B2G1646EBIH9_ddr_data,
++		   &K4B2G1646EBIH9_cmd_control,
++		   &K4B2G1646EBIH9_emif_regs,
++		   0);
 +
 +	mdelay(2);
 +}
@@ -2327,7 +2080,7 @@ index 0000000000..cc44b69bb2
 +	1, -1, -1, -1, -1
 +};
 +
-+/* DDR3 256 MB K4B2G1646Q-BCK0 ----------------------------------------------- */
++/* DDR3 256 MB K4B2G1646Q-BCK0 --------------------------------------------- */
 +
 +static const struct ctrl_ioregs K4B2G1646QBCK0_ctrl_ioregs = {
 +	.cm0ioctl               = K4B2G1646QBCK0_IOCTRL_VALUE,
@@ -2370,11 +2123,11 @@ index 0000000000..cc44b69bb2
 +static void init_K4B2G1646QBCK0(void)
 +{
 +	config_ddr(K4B2G1646QBCK0_CLOCK_MHZ,
-+		&K4B2G1646QBCK0_ctrl_ioregs,
-+		&K4B2G1646QBCK0_ddr_data,
-+		&K4B2G1646QBCK0_cmd_control,
-+		&K4B2G1646QBCK0_emif_regs,
-+		0);
++		   &K4B2G1646QBCK0_ctrl_ioregs,
++		   &K4B2G1646QBCK0_ddr_data,
++		   &K4B2G1646QBCK0_cmd_control,
++		   &K4B2G1646QBCK0_emif_regs,
++		   0);
 +
 +	mdelay(2);
 +}
@@ -2384,7 +2137,7 @@ index 0000000000..cc44b69bb2
 +	1, -1, -1, -1, -1
 +};
 +
-+/* DDR3 512MB K4B4G1646D------------------------------------------------------ */
++/* DDR3 512MB K4B4G1646D --------------------------------------------------- */
 +static const struct ctrl_ioregs K4B4G1646DBIK0_ctrl_ioregs = {
 +	.cm0ioctl               = K4B4G1646DBIK0_IOCTRL_VALUE,
 +	.cm1ioctl               = K4B4G1646DBIK0_IOCTRL_VALUE,
@@ -2426,11 +2179,11 @@ index 0000000000..cc44b69bb2
 +static void init_K4B4G1646DBIK0(void)
 +{
 +	config_ddr(K4B4G1646DBIK0_CLOCK_MHZ,
-+		&K4B4G1646DBIK0_ctrl_ioregs,
-+		&K4B4G1646DBIK0_ddr_data,
-+		&K4B4G1646DBIK0_cmd_control,
-+		&K4B4G1646DBIK0_emif_regs,
-+		0);
++		   &K4B4G1646DBIK0_ctrl_ioregs,
++		   &K4B4G1646DBIK0_ddr_data,
++		   &K4B4G1646DBIK0_cmd_control,
++		   &K4B4G1646DBIK0_emif_regs,
++		   0);
 +
 +	mdelay(2);
 +}
@@ -2440,7 +2193,7 @@ index 0000000000..cc44b69bb2
 +	1, -1, -1, -1, -1
 +};
 +
-+/* DDR3 1024MB MT41K512M16HA-107 IT:A 	D9SGD --------------------------------*/
++/* DDR3 1024MB MT41K512M16HA-107 IT:A 	D9SGD -------------------------------*/
 +
 +static const struct ctrl_ioregs MT41K512M16HA107_ctrl_ioregs = {
 +	.cm0ioctl               = MT41K512M16HA107_IOCTRL_VALUE,
@@ -2483,11 +2236,11 @@ index 0000000000..cc44b69bb2
 +static void init_MT41K512M16HA107(void)
 +{
 +	config_ddr(MT41K512M16HA107_CLOCK_MHZ,
-+		&MT41K512M16HA107_ctrl_ioregs,
-+		&MT41K512M16HA107_ddr_data,
-+		&MT41K512M16HA107_cmd_control,
-+		&MT41K512M16HA107_emif_regs,
-+		0);
++		   &MT41K512M16HA107_ctrl_ioregs,
++		   &MT41K512M16HA107_ddr_data,
++		   &MT41K512M16HA107_cmd_control,
++		   &MT41K512M16HA107_emif_regs,
++		   0);
 +
 +	mdelay(2);
 +}
@@ -2497,7 +2250,7 @@ index 0000000000..cc44b69bb2
 +	1, -1, -1, -1, -1
 +};
 +
-+/* --------------------------------------------------------------------------- */
++/* ------------------------------------------------------------------------- */
 +
 +struct ram_config {
 +	m2config_ram_t	config;
@@ -2507,18 +2260,18 @@ index 0000000000..cc44b69bb2
 +
 +const struct ram_config ram_init_map[] = {
 +	{ M2_RAM_MT47H128M16RT25E, init_MT47H128M16RT25E, &MT47H128M16RT25E_dpll },
-+	{ M2_RAM_K4B2G1646EBIH9,   init_K4B2G1646EBIH9,   &K4B2G1646EBIH9_dpll },
-+	{ M2_RAM_K4B2G1646QBCK0,   init_K4B2G1646QBCK0,   &K4B2G1646QBCK0_dpll },
-+	{ M2_RAM_K4B4G1646DBIK0,   init_K4B4G1646DBIK0,   &K4B4G1646DBIK0_dpll },
-+	{ M2_RAM_MT41K512M16HA107,   init_MT41K512M16HA107,   &MT41K512M16HA107_dpll },
++	{ M2_RAM_K4B2G1646EBIH9, init_K4B2G1646EBIH9, &K4B2G1646EBIH9_dpll },
++	{ M2_RAM_K4B2G1646QBCK0, init_K4B2G1646QBCK0, &K4B2G1646QBCK0_dpll },
++	{ M2_RAM_K4B4G1646DBIK0, init_K4B4G1646DBIK0, &K4B4G1646DBIK0_dpll },
++	{ M2_RAM_MT41K512M16HA107, init_MT41K512M16HA107, &MT41K512M16HA107_dpll },
 +	{ -1, NULL }
 +};
 +
-+static const struct ram_config *findRam(m2config_ram_t config)
++static const struct ram_config *find_ram(m2config_ram_t config)
 +{
 +	const struct ram_config *itr;
 +
-+	for (itr = ram_init_map; itr->init != NULL; itr++)
++	for (itr = ram_init_map; itr->init; itr++)
 +		if (itr->config == config)
 +			return itr;
 +
@@ -2531,7 +2284,7 @@ index 0000000000..cc44b69bb2
 +	struct m2config config;
 +
 +	m2config_get(&config);
-+	ram = findRam(config.ram);
++	ram = find_ram(config.ram);
 +
 +	return ram;
 +}
@@ -2543,24 +2296,27 @@ index 0000000000..cc44b69bb2
 +	ram->init();
 +
 +	/* Set OCP_CONFIG (fix LCD pixel shift during operation) */
-+	writel(EMIF_OCP_CONFIG_BYTEENGINE_M2, EMIF_OCP_CONFIG);
++	writel(EMIF_OCP_CONFIG_BYTEENGINE_AM335X, EMIF_OCP_CONFIG);
 +}
 +
 +const struct dpll_params *get_dpll_ddr_params(void)
 +{
 +	enable_i2c0_pin_mux();
++#ifndef CONFIG_DM_I2C
 +	i2c_init(CONFIG_SYS_OMAP24_I2C_SPEED, CONFIG_SYS_OMAP24_I2C_SLAVE);
++#endif
 +
 +	const struct ram_config *ram = getRam();
 +
 +	return ram->dpll_param;
 +}
-diff --git a/board/bytesatwork/byteengine_m2/u-boot.lds b/board/bytesatwork/byteengine_m2/u-boot.lds
+diff --git a/board/bytesatwork/byteengine_am335x/u-boot.lds b/board/bytesatwork/byteengine_am335x/u-boot.lds
 new file mode 100644
-index 0000000000..cb05d50545
+index 0000000000..a1494b9308
 --- /dev/null
-+++ b/board/bytesatwork/byteengine_m2/u-boot.lds
-@@ -0,0 +1,158 @@
++++ b/board/bytesatwork/byteengine_am335x/u-boot.lds
+@@ -0,0 +1,131 @@
++// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (c) 2004-2008 Texas Instruments
 + *
@@ -2569,21 +2325,6 @@ index 0000000000..cb05d50545
 + *
 + * See file CREDITS for list of people who contributed to this
 + * project.
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation; either version 2 of
-+ * the License, or (at your option) any later version.
-+ *
-+ * This program is distributed in the hope that it will be useful,
-+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
-+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
-+ * GNU General Public License for more details.
-+ *
-+ * You should have received a copy of the GNU General Public License
-+ * along with this program; if not, write to the Free Software
-+ * Foundation, Inc., 59 Temple Place, Suite 330, Boston,
-+ * MA 02111-1307 USA
 + */
 +
 +OUTPUT_FORMAT("elf32-littlearm", "elf32-littlearm", "elf32-littlearm")
@@ -2599,7 +2340,7 @@ index 0000000000..cb05d50545
 +		*(.__image_copy_start)
 +		*(.vectors)
 +		CPUDIR/start.o (.text*)
-+		board/bytesatwork/byteengine_m2/built-in.o (.text*)
++		board/bytesatwork/byteengine_am335x/built-in.o (.text*)
 +		*(.text*)
 +	}
 +
@@ -2622,27 +2363,14 @@ index 0000000000..cb05d50545
 +
 +	. = ALIGN(4);
 +
-+	.__efi_runtime_start : {
-+		*(.__efi_runtime_start)
-+	}
-+
-+	.efi_runtime : {
-+		*(efi_runtime_text)
-+		*(efi_runtime_data)
-+	}
-+
-+	.__efi_runtime_stop : {
-+		*(.__efi_runtime_stop)
-+	}
-+
 +	.efi_runtime_rel_start :
 +	{
 +		*(.__efi_runtime_rel_start)
 +	}
 +
 +	.efi_runtime_rel : {
-+		*(.relefi_runtime_text)
-+		*(.relefi_runtime_data)
++		*(.rel*.efi_runtime)
++		*(.rel*.efi_runtime.*)
 +	}
 +
 +	.efi_runtime_rel_stop :
@@ -2719,202 +2447,282 @@ index 0000000000..cb05d50545
 +	.gnu : { *(.gnu*) }
 +	.ARM.exidx : { *(.ARM.exidx*) }
 +}
-diff --git a/configs/byteengine_m2_defconfig b/configs/byteengine_m2_defconfig
+diff --git a/configs/am335x_bytedevkit_emmc_defconfig b/configs/am335x_bytedevkit_emmc_defconfig
 new file mode 100644
-index 0000000000..634aa0a3c5
+index 0000000000..b6089c76f9
 --- /dev/null
-+++ b/configs/byteengine_m2_defconfig
-@@ -0,0 +1,62 @@
++++ b/configs/am335x_bytedevkit_emmc_defconfig
+@@ -0,0 +1,65 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_OMAP2PLUS=y
 +CONFIG_SPL_LIBCOMMON_SUPPORT=y
 +CONFIG_SPL_LIBGENERIC_SUPPORT=y
 +CONFIG_AM33XX=y
-+CONFIG_TARGET_BYTEENGINE_M2=y
++CONFIG_TARGET_BYTEENGINE_AM335X=y
 +CONFIG_SPL_MMC_SUPPORT=y
 +CONFIG_SPL_SERIAL_SUPPORT=y
-+CONFIG_SPL_LIBDISK_SUPPORT=y
-+CONFIG_SPL_WATCHDOG_SUPPORT=y
-+CONFIG_SPL_FAT_SUPPORT=y
-+CONFIG_DEFAULT_DEVICE_TREE="byteengine-m2"
-+CONFIG_SPL_SYS_MALLOC_F_LEN=0x1000
-+CONFIG_SPL_LOAD_FIT=y
-+CONFIG_LOGLEVEL=3
-+CONFIG_SYS_CONSOLE_INFO_QUIET=y
-+CONFIG_VERSION_VARIABLE=y
 +CONFIG_SPL=y
-+# CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR is not set
-+CONFIG_SPL_EXT_SUPPORT=y
-+CONFIG_SPL_I2C_SUPPORT=y
-+CONFIG_SPL_MTD_SUPPORT=y
-+CONFIG_HUSH_PARSER=y
-+CONFIG_SYS_PROMPT="U-Boot> "
-+CONFIG_CMD_SPL=y
-+CONFIG_CMD_SPL_NAND_OFS=0x00080000
-+CONFIG_CMD_MEMINFO=y
-+# CONFIG_CMD_FLASH is not set
-+# CONFIG_CMD_FPGA is not set
-+CONFIG_CMD_MMC=y
-+CONFIG_CMD_NAND=y
-+CONFIG_CMD_PART=y
-+# CONFIG_CMD_SETEXPR is not set
-+CONFIG_CMD_DHCP=y
-+CONFIG_CMD_PXE=y
-+CONFIG_CMD_MII=y
-+CONFIG_CMD_PING=y
-+CONFIG_CMD_EXT2=y
-+CONFIG_CMD_FAT=y
-+CONFIG_CMD_FS_GENERIC=y
-+CONFIG_CMD_MTDPARTS=y
-+CONFIG_MTDIDS_DEFAULT="nand0=nand.0"
-+CONFIG_MTDPARTS_DEFAULT="mtdparts=nand.0:128k(NAND.SPL),128k(NAND.SPL.backup1),128k(NAND.SPL.backup2),128k(NAND.SPL.backup3),256k(NAND.u-boot-spl-os),1m(NAND.u-boot),128k(NAND.u-boot-env),128k(NAND.u-boot-env.backup1),8m(NAND.kernel),-(NAND.file-system)"
-+CONFIG_OF_CONTROL=y
-+CONFIG_ENV_IS_IN_NAND=y
-+# CONFIG_BLK is not set
-+CONFIG_DM_I2C=y
-+CONFIG_MISC=y
-+CONFIG_DM_MMC=y
-+# CONFIG_MMC_HW_PARTITIONING is not set
-+CONFIG_MMC_OMAP_HS=y
-+CONFIG_NAND=y
-+CONFIG_SPI_FLASH=y
-+CONFIG_SPI_FLASH_WINBOND=y
-+CONFIG_PHYLIB=y
-+CONFIG_SYS_NS16550=y
-+CONFIG_OMAP3_SPI=y
-+CONFIG_TIMER=y
-+CONFIG_OMAP_TIMER=y
-+CONFIG_DYNAMIC_CRC_TABLE=y
-+CONFIG_SPL_TINY_MEMSET=y
-+# CONFIG_EFI_LOADER is not set
-diff --git a/configs/byteengine_m2_rev4_defconfig b/configs/byteengine_m2_rev4_defconfig
-new file mode 100644
-index 0000000000..30faedebf6
---- /dev/null
-+++ b/configs/byteengine_m2_rev4_defconfig
-@@ -0,0 +1,63 @@
-+CONFIG_ARM=y
-+CONFIG_ARCH_OMAP2PLUS=y
-+CONFIG_SPL_LIBCOMMON_SUPPORT=y
-+CONFIG_SPL_LIBGENERIC_SUPPORT=y
-+CONFIG_AM33XX=y
-+CONFIG_TARGET_BYTEENGINE_M2_REV4=y
-+CONFIG_SPL_MMC_SUPPORT=y
-+CONFIG_SPL_SERIAL_SUPPORT=y
++CONFIG_SPL_FAT_SUPPORT=y
 +CONFIG_SPL_LIBDISK_SUPPORT=y
-+# CONFIG_SPL_NAND_SUPPORT is not set
 +CONFIG_SPL_SPI_FLASH_SUPPORT=y
 +CONFIG_SPL_SPI_SUPPORT=y
-+CONFIG_SPL_WATCHDOG_SUPPORT=y
-+CONFIG_SPL_FAT_SUPPORT=y
-+CONFIG_DEFAULT_DEVICE_TREE="byteengine-m2-rev4"
-+CONFIG_SPL_SYS_MALLOC_F_LEN=0x1000
-+CONFIG_SPL_LOAD_FIT=y
 +CONFIG_SPI_BOOT=y
-+CONFIG_LOGLEVEL=3
 +CONFIG_SYS_CONSOLE_INFO_QUIET=y
-+CONFIG_VERSION_VARIABLE=y
-+CONFIG_SPL=y
-+# CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR is not set
-+CONFIG_SPL_EXT_SUPPORT=y
 +CONFIG_SPL_I2C_SUPPORT=y
-+CONFIG_SPL_MTD_SUPPORT=y
++# CONFIG_SPL_NAND_SUPPORT is not set
++CONFIG_SPL_POWER_SUPPORT=y
++CONFIG_SPL_WATCHDOG_SUPPORT=y
 +CONFIG_HUSH_PARSER=y
-+CONFIG_SYS_PROMPT="U-Boot> "
-+CONFIG_CMD_SPL=y
++CONFIG_CMD_CPUINFO=y
 +CONFIG_CMD_MEMINFO=y
 +# CONFIG_CMD_FLASH is not set
-+# CONFIG_CMD_FPGA is not set
++CONFIG_CMD_GPIO=y
++CONFIG_CMD_I2C=y
 +CONFIG_CMD_MMC=y
-+CONFIG_CMD_PART=y
 +CONFIG_CMD_SF=y
 +# CONFIG_CMD_SETEXPR is not set
 +CONFIG_CMD_DHCP=y
-+CONFIG_CMD_PXE=y
 +CONFIG_CMD_MII=y
 +CONFIG_CMD_PING=y
-+CONFIG_CMD_EXT2=y
++CONFIG_CMD_PXE=y
++CONFIG_CMD_EXT4=y
 +CONFIG_CMD_FAT=y
 +CONFIG_CMD_FS_GENERIC=y
 +CONFIG_CMD_MTDPARTS=y
 +CONFIG_OF_CONTROL=y
-+# CONFIG_BLK is not set
++CONFIG_DEFAULT_DEVICE_TREE="am335x-bytedevkit-emmc"
++CONFIG_ENV_IS_IN_SPI_FLASH=y
 +CONFIG_DM_I2C=y
 +CONFIG_MISC=y
 +CONFIG_DM_MMC=y
-+# CONFIG_MMC_HW_PARTITIONING is not set
 +CONFIG_MMC_OMAP_HS=y
 +CONFIG_SPI_FLASH=y
++CONFIG_SPI_FLASH_SFDP_SUPPORT=y
++CONFIG_SPI_FLASH_ATMEL=y
++CONFIG_SPI_FLASH_EON=y
++CONFIG_SPI_FLASH_GIGADEVICE=y
++CONFIG_SPI_FLASH_ISSI=y
++CONFIG_SPI_FLASH_MACRONIX=y
 +CONFIG_SPI_FLASH_SPANSION=y
 +CONFIG_SPI_FLASH_STMICRO=y
++CONFIG_SPI_FLASH_SST=y
 +CONFIG_SPI_FLASH_WINBOND=y
-+CONFIG_PHYLIB=y
-+CONFIG_SYS_NS16550=y
++CONFIG_SPI_FLASH_XMC=y
++CONFIG_PHY_TI=y
++CONFIG_DM_ETH=y
++CONFIG_MII=y
++CONFIG_DRIVER_TI_CPSW=y
++CONFIG_SPI=y
++CONFIG_DM_SPI=y
 +CONFIG_OMAP3_SPI=y
 +CONFIG_TIMER=y
 +CONFIG_OMAP_TIMER=y
-+CONFIG_DYNAMIC_CRC_TABLE=y
-+CONFIG_SPL_TINY_MEMSET=y
 +# CONFIG_EFI_LOADER is not set
-diff --git a/include/configs/byteengine_m2.h b/include/configs/byteengine_m2.h
+diff --git a/configs/am335x_bytedevkit_nand_defconfig b/configs/am335x_bytedevkit_nand_defconfig
 new file mode 100644
-index 0000000000..6b9f2bc935
+index 0000000000..15c5bd1fe3
 --- /dev/null
-+++ b/include/configs/byteengine_m2.h
-@@ -0,0 +1,214 @@
++++ b/configs/am335x_bytedevkit_nand_defconfig
+@@ -0,0 +1,52 @@
++CONFIG_ARM=y
++CONFIG_ARCH_OMAP2PLUS=y
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_AM33XX=y
++CONFIG_TARGET_BYTEENGINE_AM335X=y
++CONFIG_SPL_MMC_SUPPORT=y
++CONFIG_SPL_SERIAL_SUPPORT=y
++CONFIG_SPL=y
++CONFIG_SPL_FAT_SUPPORT=y
++CONFIG_SPL_LIBDISK_SUPPORT=y
++CONFIG_SYS_CONSOLE_INFO_QUIET=y
++CONFIG_SPL_I2C_SUPPORT=y
++CONFIG_SPL_POWER_SUPPORT=y
++CONFIG_SPL_WATCHDOG_SUPPORT=y
++CONFIG_HUSH_PARSER=y
++CONFIG_CMD_CPUINFO=y
++CONFIG_CMD_MEMINFO=y
++# CONFIG_CMD_FLASH is not set
++CONFIG_CMD_GPIO=y
++CONFIG_CMD_I2C=y
++CONFIG_CMD_MMC=y
++CONFIG_CMD_NAND=y
++# CONFIG_CMD_SETEXPR is not set
++CONFIG_CMD_DHCP=y
++CONFIG_CMD_MII=y
++CONFIG_CMD_PING=y
++CONFIG_CMD_PXE=y
++CONFIG_CMD_EXT4=y
++CONFIG_CMD_FAT=y
++CONFIG_CMD_FS_GENERIC=y
++CONFIG_CMD_MTDPARTS=y
++CONFIG_MTDIDS_DEFAULT="nand0=8000000.nand"
++CONFIG_MTDPARTS_DEFAULT="mtdparts=8000000.nand:128k(NAND.SPL),128k(NAND.SPL.backup1),128k(NAND.SPL.backup2),128k(NAND.SPL.backup3),256k(NAND.u-boot-spl-os),1m(NAND.u-boot),128k(NAND.u-boot-env),128k(NAND.u-boot-env.backup1),8m(NAND.kernel),-(NAND.file-system)"
++CONFIG_OF_CONTROL=y
++CONFIG_DEFAULT_DEVICE_TREE="am335x-bytedevkit-nand"
++CONFIG_ENV_IS_IN_NAND=y
++CONFIG_DM_I2C=y
++CONFIG_MISC=y
++CONFIG_DM_MMC=y
++CONFIG_MMC_OMAP_HS=y
++CONFIG_NAND=y
++CONFIG_PHY_TI=y
++CONFIG_DM_ETH=y
++CONFIG_MII=y
++CONFIG_DRIVER_TI_CPSW=y
++CONFIG_SPI=y
++CONFIG_DM_SPI=y
++CONFIG_OMAP3_SPI=y
++CONFIG_TIMER=y
++CONFIG_OMAP_TIMER=y
++# CONFIG_EFI_LOADER is not set
+diff --git a/include/configs/byteengine_am335x.h b/include/configs/byteengine_am335x.h
+new file mode 100644
+index 0000000000..d75406c67b
+--- /dev/null
++++ b/include/configs/byteengine_am335x.h
+@@ -0,0 +1,270 @@
++// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2015 bytes at work AG
 + *
 + * Based on am335x_evm.h
 + *
 + * Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation version 2.
-+ *
-+ * This program is distributed "as is" WITHOUT ANY WARRANTY of any
-+ * kind, whether express or implied; without even the implied warranty
-+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
 + */
 +
-+#ifndef BYTEENGINE_M2_H
-+#define BYTEENGINE_M2_H
++#ifndef BYTEENGINE_AM335X_H
++#define BYTEENGINE_AM335X_H
 +
 +#include <configs/ti_am335x_common.h>
++#include <linux/sizes.h>
 +
 +#ifndef CONFIG_SPL_BUILD
 +# define CONFIG_TIMESTAMP
 +#endif
 +
-+#define CONFIG_SYS_BOOTM_LEN		(16 << 20)
-+
-+#define MACH_TYPE_AM335XM2		3701
-+#define CONFIG_MACH_TYPE		MACH_TYPE_AM335XM2
++#define CONFIG_SYS_BOOTM_LEN		SZ_16M
 +
 +/* Clock Defines */
-+#define V_OSCK				24000000  /* Clock output from T2 */
++#define V_OSCK				24000000 /* Clock output from T2 */
 +#define V_SCLK				(V_OSCK)
 +
-+/* Custom script for NOR */
-+#define CONFIG_SYS_LDSCRIPT		"board/bytesatwork/byteengine_m2/u-boot.lds"
++#define M2CONFIG_BUILTIN_PCB	M2_PCB_REV_02
++#define M2CONFIG_BUILTIN_RAM	M2_RAM_K4B2G1646EBIH9
++#define M2CONFIG_BUILTIN_FLASH	M2_NAND_2GBIT
 +
-+/* Always 128 KiB env size */
-+#define CONFIG_ENV_SIZE			(128 << 10)
++/* NS16550 Configuration */
++#define CONFIG_SYS_NS16550_COM1		0x44e09000	/* UART0 */
++#define CONFIG_SYS_NS16550_COM2		0x48022000	/* UART1 */
++#define CONFIG_SYS_NS16550_COM3		0x48024000	/* UART2 */
++#define CONFIG_SYS_NS16550_COM4		0x481a6000	/* UART3 */
++#define CONFIG_SYS_NS16550_COM5		0x481a8000	/* UART4 */
++#define CONFIG_SYS_NS16550_COM6		0x481aa000	/* UART5 */
 +
-+#define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
++/* PMIC support */
++#define CONFIG_POWER_TPS65910
++
++/* Network */
++#define CONFIG_PHY_ADDR			1
++
++/*
++ * Disable MMC DM for SPL build, it can be re-enabled after adding
++ * DM support in SPL
++ */
++#ifdef CONFIG_SPL_BUILD
++#undef CONFIG_DM_MMC
++#undef CONFIG_TIMER
++#undef CONFIG_DM_USB
++#endif
++
++#ifdef CONFIG_NAND
++#define BOOT_ENV_SETTINGS	NAND_BOOT_ENV_SETTINGS
++#define CONFIG_BOOTCOMMAND \
++	"if mmc rescan; then " \
++		"echo SD/MMC found on device ${mmc_dev}; " \
++		"run nand_update; " \
++		"run mmc_boot; " \
++	"else " \
++		"run nand_boot; " \
++	"fi; "
++#else
++#define BOOT_ENV_SETTINGS	MMC_BOOT_ENV_SETTINGS
++#define CONFIG_BOOTCOMMAND \
++	"if mmc rescan; then " \
++		"echo SD/MMC found on device ${mmc_dev}; " \
++		"run mmc_boot; " \
++	"else " \
++		"run emmc_boot; " \
++	"fi; "
++#endif
 +
 +#ifndef CONFIG_SPL_BUILD
-+
 +#define CONFIG_EXTRA_ENV_SETTINGS \
++	BOOT_ENV_SETTINGS \
 +	"mlofile=MLO\0" \
 +	"ubootfile=u-boot.img\0" \
 +	"kernelfile=uImage\0" \
 +	"dtbfile=devtree.dtb\0" \
++	"fdt_high=0xffffffff\0" \
 +	"loadaddr=0x82000000\0" \
 +	"dtbaddr=0x83000000\0" \
 +	"console=ttyO0,115200n8\0" \
++	"mmc_root=/dev/mmcblk0p2\0" \
++	"mmc_args=setenv bootargs " \
++		"console=${console} " \
++		"vt.global_cursor_default=0 " \
++		"${mtd_parts} " \
++		"root=${mmc_root} " \
++		"rootwait " \
++		"consoleblank=0 " \
++		"; " \
++	"\0" \
++	"mmc_boot=echo Booting from mmc ...; " \
++		"run mmc_args; " \
++		"load mmc 0 ${loadaddr} ${kernelfile} || exit; " \
++		"load mmc 0 ${dtbaddr} ${dtbfile} || exit; " \
++		"bootm ${loadaddr} - ${dtbaddr}; " \
++	"\0"
++
++#endif
++
++#ifdef CONFIG_NAND
++
++/* NAND: device related configs */
++#define CONFIG_SYS_NAND_5_ADDR_CYCLE
++#define CONFIG_SYS_NAND_PAGE_COUNT	(CONFIG_SYS_NAND_BLOCK_SIZE / \
++					 CONFIG_SYS_NAND_PAGE_SIZE)
++#define CONFIG_SYS_NAND_PAGE_SIZE	2048
++#define CONFIG_SYS_NAND_OOBSIZE		64
++#define CONFIG_SYS_NAND_BLOCK_SIZE	SZ_128K
++/* NAND: driver related configs */
++#define CONFIG_SYS_NAND_BAD_BLOCK_POS	NAND_LARGE_BADBLOCK_POS
++#define CONFIG_SYS_NAND_ECCPOS		{1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12}
++
++#define CONFIG_SYS_NAND_ECCSIZE		512
++#define CONFIG_SYS_NAND_ECCBYTES	3
++#define CONFIG_SYS_NAND_ONFI_DETECTION
++#define CONFIG_NAND_OMAP_ECCSCHEME	OMAP_ECC_HAM1_CODE_HW
++#define CONFIG_SYS_NAND_U_BOOT_OFFS	0x00080000
++/* NAND: SPL related configs */
++
++#define MTDPARTS_DEFAULT		"mtdparts=omap2-nand.0:128k(SPL)," \
++					"128k(SPL.backup1)," \
++					"128k(SPL.backup2)," \
++					"128k(SPL.backup3),1920k(u-boot)," \
++					"128k(u-boot-env),512k(devtree),5m(kernel),-(rootfs)"
++
++#ifdef CONFIG_ENV_IS_IN_NAND
++#define CONFIG_ENV_OFFSET		0x260000
++#define CONFIG_ENV_SIZE			SZ_128K
++#define CONFIG_SYS_ENV_SECT_SIZE	CONFIG_SYS_NAND_BLOCK_SIZE
++#else
++#define CONFIG_SYS_MMC_ENV_DEV		0
++#define CONFIG_ENV_OFFSET		SZ_128K
++#define CONFIG_ENV_SIZE			SZ_8K
++#endif
++
++#define NAND_BOOT_ENV_SETTINGS \
 +	"mtd_parts=" MTDPARTS_DEFAULT "\0" \
 +	"nand_root=/dev/mtdblock8\0" \
 +	"nand_root_fs_type=jffs2\0" \
@@ -2930,8 +2738,6 @@ index 0000000000..6b9f2bc935
 +	"nand_kernel_size=0x00500000\0" \
 +	"nand_rootfs_addr=0x00800000\0" \
 +	"nand_rootfs_size=0x0f800000\0" \
-+	"nand_part_addr=  0x00800000\0" \
-+	"mmc_root=/dev/mmcblk0p2\0" \
 +	"updatepath=/batw-sw\0" \
 +	"nand_args=setenv bootargs " \
 +		"console=${console} " \
@@ -2945,33 +2751,33 @@ index 0000000000..6b9f2bc935
 +	"\0" \
 +	"nand_boot=echo Booting from nand ...; " \
 +		"run nand_args; " \
-+		"nand read ${loadaddr} ${nand_kernel_addr} ${nand_kernel_size}; " \
-+		"nand read ${dtbaddr} ${nand_dtb_addr} ${nand_dtb_size}; " \
++		"nand read ${loadaddr} ${nand_kernel_addr} ${nand_kernel_size} || exit;" \
++		"nand read ${dtbaddr} ${nand_dtb_addr} ${nand_dtb_size} || exit; " \
 +		"bootm ${loadaddr} - ${dtbaddr}; " \
 +	"\0" \
 +	"nand_update=echo Updating nand from mmc...; " \
-+		"if fatsize mmc 0 ${updatepath}; then " \
-+			"if fatload mmc 0 ${loadaddr} ${updatepath}/MLO; then " \
++		"if size mmc 0 ${updatepath}; then " \
++			"if load mmc 0 ${loadaddr} ${updatepath}/MLO; then " \
 +				"echo Found new SPL, flash it.; "\
 +				"nand erase ${nand_spl_addr} ${nand_spl_size}; " \
 +				"nand write ${loadaddr} ${nand_spl_addr} ${filesize}; " \
 +			"fi; " \
-+			"if fatload mmc 0 ${loadaddr} ${updatepath}/u-boot.img; then " \
++			"if load mmc 0 ${loadaddr} ${updatepath}/u-boot.img; then " \
 +				"echo Found new U-Boot, flash it.; "\
 +				"nand erase ${nand_u-boot_addr} ${nand_u-boot_size}; " \
 +				"nand write ${loadaddr} ${nand_u-boot_addr} ${filesize}; " \
 +			"fi; " \
-+			"if fatload mmc 0 ${loadaddr} ${updatepath}/devtree.dtb; then " \
++			"if load mmc 0 ${loadaddr} ${updatepath}/devtree.dtb; then " \
 +				"echo Found new device tree, flash it.; "\
 +				"nand erase ${nand_dtb_addr} ${nand_dtb_size}; " \
 +				"nand write ${loadaddr} ${nand_dtb_addr} ${filesize}; " \
 +			"fi; " \
-+			"if fatload mmc 0 ${loadaddr} ${updatepath}/uImage; then " \
++			"if load mmc 0 ${loadaddr} ${updatepath}/uImage; then " \
 +				"echo Found new uImage, flash it.; "\
 +				"nand erase ${nand_kernel_addr} ${nand_kernel_size}; " \
 +				"nand write ${loadaddr} ${nand_kernel_addr} ${filesize}; " \
 +			"fi; " \
-+			"if fatload mmc 0 ${loadaddr} ${updatepath}/rootfs.jffs2; then " \
++			"if load mmc 0 ${loadaddr} ${updatepath}/rootfs.jffs2; then " \
 +				"echo Found new rootfs, flash it.; "\
 +				"nand erase ${nand_rootfs_addr} ${nand_rootfs_size}; " \
 +				"nand write ${loadaddr} ${nand_rootfs_addr} ${filesize}; " \
@@ -2980,192 +2786,45 @@ index 0000000000..6b9f2bc935
 +		"else " \
 +			"echo Update path ${updatepath} not found.; " \
 +		"fi; " \
-+	"\0" \
-+	"mmc_args=setenv bootargs " \
-+		"console=${console} " \
-+		"vt.global_cursor_default=0 " \
-+		"${mtd_parts} " \
-+		"root=${mmc_root} " \
-+		"rootwait " \
-+		"consoleblank=0 " \
-+		"; " \
-+	"\0" \
-+	"mmc_boot=echo Booting from mmc ...; " \
-+		"if fatsize mmc 0 ${kernelfile}; then " \
-+			"echo Found kernel on MMC; " \
-+			"if fatsize mmc 0 ${dtbfile}; then " \
-+				"echo Found device tree on MMC; " \
-+				"run mmc_args; " \
-+				"fatload mmc 0 ${loadaddr} ${kernelfile}; " \
-+				"fatload mmc 0 ${dtbaddr} ${dtbfile}; " \
-+				"bootm ${loadaddr} - ${dtbaddr}; " \
-+			"else " \
-+				"echo Device tree not found on MMC; " \
-+			"fi; " \
-+		"else " \
-+			"echo Kernel not found on MMC; " \
-+		"fi; " \
-+		"run nand_boot; " \
 +	"\0"
-+#endif
-+
-+#define CONFIG_BOOTCOMMAND \
-+	"if mmc rescan; then " \
-+		"echo SD/MMC found on device ${mmc_dev}; " \
-+		"run nand_update; " \
-+		"run mmc_boot; " \
-+	"else " \
-+		"run nand_boot; " \
-+	"fi; "
-+
-+#define M2CONFIG_BUILTIN_PCB	M2_PCB_REV_02
-+#define M2CONFIG_BUILTIN_RAM	M2_RAM_K4B2G1646EBIH9
-+#define M2CONFIG_BUILTIN_FLASH	M2_NAND_2GBIT
-+
-+/* NS16550 Configuration */
-+#define CONFIG_SYS_NS16550_COM1		0x44e09000
-+
-+/* PMIC support */
-+#define CONFIG_POWER_TPS65910
-+
-+/* SPL */
-+#define CONFIG_SPL_POWER_SUPPORT
-+
-+/* NAND: device related configs */
-+#define CONFIG_SYS_NAND_5_ADDR_CYCLE
-+#define CONFIG_SYS_NAND_PAGE_COUNT	(CONFIG_SYS_NAND_BLOCK_SIZE / \
-+					 CONFIG_SYS_NAND_PAGE_SIZE)
-+#define CONFIG_SYS_NAND_PAGE_SIZE	2048
-+#define CONFIG_SYS_NAND_OOBSIZE		64
-+#define CONFIG_SYS_NAND_BLOCK_SIZE	(128 * 1024)
-+/* NAND: driver related configs */
-+#define CONFIG_SYS_NAND_BAD_BLOCK_POS	NAND_LARGE_BADBLOCK_POS
-+#define CONFIG_SYS_NAND_ECCPOS		{1, 2, 3, 4, 5, 6, 7, 8, 9,\
-+						10, 11, 12}
-+
-+#define CONFIG_SYS_NAND_ECCSIZE		512
-+#define CONFIG_SYS_NAND_ECCBYTES	3
-+#define CONFIG_NAND_OMAP_ECCSCHEME	OMAP_ECC_HAM1_CODE_HW
-+#define CONFIG_SYS_NAND_U_BOOT_OFFS	0x00080000
-+
-+#define CONFIG_ENV_OFFSET		0x260000
-+#define CONFIG_SYS_ENV_SECT_SIZE	CONFIG_SYS_NAND_BLOCK_SIZE
-+
-+#undef CONFIG_SPL_OS_BOOT
-+
-+/* NAND support */
-+#define MTDPARTS_DEFAULT		"mtdparts=omap2-nand.0:128k(SPL)," \
-+					"128k(SPL.backup1)," \
-+					"128k(SPL.backup2)," \
-+					"128k(SPL.backup3),1920k(u-boot)," \
-+					"128k(u-boot-env),512k(devtree),5m(kernel),-(rootfs)"
-+#define CONFIG_SYS_MAX_NAND_DEVICE	1		/* Max number of NAND
-+							   devices */
-+
-+/* Network. */
-+#define CONFIG_PHY_ADDR			1
-+
-+/*
-+ * Disable MMC DM for SPL build and can be re-enabled after adding
-+ * DM support in SPL
-+ */
-+#ifdef CONFIG_SPL_BUILD
-+#undef CONFIG_DM_MMC
-+#undef CONFIG_TIMER
-+#undef CONFIG_DM_USB
-+#endif
 +
 +#endif
-diff --git a/include/configs/byteengine_m2_rev4.h b/include/configs/byteengine_m2_rev4.h
-new file mode 100644
-index 0000000000..9e9fb84749
---- /dev/null
-+++ b/include/configs/byteengine_m2_rev4.h
-@@ -0,0 +1,173 @@
-+/*
-+ * Copyright (C) 2015 bytes at work AG
-+ *
-+ * Based on am335x_evm.h
-+ *
-+ * Copyright (C) 2011 Texas Instruments Incorporated - http://www.ti.com/
-+ *
-+ * This program is free software; you can redistribute it and/or
-+ * modify it under the terms of the GNU General Public License as
-+ * published by the Free Software Foundation version 2.
-+ *
-+ * This program is distributed "as is" WITHOUT ANY WARRANTY of any
-+ * kind, whether express or implied; without even the implied warranty
-+ * of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-+ * GNU General Public License for more details.
-+ */
 +
-+#ifndef BYTEENGINE_M2_REV4_H
-+#define BYTEENGINE_M2_REV4_H
-+
-+#include <configs/ti_am335x_common.h>
++#ifdef CONFIG_SPI_FLASH
 +
 +#ifndef CONFIG_SPL_BUILD
-+# define CONFIG_TIMESTAMP
++# define CONFIG_DM_SPI_FLASH
 +#endif
 +
-+#define CONFIG_SYS_BOOTM_LEN		(16 << 20)
++/* SPI Nor Flash */
++#define CONFIG_SF_DEFAULT_SPEED		24000000
++/*
++ * Default to using SPI for environment for M25PE40.
++ * 0x000000 - 0x010000 : SPL (64KiB)
++ * 0x010000 - 0x060000 : U-Boot (320kiB)
++ * 0x060000 - 0x080000 : U-Boot Environment (128KiB)
++ */
++#ifdef CONFIG_SPI_BOOT
++/* SPL related */
++#define CONFIG_SPL_SPI_LOAD
++#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x10000
 +
-+#define MACH_TYPE_AM335XM2		3701
-+#define CONFIG_MACH_TYPE		MACH_TYPE_AM335XM2
++/* M25PE40: 64 KiB env size */
++#define CONFIG_ENV_SIZE			SZ_64K
++#define CONFIG_ENV_SPI_MAX_HZ		CONFIG_SF_DEFAULT_SPEED
++#define CONFIG_ENV_SECT_SIZE		SZ_64K
++#define CONFIG_ENV_OFFSET		(2112 * 1024)
++#define MTDIDS_DEFAULT			"nor0=m25pe40-flash.0"
++#define MTDPARTS_DEFAULT		"mtdparts=m25pe40-flash.0:64k(SPL)," \
++					"2048k(u-boot),64k(u-boot-env1)"
++#endif
 +
-+/* Clock Defines */
-+#define V_OSCK				24000000  /* Clock output from T2 */
-+#define V_SCLK				(V_OSCK)
-+
-+/* Custom script for NOR */
-+#define CONFIG_SYS_LDSCRIPT		"board/bytesatwork/byteengine_m2/u-boot.lds"
-+
-+/* need it early */
-+#define CONFIG_ENV_SIZE			(64 << 10)
-+
-+#define CONFIG_ENV_VARS_UBOOT_RUNTIME_CONFIG
-+
-+#ifndef CONFIG_SPL_BUILD
-+
-+#define CONFIG_EXTRA_ENV_SETTINGS \
-+	"mlofile=MLO\0" \
++#define MMC_BOOT_ENV_SETTINGS \
 +	"mlofilespi=MLO.byteswap\0" \
-+	"ubootfile=u-boot.img\0" \
-+	"kernelfile=uImage\0" \
-+	"dtbfile=devtree.dtb\0" \
 +	"ubootoffset=0x10000\0" \
-+	"spiflashsize=0x80000\0" \
-+	"loadaddr=0x82000000\0" \
-+	"dtbaddr=0x83000000\0" \
-+	"fdt_high=0xffffffff\0" \
-+	"console=ttyO0,115200n8\0" \
-+	"mmc_root=/dev/mmcblk0p2\0" \
++	"spiflashsize=0x1000000\0" \
++	"bootsize=0x210000\0" \
 +	"emmc_root=/dev/mmcblk1p2\0" \
-+	"updatepath=/batw-sw\0" \
-+	"mmc_args=setenv bootargs " \
-+		"console=${console} " \
-+		"vt.global_cursor_default=0 " \
-+		"root=${mmc_root} " \
-+		"rootwait " \
-+		"consoleblank=0 " \
-+		"; " \
-+	"\0" \
-+	"mmc_boot=echo Booting from mmc ...; " \
-+		"if fatsize mmc 0 ${kernelfile}; then " \
-+			"echo Found kernel on MMC; " \
-+			"if fatsize mmc 0 ${dtbfile}; then " \
-+				"echo Found device tree on MMC; " \
-+				"run mmc_args; " \
-+				"fatload mmc 0 ${loadaddr} ${kernelfile}; " \
-+				"fatload mmc 0 ${dtbaddr} ${dtbfile}; " \
-+				"bootm ${loadaddr} - ${dtbaddr}; " \
-+			"else " \
-+				"echo Device tree not found on MMC; " \
-+			"fi; " \
-+		"else " \
-+			"echo Kernel not found on MMC; " \
-+		"fi; " \
-+	"\0" \
 +	"emmc_args=setenv bootargs " \
 +		"console=${console} " \
 +		"vt.global_cursor_default=0 " \
@@ -3176,82 +2835,20 @@ index 0000000000..9e9fb84749
 +	"\0" \
 +	"emmc_boot=echo Booting from Emmc ...; " \
 +		"run emmc_args; " \
-+		"ext2load mmc 1:1 ${loadaddr} ${kernelfile}; " \
-+		"ext2load mmc 1:1 ${dtbaddr} ${dtbfile}; " \
++		"load mmc 1:1 ${loadaddr} ${kernelfile} || exit; " \
++		"load mmc 1:1 ${dtbaddr} ${dtbfile} || exit; " \
 +		"bootm ${loadaddr} - ${dtbaddr}; " \
 +	"\0" \
 +	"update_spiflash=echo Updating SPI Flash ...; " \
 +		"sf probe 0; " \
-+		"sf erase 0 +${spiflashsize}; " \
++		"sf erase 0 +${bootsize}; " \
 +		"mmc rescan; " \
-+		"fatload mmc 0 ${loadaddr} ${mlofilespi}; "\
++		"load mmc 0 ${loadaddr} ${mlofilespi} || exit; "\
 +		"sf write ${loadaddr} 0 ${filesize}; " \
-+		"fatload mmc 0 ${loadaddr} ${ubootfile}; " \
++		"load mmc 0 ${loadaddr} ${ubootfile} || exit; " \
 +		"sf write ${loadaddr} ${ubootoffset} ${filesize}; " \
 +	"\0"
-+#endif
 +
-+#define CONFIG_BOOTCOMMAND \
-+	"if mmc rescan; then " \
-+		"echo SD/MMC found on device ${mmc_dev}; " \
-+		"run mmc_boot; " \
-+	"else " \
-+		"run emmc_boot; " \
-+	"fi; "
-+
-+#define M2CONFIG_BUILTIN_PCB	M2_PCB_REV_04
-+#define M2CONFIG_BUILTIN_RAM	M2_RAM_MT41K512M16HA107
-+#define M2CONFIG_BUILTIN_FLASH	M2_EMMC_4GB
-+
-+/* NS16550 Configuration */
-+#define CONFIG_SYS_NS16550_COM1		0x44e09000
-+
-+/* PMIC support */
-+#define CONFIG_POWER_TPS65910
-+
-+/* SPL */
-+#define CONFIG_SPL_POWER_SUPPORT
-+
-+/* SPI Nor Flash */
-+#define CONFIG_SF_DEFAULT_SPEED		24000000
-+/*
-+ * Default to using SPI for environment for M25PE40.
-+ * 0x000000 - 0x010000 : SPL (64KiB)
-+ * 0x010000 - 0x060000 : U-Boot (320kiB)
-+ * 0x060000 - 0x080000 : U-Boot Environment (128KiB)
-+ */
-+#if defined(CONFIG_SPI_BOOT)
-+/* SPL related */
-+#undef CONFIG_SPL_OS_BOOT		/* Not supported by existing map */
-+#define CONFIG_SPL_SPI_LOAD
-+#define CONFIG_SYS_SPI_U_BOOT_OFFS	0x10000
-+
-+/* M25PE40: 64 KiB env size */
-+#define CONFIG_ENV_SIZE			(64 << 10)
-+#define CONFIG_ENV_IS_IN_SPI_FLASH
-+/* #define CONFIG_SYS_REDUNDAND_ENVIRONMENT */
-+#define CONFIG_ENV_SPI_MAX_HZ		CONFIG_SF_DEFAULT_SPEED
-+#define CONFIG_ENV_SECT_SIZE		(64 << 10) /* 64 KB sectors */
-+#define CONFIG_ENV_OFFSET		(320 << 10) /* 768 KiB in */
-+/* #define CONFIG_ENV_OFFSET_REDUND	(896 << 10)  896 KiB in */
-+#define MTDIDS_DEFAULT			"nor0=m25pe40-flash.0"
-+#define MTDPARTS_DEFAULT		"mtdparts=m25pe40-flash.0:64k(SPL)," \
-+					"320k(u-boot),128k(u-boot-env1)"
-+#endif
-+
-+#undef CONFIG_SPL_OS_BOOT
-+
-+/* Network. */
-+#define CONFIG_PHY_ADDR			1
-+
-+/*
-+ * Disable MMC DM for SPL build and can be re-enabled after adding
-+ * DM support in SPL
-+ */
-+#ifdef CONFIG_SPL_BUILD
-+#undef CONFIG_DM_MMC
-+#undef CONFIG_TIMER
-+#undef CONFIG_DM_USB
 +#endif
 +
 +#endif

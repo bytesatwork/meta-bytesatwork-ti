@@ -33,6 +33,7 @@ SRC_URI += " \
 	file://0027-ARM-bytepanel_defconfig-Adapt-to-linux-4.19.patch \
 	file://0028-video-logo-Select-logo-chosen-in-device-tree.patch \
 	file://0029-ARM-dts-bytepanel-Select-logo-from-device-tree.patch \
+	file://0030-ARM-bytepanel_defconfig-Enable-dynamic-printk-suppor.patch \
 "
 
 deltask compileconfigs

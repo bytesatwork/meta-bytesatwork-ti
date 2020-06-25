@@ -1,4 +1,4 @@
-From d84284436f3efab1367b12b90c14717b02997be7 Mon Sep 17 00:00:00 2001
+From 127d32f721e68fc15921798c20caa3a95833acb3 Mon Sep 17 00:00:00 2001
 From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 Date: Wed, 13 Mar 2019 07:43:54 +0100
 Subject: [PATCH] lib/crc16.c: Fix compiler warning
@@ -23,5 +23,5 @@ index f46ba727c9..89d2cff131 100644
  
  	return cksum;
 -- 
-2.11.0
+2.20.1
 

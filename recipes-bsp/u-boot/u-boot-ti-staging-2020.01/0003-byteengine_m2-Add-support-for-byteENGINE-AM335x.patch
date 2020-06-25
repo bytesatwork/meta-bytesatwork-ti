@@ -1,37 +1,37 @@
-From 474cdecd67f73b1b5af3c0dd146270749367aa4b Mon Sep 17 00:00:00 2001
+From 00b840c382915030cc68d5a84c9fef01c1208c78 Mon Sep 17 00:00:00 2001
 From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 Date: Tue, 10 Jul 2018 11:00:42 +0200
 Subject: [PATCH] byteengine_m2: Add support for byteENGINE AM335x
 
 ---
- arch/arm/dts/am335x-bytedevkit-emmc.dts            |  34 ++
- arch/arm/dts/am335x-bytedevkit-nand.dts            |  22 ++
- arch/arm/dts/am335x-bytedevkit.dtsi                | 101 ++++++
- arch/arm/dts/am335x-byteengine.dtsi                | 265 +++++++++++++++
- arch/arm/mach-omap2/Kconfig                        |   1 +
- arch/arm/mach-omap2/am33xx/Kconfig                 |   9 +
- board/bytesatwork/byteengine_am335x/Kconfig        |  44 +++
- board/bytesatwork/byteengine_am335x/MAINTAINERS    |   7 +
- board/bytesatwork/byteengine_am335x/Makefile       |  21 ++
- board/bytesatwork/byteengine_am335x/board.c        | 149 +++++++++
- board/bytesatwork/byteengine_am335x/board.h        |  37 +++
- board/bytesatwork/byteengine_am335x/ddr_defs_baw.h |  59 ++++
- .../bytesatwork/byteengine_am335x/m2config/README  |  68 ++++
- .../byteengine_am335x/m2config/cmd_m2config.c      | 223 +++++++++++++
- .../byteengine_am335x/m2config/m2config.c          |  45 +++
- .../byteengine_am335x/m2config/m2config.h          |  79 +++++
- .../byteengine_am335x/m2config/m2config_builtin.c  |  15 +
- .../byteengine_am335x/m2config/m2config_builtin.h  |  21 ++
- .../byteengine_am335x/m2config/m2config_eeprom.c   | 301 +++++++++++++++++
- .../byteengine_am335x/m2config/m2config_eeprom.h   |  37 +++
- .../byteengine_am335x/m2config/m2config_get.c      |  45 +++
- .../byteengine_am335x/m2config/m2config_get.h      |  13 +
- board/bytesatwork/byteengine_am335x/mux.c          | 144 +++++++++
- board/bytesatwork/byteengine_am335x/ram.c          | 356 +++++++++++++++++++++
- board/bytesatwork/byteengine_am335x/u-boot.lds     | 131 ++++++++
- configs/am335x_bytedevkit_emmc_defconfig           |  65 ++++
- configs/am335x_bytedevkit_nand_defconfig           |  52 +++
- include/configs/byteengine_am335x.h                | 270 ++++++++++++++++
+ arch/arm/dts/am335x-bytedevkit-emmc.dts       |  34 ++
+ arch/arm/dts/am335x-bytedevkit-nand.dts       |  22 ++
+ arch/arm/dts/am335x-bytedevkit.dtsi           | 101 +++++
+ arch/arm/dts/am335x-byteengine.dtsi           | 265 +++++++++++++
+ arch/arm/mach-omap2/Kconfig                   |   1 +
+ arch/arm/mach-omap2/am33xx/Kconfig            |   9 +
+ board/bytesatwork/byteengine_am335x/Kconfig   |  44 +++
+ .../bytesatwork/byteengine_am335x/MAINTAINERS |   7 +
+ board/bytesatwork/byteengine_am335x/Makefile  |  21 ++
+ board/bytesatwork/byteengine_am335x/board.c   | 149 ++++++++
+ board/bytesatwork/byteengine_am335x/board.h   |  37 ++
+ .../byteengine_am335x/ddr_defs_baw.h          |  59 +++
+ .../byteengine_am335x/m2config/README         |  68 ++++
+ .../byteengine_am335x/m2config/cmd_m2config.c | 223 +++++++++++
+ .../byteengine_am335x/m2config/m2config.c     |  45 +++
+ .../byteengine_am335x/m2config/m2config.h     |  79 ++++
+ .../m2config/m2config_builtin.c               |  15 +
+ .../m2config/m2config_builtin.h               |  21 ++
+ .../m2config/m2config_eeprom.c                | 301 +++++++++++++++
+ .../m2config/m2config_eeprom.h                |  37 ++
+ .../byteengine_am335x/m2config/m2config_get.c |  45 +++
+ .../byteengine_am335x/m2config/m2config_get.h |  13 +
+ board/bytesatwork/byteengine_am335x/mux.c     | 144 +++++++
+ board/bytesatwork/byteengine_am335x/ram.c     | 356 ++++++++++++++++++
+ .../bytesatwork/byteengine_am335x/u-boot.lds  | 131 +++++++
+ configs/am335x_bytedevkit_emmc_defconfig      |  65 ++++
+ configs/am335x_bytedevkit_nand_defconfig      |  52 +++
+ include/configs/byteengine_am335x.h           | 270 +++++++++++++
  28 files changed, 2614 insertions(+)
  create mode 100644 arch/arm/dts/am335x-bytedevkit-emmc.dts
  create mode 100644 arch/arm/dts/am335x-bytedevkit-nand.dts
@@ -507,22 +507,22 @@ index 0000000000..c16b80988d
 +	status = "disabled";
 +};
 diff --git a/arch/arm/mach-omap2/Kconfig b/arch/arm/mach-omap2/Kconfig
-index d9bdcb355a..6e4d9fd13a 100644
+index 4c87cbc00f..09e170e3a5 100644
 --- a/arch/arm/mach-omap2/Kconfig
 +++ b/arch/arm/mach-omap2/Kconfig
-@@ -199,6 +199,7 @@ source "board/ti/ti814x/Kconfig"
+@@ -185,6 +185,7 @@ source "board/ti/ti814x/Kconfig"
  source "board/ti/ti816x/Kconfig"
  source "board/ti/am43xx/Kconfig"
  source "board/ti/am335x/Kconfig"
 +source "board/bytesatwork/byteengine_am335x/Kconfig"
  source "board/compulab/cm_t335/Kconfig"
  source "board/compulab/cm_t43/Kconfig"
- 
+ source "board/phytec/phycore_am335x_r2/Kconfig"
 diff --git a/arch/arm/mach-omap2/am33xx/Kconfig b/arch/arm/mach-omap2/am33xx/Kconfig
-index 2dac97a530..0a987463dc 100644
+index 68b339d8d5..ce93b3ca41 100644
 --- a/arch/arm/mach-omap2/am33xx/Kconfig
 +++ b/arch/arm/mach-omap2/am33xx/Kconfig
-@@ -118,6 +118,15 @@ config TARGET_BRPPT1
+@@ -160,6 +160,15 @@ config TARGET_BRPPT1
  	bool "Support BRPPT1"
  	select BOARD_LATE_INIT
  
@@ -2853,5 +2853,5 @@ index 0000000000..d75406c67b
 +
 +#endif
 -- 
-2.11.0
+2.20.1
 

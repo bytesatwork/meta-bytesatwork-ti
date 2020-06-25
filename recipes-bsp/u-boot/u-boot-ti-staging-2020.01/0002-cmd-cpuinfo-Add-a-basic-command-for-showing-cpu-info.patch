@@ -1,4 +1,4 @@
-From 39a37d964c44dd8de42d6a6b647251e945dc1165 Mon Sep 17 00:00:00 2001
+From 3ccf068bf2f9885f1c40774751ddde9bdbe9ff56 Mon Sep 17 00:00:00 2001
 From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 Date: Thu, 10 Oct 2019 19:04:18 +0200
 Subject: [PATCH] cmd: cpuinfo: Add a basic command for showing cpu information
@@ -11,10 +11,10 @@ Subject: [PATCH] cmd: cpuinfo: Add a basic command for showing cpu information
  create mode 100644 cmd/cpuinfo.c
 
 diff --git a/cmd/Kconfig b/cmd/Kconfig
-index ea1a325eb3..046dba9d36 100644
+index 45dba8ba0f..9cbb3ddfe3 100644
 --- a/cmd/Kconfig
 +++ b/cmd/Kconfig
-@@ -176,6 +176,11 @@ config CMD_CPU
+@@ -222,6 +222,11 @@ config CMD_CPU
  	  internal name) and clock frequency. Other information may be
  	  available depending on the CPU driver.
  
@@ -27,10 +27,10 @@ index ea1a325eb3..046dba9d36 100644
  	bool "license"
  	select BUILD_BIN2C
 diff --git a/cmd/Makefile b/cmd/Makefile
-index 0d1e796244..c8c93754f6 100644
+index a8abe952a3..59e5c948e2 100644
 --- a/cmd/Makefile
 +++ b/cmd/Makefile
-@@ -37,6 +37,7 @@ obj-$(CONFIG_CMD_CONFIG) += config.o
+@@ -39,6 +39,7 @@ obj-$(CONFIG_CMD_CONFIG) += config.o
  obj-$(CONFIG_CMD_CONITRACE) += conitrace.o
  obj-$(CONFIG_CMD_CONSOLE) += console.o
  obj-$(CONFIG_CMD_CPU) += cpu.o
@@ -63,5 +63,5 @@ index 0000000000..a5bf2e7aa9
 +	""
 +);
 -- 
-2.11.0
+2.20.1
 

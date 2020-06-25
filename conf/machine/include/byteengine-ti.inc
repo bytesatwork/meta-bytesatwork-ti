@@ -11,7 +11,7 @@ IMAGE_FSTYPES = "tar.bz2 wic.bmap wic.gz"
 KERNEL_IMAGETYPE = "uImage"
 PREFERRED_PROVIDER_virtual/kernel = "linux-ti-staging"
 PREFERRED_PROVIDER_virtual/bootloader = "u-boot-ti-staging"
-PREFERRED_VERSION_linux-ti-staging = "4.19%"
+PREFERRED_VERSION_linux-ti-staging = "5.4%"
 PREFERRED_VERSION_u-boot-ti-staging = "2020.01%"
 
 WKS_FILE = "beaglebone-yocto.wks"

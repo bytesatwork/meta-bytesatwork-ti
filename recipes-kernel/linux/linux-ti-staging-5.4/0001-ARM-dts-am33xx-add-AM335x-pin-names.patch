@@ -1,0 +1,154 @@
+From 7242dc6c30efa83cdff15fde7fa08a2ea176e163 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Oliver=20St=C3=A4bler?= <oliver.staebler@bytesatwork.ch>
+Date: Wed, 4 Mar 2015 19:06:26 +0100
+Subject: [PATCH] ARM: dts: am33xx: add AM335x pin names
+
+---
+ include/dt-bindings/pinctrl/am335x-names.h | 135 +++++++++++++++++++++
+ 1 file changed, 135 insertions(+)
+ create mode 100644 include/dt-bindings/pinctrl/am335x-names.h
+
+diff --git a/include/dt-bindings/pinctrl/am335x-names.h b/include/dt-bindings/pinctrl/am335x-names.h
+new file mode 100644
+index 000000000000..79d872bc2470
+--- /dev/null
++++ b/include/dt-bindings/pinctrl/am335x-names.h
+@@ -0,0 +1,135 @@
++/*
++ * This header provides constants specific to AM335X pin names.
++ */
++
++#ifndef _DT_BINDINGS_PINCTRL_AM335X_NAMES_H
++#define _DT_BINDINGS_PINCTRL_AM335X_NAMES_H
++
++#define	PIN_GPMC_AD0		0x000
++#define	PIN_GPMC_AD1		0x004
++#define	PIN_GPMC_AD2		0x008
++#define	PIN_GPMC_AD3		0x00C
++#define	PIN_GPMC_AD4		0x010
++#define	PIN_GPMC_AD5		0x014
++#define	PIN_GPMC_AD6		0x018
++#define	PIN_GPMC_AD7		0x01C
++#define	PIN_GPMC_AD8		0x020
++#define	PIN_GPMC_AD9		0x024
++#define	PIN_GPMC_AD10		0x028
++#define	PIN_GPMC_AD11		0x02C
++#define	PIN_GPMC_AD12		0x030
++#define	PIN_GPMC_AD13		0x034
++#define	PIN_GPMC_AD14		0x038
++#define	PIN_GPMC_AD15		0x03C
++#define	PIN_GPMC_A0		0x040
++#define	PIN_GPMC_A1		0x044
++#define	PIN_GPMC_A2		0x048
++#define	PIN_GPMC_A3		0x04C
++#define	PIN_GPMC_A4		0x050
++#define	PIN_GPMC_A5		0x054
++#define	PIN_GPMC_A6		0x058
++#define	PIN_GPMC_A7		0x05C
++#define	PIN_GPMC_A8		0x060
++#define	PIN_GPMC_A9		0x064
++#define	PIN_GPMC_A10		0x068
++#define	PIN_GPMC_A11		0x06C
++#define	PIN_GPMC_WAIT0		0x070
++#define	PIN_GPMC_WPN		0x074
++#define	PIN_GPMC_BEN1		0x078
++#define	PIN_GPMC_CSN0		0x07C
++#define	PIN_GPMC_CSN1		0x080
++#define	PIN_GPMC_CSN2		0x084
++#define	PIN_GPMC_CSN3		0x088
++#define	PIN_GPMC_CLK		0x08C
++#define	PIN_GPMC_ADVN_ALE	0x090
++#define	PIN_GPMC_OEN_REN	0x094
++#define	PIN_GPMC_WEN		0x098
++#define	PIN_GPMC_BEN0_CLE	0x09C
++#define	PIN_LCD_DATA0		0x0A0
++#define	PIN_LCD_DATA1		0x0A4
++#define	PIN_LCD_DATA2		0x0A8
++#define	PIN_LCD_DATA3		0x0AC
++#define	PIN_LCD_DATA4		0x0B0
++#define	PIN_LCD_DATA5		0x0B4
++#define	PIN_LCD_DATA6		0x0B8
++#define	PIN_LCD_DATA7		0x0BC
++#define	PIN_LCD_DATA8		0x0C0
++#define	PIN_LCD_DATA9		0x0C4
++#define	PIN_LCD_DATA10		0x0C8
++#define	PIN_LCD_DATA11		0x0CC
++#define	PIN_LCD_DATA12		0x0D0
++#define	PIN_LCD_DATA13		0x0D4
++#define	PIN_LCD_DATA14		0x0D8
++#define	PIN_LCD_DATA15		0x0DC
++#define	PIN_LCD_VSYNC		0x0E0
++#define	PIN_LCD_HSYNC		0x0E4
++#define	PIN_LCD_PCLK		0x0E8
++#define	PIN_LCD_AC_BIAS_EN	0x0EC
++#define	PIN_MMC0_DAT3		0x0F0
++#define	PIN_MMC0_DAT2		0x0F4
++#define	PIN_MMC0_DAT1		0x0F8
++#define	PIN_MMC0_DAT0		0x0FC
++#define	PIN_MMC0_CLK		0x100
++#define	PIN_MMC0_CMD		0x104
++#define	PIN_MII1_COL		0x108
++#define	PIN_MII1_CRS		0x10C
++#define	PIN_MII1_RX_ER		0x110
++#define	PIN_MII1_TX_EN		0x114
++#define	PIN_MII1_RX_DV		0x118
++#define	PIN_MII1_TXD3		0x11C
++#define	PIN_MII1_TXD2		0x120
++#define	PIN_MII1_TXD1		0x124
++#define	PIN_MII1_TXD0		0x128
++#define	PIN_MII1_TX_CLK		0x12C
++#define	PIN_MII1_RX_CLK		0x130
++#define	PIN_MII1_RXD3		0x134
++#define	PIN_MII1_RXD2		0x138
++#define	PIN_MII1_RXD1		0x13C
++#define	PIN_MII1_RXD0		0x140
++#define	PIN_RMII1_REF_CLK	0x144
++#define	PIN_MDIO		0x148
++#define	PIN_MDC			0x14C
++#define	PIN_SPI0_SCLK		0x150
++#define	PIN_SPI0_D0		0x154
++#define	PIN_SPI0_D1		0x158
++#define	PIN_SPI0_CS0		0x15C
++#define	PIN_SPI0_CS1		0x160
++#define	PIN_ECAP0_IN_PWM0_OUT	0x164
++#define	PIN_UART0_CTSN		0x168
++#define	PIN_UART0_RTSN		0x16C
++#define	PIN_UART0_RXD		0x170
++#define	PIN_UART0_TXD		0x174
++#define	PIN_UART1_CTSN		0x178
++#define	PIN_UART1_RTSN		0x17C
++#define	PIN_UART1_RXD		0x180
++#define	PIN_UART1_TXD		0x184
++#define	PIN_I2C0_SDA		0x188
++#define	PIN_I2C0_SCL		0x18C
++#define	PIN_MCASP0_ACLKX	0x190
++#define	PIN_MCASP0_FSX		0x194
++#define	PIN_MCASP0_AXR0		0x198
++#define	PIN_MCASP0_AHCLKR	0x19C
++#define	PIN_MCASP0_ACLKR	0x1A0
++#define	PIN_MCASP0_FSR		0x1A4
++#define	PIN_MCASP0_AXR1		0x1A8
++#define	PIN_MCASP0_AHCLKX	0x1AC
++#define	PIN_XDMA_EVENT_INTR0	0x1B0
++#define	PIN_XDMA_EVENT_INTR1	0x1B4
++#define	PIN_WARMRSTN		0x1B8
++#define	PIN_NNMI		0x1C0
++#define	PIN_TMS			0x1D0
++#define	PIN_TDI			0x1D4
++#define	PIN_TDO			0x1D8
++#define	PIN_TCK			0x1DC
++#define	PIN_TRSTN		0x1E0
++#define	PIN_EMU0		0x1E4
++#define	PIN_EMU1		0x1E8
++#define	PIN_RTC_PWRONRSTN	0x1F8
++#define	PIN_PMIC_POWER_EN	0x1FC
++#define	PIN_EXT_WAKEUP		0x200
++#define	PIN_RTC_KALDO_ENN	0x204
++#define	PIN_USB0_DRVVBUS	0x21C
++#define	PIN_USB1_DRVVBUS	0x234
++
++#endif
++
+-- 
+2.20.1
+

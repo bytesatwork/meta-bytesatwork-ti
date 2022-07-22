@@ -12,8 +12,8 @@ It is hosted on [github](https://github.com/bytesatwork/meta-bytesatwork-ti.git)
 This layer depends on:
 
 	URI: https://git.yoctoproject.org/git/meta-ti
-	layer: meta-ti
-	branch: dunfell
+	layer: meta-ti-bsp
+	branch: kirkstone
 
 
 BSP

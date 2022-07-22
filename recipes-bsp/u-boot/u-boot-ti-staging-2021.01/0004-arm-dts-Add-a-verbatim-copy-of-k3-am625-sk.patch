@@ -1,0 +1,945 @@
+From 68ca495cf53a3e6018a058a15014ac389723d2b2 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Mon, 18 Jul 2022 06:50:59 +0200
+Subject: [PATCH] arm: dts: Add a verbatim copy of k3-am625*sk
+
+Renamed to k3-am62*bytedevkit
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+---
+ MAINTAINERS                                  |   1 +
+ arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi | 224 +++++++++
+ arch/arm/dts/k3-am625-bytedevkit.dts         | 499 +++++++++++++++++++
+ arch/arm/dts/k3-am625-r5-bytedevkit.dts      | 171 +++++++
+ 4 files changed, 895 insertions(+)
+ create mode 100644 arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi
+ create mode 100644 arch/arm/dts/k3-am625-bytedevkit.dts
+ create mode 100644 arch/arm/dts/k3-am625-r5-bytedevkit.dts
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6d47698288..eb55b82b61 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -191,6 +191,7 @@ W:	https://www.bytesatwork.io/
+ T:	git https://github.com/bytesatwork/u-boot-ti
+ M:	Rico Ganahl <rico.ganahl@bytesatwork.ch>
+ S:	Maintained
++F:	arch/arm/dts/k3-am62*bytedevkit*
+ F:	configs/*bytedevkit*_defconfig
+ F:	include/configs/*bytedevkit*.h
+ 
+diff --git a/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi b/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi
+new file mode 100644
+index 0000000000..f815a1b11c
+--- /dev/null
++++ b/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi
+@@ -0,0 +1,224 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * AM625 SK dts file for SPLs
++ * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
++ */
++
++/ {
++	chosen {
++		stdout-path = "serial2:115200n8";
++		tick-timer = &timer1;
++	};
++
++	aliases {
++		mmc0 = &sdhci0;
++		mmc1 = &sdhci1;
++	};
++
++	memory@80000000 {
++		u-boot,dm-spl;
++	};
++};
++
++&cbass_main{
++	u-boot,dm-spl;
++
++	timer1: timer@2400000 {
++		compatible = "ti,omap5430-timer";
++		reg = <0x00 0x2400000 0x00 0x80>;
++		ti,timer-alwon;
++		clock-frequency = <25000000>;
++		u-boot,dm-spl;
++	};
++};
++
++&dmss {
++	u-boot,dm-spl;
++};
++
++&secure_proxy_main {
++	u-boot,dm-spl;
++};
++
++&dmsc {
++	u-boot,dm-spl;
++};
++
++&k3_pds {
++	u-boot,dm-spl;
++};
++
++&k3_clks {
++	u-boot,dm-spl;
++};
++
++&k3_reset {
++	u-boot,dm-spl;
++};
++
++&wkup_conf {
++	u-boot,dm-spl;
++};
++
++&chipid {
++	u-boot,dm-spl;
++};
++
++&main_pmx0 {
++	u-boot,dm-spl;
++};
++
++&main_uart0 {
++	u-boot,dm-spl;
++};
++
++&main_uart0_pins_default {
++	u-boot,dm-spl;
++};
++
++&main_uart1 {
++	u-boot,dm-spl;
++};
++
++&cbass_mcu {
++	u-boot,dm-spl;
++};
++
++&cbass_wakeup {
++	u-boot,dm-spl;
++};
++
++&mcu_pmx0 {
++	u-boot,dm-spl;
++};
++
++&wkup_uart0 {
++	u-boot,dm-spl;
++};
++
++&main_i2c0 {
++	u-boot,dm-spl;
++};
++
++&main_i2c0_pins_default {
++	u-boot,dm-spl;
++};
++
++&sdhci0 {
++	u-boot,dm-spl;
++};
++
++&sdhci1 {
++	sdhci-caps-mask = <0x00000007 0x00000000>;
++	u-boot,dm-spl;
++};
++
++&main_mmc1_pins_default {
++	u-boot,dm-spl;
++};
++
++&usbss0 {
++	u-boot,dm-spl;
++};
++
++&usb0 {
++	dr_mode = "peripheral";
++	/* Since role switching is not supported in U-Boot */
++	/delete-property/ extcon;
++	u-boot,dm-spl;
++};
++
++&usbss1 {
++	u-boot,dm-spl;
++};
++
++&usb1 {
++	u-boot,dm-spl;
++};
++
++&main_usb1_pins_default {
++	u-boot,dm-spl;
++};
++
++&cpsw3g {
++	reg = <0x0 0x8000000 0x0 0x200000>,
++	      <0x0 0x43000200 0x0 0x8>;
++	reg-names = "cpsw_nuss", "mac_efuse";
++	/delete-property/ ranges;
++	u-boot,dm-spl;
++
++	cpsw-phy-sel@04044 {
++		compatible = "ti,am64-phy-gmii-sel";
++		reg = <0x0 0x00104044 0x0 0x8>;
++		u-boot,dm-spl;
++	};
++};
++
++&cpsw_port2 {
++	status = "disabled";
++};
++
++&main_bcdma {
++	u-boot,dm-spl;
++};
++
++&main_pktdma {
++	u-boot,dm-spl;
++};
++
++&fss {
++	u-boot,dm-spl;
++};
++
++&ospi0_pins_default {
++	u-boot,dm-spl;
++};
++
++&cpsw_port1 {
++	u-boot,dm-spl;
++};
++
++&main_rgmii1_pins_default {
++	u-boot,dm-spl;
++};
++
++&main_mdio1_pins_default {
++	u-boot,dm-spl;
++};
++
++&cpsw3g_phy0 {
++	u-boot,dm-spl;
++};
++
++&dmsc {
++	u-boot,dm-spl;
++	k3_sysreset: sysreset-controller {
++		compatible = "ti,sci-sysreset";
++		u-boot,dm-spl;
++	};
++};
++
++&main_rgmii2_pins_default {
++	u-boot,dm-spl;
++};
++
++&cpsw3g_phy1 {
++	u-boot,dm-spl;
++};
++
++&ospi0 {
++	u-boot,dm-spl;
++
++	flash@0 {
++		u-boot,dm-spl;
++
++		partitions {
++			u-boot,dm-spl;
++
++			partition@3fc0000 {
++				u-boot,dm-spl;
++			};
++		};
++	};
++};
++
+diff --git a/arch/arm/dts/k3-am625-bytedevkit.dts b/arch/arm/dts/k3-am625-bytedevkit.dts
+new file mode 100644
+index 0000000000..083fdfd059
+--- /dev/null
++++ b/arch/arm/dts/k3-am625-bytedevkit.dts
+@@ -0,0 +1,499 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * AM625 SK: https://www.ti.com/lit/zip/sprr448
++ *
++ * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
++ */
++
++/dts-v1/;
++
++#include <dt-bindings/leds/common.h>
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/net/ti-dp83867.h>
++#include "k3-am625.dtsi"
++
++/ {
++	compatible =  "ti,am625-sk", "ti,am625";
++	model = "Texas Instruments AM625 SK";
++
++	aliases {
++		serial2 = &main_uart0;
++		mmc0 = &sdhci0;
++		mmc1 = &sdhci1;
++		mmc2 = &sdhci2;
++		usb0 = &usb0;
++		usb1 = &usb1;
++		spi0 = &ospi0;
++	};
++
++	chosen {
++		stdout-path = "serial2:115200n8";
++		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		/* 2G RAM */
++		reg = <0x00000000 0x80000000 0x00000000 0x80000000>;
++
++	};
++
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		secure_tfa_ddr: tfa@9e780000 {
++			reg = <0x00 0x9e780000 0x00 0x80000>;
++			alignment = <0x1000>;
++			no-map;
++		};
++
++		secure_ddr: optee@9e800000 {
++			reg = <0x00 0x9e800000 0x00 0x01800000>; /* for OP-TEE */
++			alignment = <0x1000>;
++			no-map;
++		};
++
++		wkup_r5fss0_core0_dma_memory_region: r5f-dma-memory@9db00000 {
++			compatible = "shared-dma-pool";
++			reg = <0x00 0x9db00000 0x00 0xc00000>;
++			no-map;
++		};
++	};
++
++	vmain_pd: regulator-0 {
++		/* TPS65988 PD CONTROLLER OUTPUT */
++		compatible = "regulator-fixed";
++		regulator-name = "vmain_pd";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		regulator-always-on;
++		regulator-boot-on;
++	};
++
++	vcc_5v0: regulator-1 {
++		/* Output of LM34936 */
++		compatible = "regulator-fixed";
++		regulator-name = "vcc_5v0";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		vin-supply = <&vmain_pd>;
++		regulator-always-on;
++		regulator-boot-on;
++	};
++
++	vcc_3v3_sys: regulator-2 {
++		/* output of LM61460-Q1 */
++		compatible = "regulator-fixed";
++		regulator-name = "vcc_3v3_sys";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		vin-supply = <&vmain_pd>;
++		regulator-always-on;
++		regulator-boot-on;
++	};
++
++	vdd_mmc1: fixed-regulator-sd {
++		/* TPS22918DBVR */
++		compatible = "regulator-fixed";
++		regulator-name = "vdd_mmc1";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-boot-on;
++		enable-active-high;
++		vin-supply = <&vcc_3v3_sys>;
++		gpio = <&exp1 3 GPIO_ACTIVE_HIGH>;
++	};
++
++	vdd_sd_dv: gpio-regulator-TLV71033 {
++		/* Output of TLV71033 */
++		compatible = "regulator-gpio";
++		regulator-name = "tlv71033";
++		pinctrl-names = "default";
++		pinctrl-0 = <&vdd_sd_dv_pins_default>;
++		regulator-min-microvolt = <1800000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-boot-on;
++		vin-supply = <&vcc_5v0>;
++		gpios = <&main_gpio0 31 GPIO_ACTIVE_HIGH>;
++		states = <1800000 0x0>,
++			 <3300000 0x1>;
++	};
++
++	leds {
++		compatible = "gpio-leds";
++		pinctrl-names = "default";
++		pinctrl-0 = <&usr_led_pins_default>;
++
++		led-0 {
++			label = "am62-sk:green:heartbeat";
++			gpios = <&main_gpio1 49 GPIO_ACTIVE_HIGH>;
++			linux,default-trigger = "heartbeat";
++			function = LED_FUNCTION_HEARTBEAT;
++			default-state = "off";
++		};
++	};
++
++	extcon_usb0: extcon-usb0 {
++		compatible = "linux,extcon-usb-gpio";
++		id-gpios = <&main_gpio1 50 GPIO_ACTIVE_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&extcon_usb0_gpio_id_pins_default>;
++	};
++};
++
++&main_pmx0 {
++	main_uart0_pins_default: main-uart0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x1c8, PIN_INPUT, 0) /* (D14) UART0_RXD */
++			AM62X_IOPAD(0x1cc, PIN_OUTPUT, 0) /* (E14) UART0_TXD */
++		>;
++	};
++
++	main_i2c0_pins_default: main-i2c0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x1e0, PIN_INPUT_PULLUP, 0) /* (B16) I2C0_SCL */
++			AM62X_IOPAD(0x1e4, PIN_INPUT_PULLUP, 0) /* (A16) I2C0_SDA */
++		>;
++	};
++
++	main_i2c1_pins_default: main-i2c1-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x1e8, PIN_INPUT_PULLUP, 0) /* (B17) I2C1_SCL */
++			AM62X_IOPAD(0x1ec, PIN_INPUT_PULLUP, 0) /* (A17) I2C1_SDA */
++		>;
++	};
++
++	main_i2c2_pins_default: main-i2c2-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x0b0, PIN_INPUT_PULLUP, 1) /* (K22) GPMC0_CSn2.I2C2_SCL */
++			AM62X_IOPAD(0x0b4, PIN_INPUT_PULLUP, 1) /* (K24) GPMC0_CSn3.I2C2_SDA */
++		>;
++	};
++
++	main_mmc0_pins_default: main-mmc0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x220, PIN_INPUT, 0) /* (Y3) MMC0_CMD */
++			AM62X_IOPAD(0x218, PIN_INPUT, 0) /* (AB1) MMC0_CLK */
++			AM62X_IOPAD(0x214, PIN_INPUT, 0) /* (AA2) MMC0_DAT0 */
++			AM62X_IOPAD(0x210, PIN_INPUT, 0) /* (AA1) MMC0_DAT1 */
++			AM62X_IOPAD(0x20c, PIN_INPUT, 0) /* (AA3) MMC0_DAT2 */
++			AM62X_IOPAD(0x208, PIN_INPUT, 0) /* (Y4) MMC0_DAT3 */
++			AM62X_IOPAD(0x204, PIN_INPUT, 0) /* (AB2) MMC0_DAT4 */
++			AM62X_IOPAD(0x200, PIN_INPUT, 0) /* (AC1) MMC0_DAT5 */
++			AM62X_IOPAD(0x1fc, PIN_INPUT, 0) /* (AD2) MMC0_DAT6 */
++			AM62X_IOPAD(0x1f8, PIN_INPUT, 0) /* (AC2) MMC0_DAT7 */
++		>;
++	};
++
++	main_mmc1_pins_default: main-mmc1-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x23c, PIN_INPUT, 0) /* (A21) MMC1_CMD */
++			AM62X_IOPAD(0x234, PIN_INPUT, 0) /* (B22) MMC1_CLK */
++			AM62X_IOPAD(0x230, PIN_INPUT, 0) /* (A22) MMC1_DAT0 */
++			AM62X_IOPAD(0x22c, PIN_INPUT, 0) /* (B21) MMC1_DAT1 */
++			AM62X_IOPAD(0x228, PIN_INPUT, 0) /* (C21) MMC1_DAT2 */
++			AM62X_IOPAD(0x224, PIN_INPUT, 0) /* (D22) MMC1_DAT3 */
++			AM62X_IOPAD(0x240, PIN_INPUT, 0) /* (D17) MMC1_SDCD */
++		>;
++	};
++
++	usr_led_pins_default: usr-led-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x244, PIN_OUTPUT, 7) /* (C17) MMC1_SDWP.GPIO1_49 */
++		>;
++	};
++
++	main_mdio1_pins_default: main-mdio1-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x160, PIN_OUTPUT, 0) /* (AD24) MDIO0_MDC */
++			AM62X_IOPAD(0x15c, PIN_INPUT, 0) /* (AB22) MDIO0_MDIO */
++		>;
++	};
++
++	main_rgmii1_pins_default: main-rgmii1-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x14c, PIN_INPUT, 0) /* (AB17) RGMII1_RD0 */
++			AM62X_IOPAD(0x150, PIN_INPUT, 0) /* (AC17) RGMII1_RD1 */
++			AM62X_IOPAD(0x154, PIN_INPUT, 0) /* (AB16) RGMII1_RD2 */
++			AM62X_IOPAD(0x158, PIN_INPUT, 0) /* (AA15) RGMII1_RD3 */
++			AM62X_IOPAD(0x148, PIN_INPUT, 0) /* (AD17) RGMII1_RXC */
++			AM62X_IOPAD(0x144, PIN_INPUT, 0) /* (AE17) RGMII1_RX_CTL */
++			AM62X_IOPAD(0x134, PIN_OUTPUT, 0) /* (AE20) RGMII1_TD0 */
++			AM62X_IOPAD(0x138, PIN_OUTPUT, 0) /* (AD20) RGMII1_TD1 */
++			AM62X_IOPAD(0x13c, PIN_OUTPUT, 0) /* (AE18) RGMII1_TD2 */
++			AM62X_IOPAD(0x140, PIN_OUTPUT, 0) /* (AD18) RGMII1_TD3 */
++			AM62X_IOPAD(0x130, PIN_OUTPUT, 0) /* (AE19) RGMII1_TXC */
++			AM62X_IOPAD(0x12c, PIN_OUTPUT, 0) /* (AD19) RGMII1_TX_CTL */
++		>;
++	};
++
++	main_rgmii2_pins_default: main-rgmii2-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x184, PIN_INPUT, 0) /* (AE23) RGMII2_RD0 */
++			AM62X_IOPAD(0x188, PIN_INPUT, 0) /* (AB20) RGMII2_RD1 */
++			AM62X_IOPAD(0x18c, PIN_INPUT, 0) /* (AC21) RGMII2_RD2 */
++			AM62X_IOPAD(0x190, PIN_INPUT, 0) /* (AE22) RGMII2_RD3 */
++			AM62X_IOPAD(0x180, PIN_INPUT, 0) /* (AD23) RGMII2_RXC */
++			AM62X_IOPAD(0x17c, PIN_INPUT, 0) /* (AD22) RGMII2_RX_CTL */
++			AM62X_IOPAD(0x16c, PIN_OUTPUT, 0) /* (Y18) RGMII2_TD0 */
++			AM62X_IOPAD(0x170, PIN_OUTPUT, 0) /* (AA18) RGMII2_TD1 */
++			AM62X_IOPAD(0x174, PIN_OUTPUT, 0) /* (AD21) RGMII2_TD2 */
++			AM62X_IOPAD(0x178, PIN_OUTPUT, 0) /* (AC20) RGMII2_TD3 */
++			AM62X_IOPAD(0x168, PIN_OUTPUT, 0) /* (AE21) RGMII2_TXC */
++			AM62X_IOPAD(0x164, PIN_OUTPUT, 0) /* (AA19) RGMII2_TX_CTL */
++		>;
++	};
++
++	vdd_sd_dv_pins_default: vdd-sd-dv-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x07c, PIN_OUTPUT, 7) /* (P25) GPMC0_CLK.GPIO0_31 */
++		>;
++	};
++
++	extcon_usb0_gpio_id_pins_default: extcon-usb0-gpio-id-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x254, PIN_INPUT_PULLUP, 7) /* (C20) USB0_DRVVBUS.GPIO1_50 */
++		>;
++	};
++
++	main_usb1_pins_default: main-usb1-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x0258, PIN_OUTPUT, 0) /* (F18) USB1_DRVVBUS */
++		>;
++	};
++
++	ospi0_pins_default: ospi0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x000, PIN_OUTPUT, 0) /* (H24) OSPI0_CLK */
++			AM62X_IOPAD(0x02c, PIN_OUTPUT, 0) /* (F23) OSPI0_CSn0 */
++			AM62X_IOPAD(0x00c, PIN_INPUT, 0) /* (E25) OSPI0_D0 */
++			AM62X_IOPAD(0x010, PIN_INPUT, 0) /* (G24) OSPI0_D1 */
++			AM62X_IOPAD(0x014, PIN_INPUT, 0) /* (F25) OSPI0_D2 */
++			AM62X_IOPAD(0x018, PIN_INPUT, 0) /* (F24) OSPI0_D3 */
++			AM62X_IOPAD(0x01c, PIN_INPUT, 0) /* (J23) OSPI0_D4 */
++			AM62X_IOPAD(0x020, PIN_INPUT, 0) /* (J25) OSPI0_D5 */
++			AM62X_IOPAD(0x024, PIN_INPUT, 0) /* (H25) OSPI0_D6 */
++			AM62X_IOPAD(0x028, PIN_INPUT, 0) /* (J22) OSPI0_D7 */
++			AM62X_IOPAD(0x008, PIN_INPUT, 0) /* (J24) OSPI0_DQS */
++		>;
++	};
++};
++
++&wkup_uart0 {
++	/* WKUP UART0 is used by DM firmware */
++	status = "reserved";
++};
++
++&mcu_uart0 {
++	status = "disabled";
++};
++
++&main_uart0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_uart0_pins_default>;
++};
++
++&main_uart1 {
++	/* Main UART1 is used by TIFS firmware */
++	status = "reserved";
++};
++
++&main_uart2 {
++	status = "disabled";
++};
++
++&main_uart3 {
++	status = "disabled";
++};
++
++&main_uart4 {
++	status = "disabled";
++};
++
++&main_uart5 {
++	status = "disabled";
++};
++
++&main_uart6 {
++	status = "disabled";
++};
++
++&mcu_i2c0 {
++	status = "disabled";
++};
++
++&wkup_i2c0 {
++	status = "disabled";
++};
++
++&main_i2c0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_i2c0_pins_default>;
++	clock-frequency = <400000>;
++};
++
++&main_i2c1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_i2c1_pins_default>;
++	clock-frequency = <400000>;
++
++	exp1: gpio@22 {
++		compatible = "ti,tca6424";
++		reg = <0x22>;
++		gpio-controller;
++		#gpio-cells = <2>;
++		gpio-line-names = "GPIO_CPSW2_RST", "GPIO_CPSW1_RST",
++				   "PRU_DETECT", "MMC1_SD_EN",
++				   "VPP_LDO_EN", "EXP_PS_3V3_En",
++				   "EXP_PS_5V0_En", "EXP_HAT_DETECT",
++				   "GPIO_AUD_RSTn", "GPIO_eMMC_RSTn",
++				   "UART1_FET_BUF_EN", "WL_LT_EN",
++				   "GPIO_HDMI_RSTn", "CSI_GPIO1",
++				   "CSI_GPIO2", "PRU_3V3_EN",
++				   "HDMI_INTn", "TEST_GPIO2",
++				   "MCASP1_FET_EN", "MCASP1_BUF_BT_EN",
++				   "MCASP1_FET_SEL", "UART1_FET_SEL",
++				   "TSINT#", "IO_EXP_TEST_LED";
++	};
++};
++
++&main_i2c2 {
++	status = "disabled";
++};
++
++&main_i2c3 {
++	status = "disabled";
++};
++
++&sdhci0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_mmc0_pins_default>;
++	ti,driver-strength-ohm = <50>;
++	disable-wp;
++};
++
++&sdhci1 {
++	/* SD/MMC */
++	vmmc-supply = <&vdd_mmc1>;
++	vqmmc-supply = <&vdd_sd_dv>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_mmc1_pins_default>;
++	ti,driver-strength-ohm = <50>;
++	disable-wp;
++};
++
++&usbss0 {
++	ti,vbus-divider;
++};
++
++&usb0 {
++	extcon = <&extcon_usb0>;
++};
++
++&usb1 {
++	dr_mode = "host";
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_usb1_pins_default>;
++};
++
++&cpsw3g {
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_mdio1_pins_default
++		     &main_rgmii1_pins_default
++		     &main_rgmii2_pins_default>;
++};
++
++&cpsw_port1 {
++	phy-mode = "rgmii-rxid";
++	phy-handle = <&cpsw3g_phy0>;
++};
++
++&cpsw_port2 {
++	phy-mode = "rgmii-rxid";
++	phy-handle = <&cpsw3g_phy1>;
++};
++
++&cpsw3g_mdio {
++	cpsw3g_phy0: ethernet-phy@0 {
++		reg = <0>;
++		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
++		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
++		ti,min-output-impedance;
++	};
++
++	cpsw3g_phy1: ethernet-phy@1 {
++		reg = <1>;
++		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
++		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
++		ti,min-output-impedance;
++	};
++};
++
++&mailbox0_cluster0 {
++	mbox_m4_0: mbox-m4-0 {
++		ti,mbox-rx = <0 0 0>;
++		ti,mbox-tx = <1 0 0>;
++	};
++};
++
++&ospi0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&ospi0_pins_default>;
++
++	flash@0{
++		compatible = "jedec,spi-nor";
++		reg = <0x0>;
++		spi-tx-bus-width = <8>;
++		spi-rx-bus-width = <8>;
++		spi-max-frequency = <25000000>;
++		cdns,tshsl-ns = <60>;
++		cdns,tsd2d-ns = <60>;
++		cdns,tchsh-ns = <60>;
++		cdns,tslch-ns = <60>;
++		cdns,read-delay = <4>;
++		cdns,phy-mode;
++
++		partitions {
++			compatible = "fixed-partitions";
++			#address-cells = <1>;
++			#size-cells = <1>;
++
++			partition@0 {
++				label = "ospi.tiboot3";
++				reg = <0x0 0x80000>;
++			};
++
++			partition@80000 {
++				label = "ospi.tispl";
++				reg = <0x80000 0x200000>;
++			};
++
++			partition@280000 {
++				label = "ospi.u-boot";
++				reg = <0x280000 0x400000>;
++			};
++
++			partition@680000 {
++				label = "ospi.env";
++				reg = <0x680000 0x40000>;
++			};
++
++			partition@6c0000 {
++				label = "ospi.env.backup";
++				reg = <0x6c0000 0x40000>;
++			};
++
++			partition@800000 {
++				label = "ospi.rootfs";
++				reg = <0x800000 0x37c0000>;
++			};
++
++			partition@3fc0000 {
++				label = "ospi.phypattern";
++				reg = <0x3fc0000 0x40000>;
++			};
++		};
++	};
++};
+diff --git a/arch/arm/dts/k3-am625-r5-bytedevkit.dts b/arch/arm/dts/k3-am625-r5-bytedevkit.dts
+new file mode 100644
+index 0000000000..a23d2589a9
+--- /dev/null
++++ b/arch/arm/dts/k3-am625-r5-bytedevkit.dts
+@@ -0,0 +1,171 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * AM625 SK dts file for R5 SPL
++ * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
++ */
++
++#include "k3-am625-sk.dts"
++#include "k3-am62x-sk-ddr4-1600MTs.dtsi"
++#include "k3-am62-ddr.dtsi"
++
++#include "k3-am625-sk-u-boot.dtsi"
++
++/ {
++	aliases {
++		remoteproc0 = &sysctrler;
++		remoteproc1 = &a53_0;
++		serial0 = &wkup_uart0;
++		serial3 = &main_uart1;
++	};
++
++	chosen {
++		stdout-path = "serial2:115200n8";
++		tick-timer = &timer1;
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		/* 2G RAM */
++		reg = <0x00000000 0x80000000 0x00000000 0x80000000>;
++
++		u-boot,dm-spl;
++	};
++
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		secure_ddr: optee@9e800000 {
++			reg = <0x00 0x9e800000 0x00 0x01800000>; /* for OP-TEE */
++			alignment = <0x1000>;
++			no-map;
++		};
++	};
++
++	a53_0: a53@0 {
++		compatible = "ti,am654-rproc";
++		reg = <0x00 0x00a90000 0x00 0x10>;
++		power-domains = <&k3_pds 61 TI_SCI_PD_EXCLUSIVE>,
++				<&k3_pds 135 TI_SCI_PD_EXCLUSIVE>;
++		resets = <&k3_reset 135 0>;
++		clocks = <&k3_clks 61 0>;
++		assigned-clocks = <&k3_clks 61 0>, <&k3_clks 135 0>;
++		assigned-clock-parents = <&k3_clks 61 2>;
++		assigned-clock-rates = <200000000>, <1250000000>;
++		ti,sci = <&dmsc>;
++		ti,sci-proc-id = <32>;
++		ti,sci-host-id = <10>;
++		u-boot,dm-spl;
++	};
++
++	dm_tifs: dm-tifs {
++		compatible = "ti,j721e-dm-sci";
++		ti,host-id = <36>;
++		ti,secure-host;
++		mbox-names = "rx", "tx";
++		mboxes= <&secure_proxy_main 22>,
++			<&secure_proxy_main 23>;
++		u-boot,dm-spl;
++	};
++};
++
++&dmsc {
++	mboxes= <&secure_proxy_main 0>,
++		<&secure_proxy_main 1>,
++		<&secure_proxy_main 0>;
++	mbox-names = "rx", "tx", "notify";
++	ti,host-id = <35>;
++	ti,secure-host;
++};
++
++&cbass_mcu {
++	mcu_esm: esm@4100000 {
++		compatible = "ti,j721e-esm";
++		reg = <0x0 0x4100000 0x0 0x1000>;
++		ti,esm-pins = <0>, <1>, <2>, <85>;
++		u-boot,dm-spl;
++	};
++};
++
++&cbass_main {
++	sa3_secproxy: secproxy@44880000 {
++		u-boot,dm-spl;
++		compatible = "ti,am654-secure-proxy";
++		#mbox-cells = <1>;
++		reg-names = "rt", "scfg", "target_data";
++		reg = <0x00 0x44880000 0x00 0x20000>,
++		      <0x0 0x44860000 0x0 0x20000>,
++		      <0x0 0x43600000 0x0 0x10000>;
++	};
++
++	sysctrler: sysctrler {
++		compatible = "ti,am654-system-controller";
++		mboxes= <&secure_proxy_main 1>, <&secure_proxy_main 0>, <&sa3_secproxy 0>;
++		mbox-names = "tx", "rx", "boot_notify";
++		u-boot,dm-spl;
++	};
++
++	main_esm: esm@420000 {
++		compatible = "ti,j721e-esm";
++		reg = <0x0 0x420000 0x0 0x1000>;
++		ti,esm-pins = <160>, <161>, <162>, <163>, <177>, <178>;
++		u-boot,dm-spl;
++	};
++};
++
++&mcu_pmx0 {
++	u-boot,dm-spl;
++	wkup_uart0_pins_default: wkup-uart0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_MCU_IOPAD(0x02c, PIN_INPUT, 0) /* (C6) WKUP_UART0_CTSn */
++			AM62X_MCU_IOPAD(0x030, PIN_OUTPUT, 0) /* (A4) WKUP_UART0_RTSn */
++			AM62X_MCU_IOPAD(0x024, PIN_INPUT, 0) /* (B4) WKUP_UART0_RXD */
++			AM62X_MCU_IOPAD(0x028, PIN_OUTPUT, 0) /* (C5) WKUP_UART0_TXD */
++		>;
++		u-boot,dm-spl;
++	};
++};
++
++&main_pmx0 {
++	u-boot,dm-spl;
++	main_uart1_pins_default: main-uart1-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x194, PIN_INPUT, 2) /* (B19) MCASP0_AXR3.UART1_CTSn */
++			AM62X_IOPAD(0x198, PIN_OUTPUT, 2) /* (A19) MCASP0_AXR2.UART1_RTSn */
++			AM62X_IOPAD(0x1ac, PIN_INPUT, 2) /* (E19) MCASP0_AFSR.UART1_RXD */
++			AM62X_IOPAD(0x1b0, PIN_OUTPUT, 2) /* (A20) MCASP0_ACLKR.UART1_TXD */
++		>;
++		u-boot,dm-spl;
++	};
++};
++
++/* WKUP UART0 is used for DM firmware logs */
++&wkup_uart0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&wkup_uart0_pins_default>;
++	status = "okay";
++	u-boot,dm-spl;
++};
++
++/* Main UART1 is used for TIFS firmware logs */
++&main_uart1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_uart1_pins_default>;
++	status = "okay";
++	u-boot,dm-spl;
++};
++
++&ospi0 {
++	reg = <0x00 0x0fc40000 0x00 0x100>,
++	      <0x00 0x60000000 0x00 0x08000000>;
++};
++
++&main_pktdma {
++	ti,sci = <&dm_tifs>;
++};
++
++&main_bcdma {
++	ti,sci = <&dm_tifs>;
++};
++
+-- 
+2.30.2
+

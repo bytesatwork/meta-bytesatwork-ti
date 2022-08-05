@@ -1,6 +1,6 @@
 MLO_IMAGE ??= "${SPL_BINARY}"
 
-FILESEXTRAPATHS_prepend := "${THISDIR}/${PN}-2020.01:"
+FILESEXTRAPATHS:prepend := "${THISDIR}/${PN}-2020.01:"
 SRC_URI += " \
 	file://0001-lib-crc16.c-Fix-compiler-warning.patch \
 	file://0002-cmd-cpuinfo-Add-a-basic-command-for-showing-cpu-info.patch \
@@ -8,7 +8,7 @@ SRC_URI += " \
 	file://0004-byteengine_m2-Add-support-for-2020.01.patch \
 "
 
-do_deploy_append_bytepanel-emmc () {
+do_deploy:append:bytedevkit-am335x () {
 	install -d ${DEPLOY_DIR_IMAGE}
 	install ${B}/${SPL_BINARY}.byteswap ${DEPLOY_DIR_IMAGE}/${MLO_IMAGE}.byteswap
 }

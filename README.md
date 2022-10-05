@@ -43,7 +43,7 @@ or using `bmap-tools`:
 	cd $BUILDDIR
 	bmaptool copy tmp/deploy/images/bytedevkit-am335x/bytesatwork-minimal-image-bytedevkit-am335x.wic.bmap /dev/sdX
 
-For more information on `bmap-tools`, follow [this](https://www.yoctoproject.org/docs/3.1/dev-manual/dev-manual.html#flashing-images-using-bmaptool) link.
+For more information on `bmap-tools`, follow [this](https://docs.yoctoproject.org/4.0/dev-manual/common-tasks.html#flashing-images-using-bmaptool) link.
 
 
 Reporting bugs

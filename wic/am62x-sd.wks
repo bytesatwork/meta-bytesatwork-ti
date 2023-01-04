@@ -1,0 +1,4 @@
+# short-description: SD card image for AM62x
+
+part /boot --source bootimg-partition --ondisk mmcblk0 --fstype=vfat --label boot --align 1024 --active --fixed-size 128M --fsoptions "defaults,noauto"
+part / --source rootfs --ondisk mmcblk0 --fstype=ext4 --label rootfs --align 1024

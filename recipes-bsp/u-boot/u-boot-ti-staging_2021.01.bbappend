@@ -1,4 +1,4 @@
-PR = "r0"
+PR = "r1"
 
 SRCREV = "2dd2e1d366acf7f41bbd8f2d1dbe6cf5e1bcbad6"
 
@@ -18,6 +18,7 @@ SRC_URI += " \
 	file://0012-include-configs-clean-up-bytedevkit-u-boot-environme.patch \
 	file://0013-configs-disable-distro-bootcmd-on-bytedevkit.patch \
 	file://0014-configs-bytedevkit-r5-savedefconfig.patch \
+	file://0015-byteengine-bytedevkit-Change-primary-boot-medium-to-.patch \
 "
 
 SPL_UART_BINARY:bytedevkit-am62x-k3r5 = "u-boot-spl.bin"

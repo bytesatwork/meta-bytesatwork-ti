@@ -1,5 +1,6 @@
 # meta-bytesatwork-ti
 
+
 ## Introduction
 
 This is the official OpenEmbedded/Yocto BSP layer for byteDEVKIT AM335x and byteDEVKIT AM62x by
@@ -13,6 +14,7 @@ This layer depends on:
 	layer: meta-ti-bsp
 	branch: kirkstone
 
+
 ## BSP
 
 This meta layer provides the Board Support Package (U-Boot and Linux kernel) for byteDEVKIT AM335x
@@ -22,6 +24,7 @@ or `bytedevkit-am62x` to use this BSP.
 Linux Kernel recipe: linux-ti-staging
 
 U-Boot recipe: u-boot-ti-staging
+
 
 ## SD Card
 
@@ -38,7 +41,7 @@ or using `bmap-tools`:
 	cd $BUILDDIR
 	bmaptool copy tmp/deploy/images/bytedevkit-am335x/bytesatwork-minimal-image-bytedevkit-am335x.wic.bmap /dev/sdX
 
-For more information on `bmap-tools`, follow [this](https://docs.yoctoproject.org/4.0/dev-manual/common-tasks.html#flashing-images-using-bmaptool) link.
+You can find more information on `bmap-tools` in the [Yocto Project documentation](https://docs.yoctoproject.org/4.0/dev-manual/common-tasks.html#flashing-images-using-bmaptool).
 
 
 ## Reporting bugs

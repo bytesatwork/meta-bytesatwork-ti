@@ -1,0 +1,28 @@
+From b4d12b97443b41bbd57ff6bd2f611b44cd985f54 Mon Sep 17 00:00:00 2001
+From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+Date: Tue, 6 Jun 2023 12:34:06 +0200
+Subject: [PATCH] dt-bindings: display: simple: Add Youritech ET050WV05
+
+Add Youritech ET050WV05 5" WVGA (800x480) TFT LCD panel.
+
+Signed-off-by: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+---
+ .../devicetree/bindings/display/panel/panel-simple.yaml         | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/display/panel/panel-simple.yaml b/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
+index 15f6a8233d9b..683def0ac8de 100644
+--- a/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
++++ b/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
+@@ -284,6 +284,8 @@ properties:
+       - vxt,vl050-8048nt-c01
+         # Winstar Display Corporation 3.5" QVGA (320x240) TFT LCD panel
+       - winstar,wf35ltiacd
++        # Youritech ET050WV05 5" WVGA (800x480) TFT LCD panel
++      - youritech,et050WV05
+         # TI Simple EDP panel
+       - ti,panel-edp
+ 
+-- 
+2.39.2
+

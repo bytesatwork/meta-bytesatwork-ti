@@ -1,0 +1,38 @@
+From f41ddc5c13e4f9227127e40fb9bf9454358349f5 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Stephan=20D=C3=BCnner?= <stephan.duenner@bytesatwork.ch>
+Date: Wed, 22 Feb 2023 09:17:57 +0100
+Subject: [PATCH] usb: dwc3: Fix OTG role switch support for AM62
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Fix OTG role switch support for AM62.
+The overlying subsystem of the USB should pass on the OTG role-switch
+with an extcon for the switch. But it doesn't do that, and jumps out
+of there with the return. The extcon setup comes afterwards. This is
+then not called and the switch with the ID pin via extcon does not work.
+
+Signed-off-by: Stephan Dünner <stephan.duenner@bytesatwork.ch>
+---
+ drivers/usb/dwc3/drd.c | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/drivers/usb/dwc3/drd.c b/drivers/usb/dwc3/drd.c
+index 0a96f44ccca7..16546bdd2a64 100644
+--- a/drivers/usb/dwc3/drd.c
++++ b/drivers/usb/dwc3/drd.c
+@@ -568,9 +568,11 @@ int dwc3_drd_init(struct dwc3 *dwc)
+ {
+ 	int ret, irq;
+ 
++#ifndef CONFIG_USB_DWC3_AM62
+ 	if (ROLE_SWITCH &&
+ 	    device_property_read_bool(dwc->dev, "usb-role-switch"))
+ 		return dwc3_setup_role_switch(dwc);
++#endif
+ 
+ 	dwc->edev = dwc3_get_extcon(dwc);
+ 	if (IS_ERR(dwc->edev))
+-- 
+2.39.2
+

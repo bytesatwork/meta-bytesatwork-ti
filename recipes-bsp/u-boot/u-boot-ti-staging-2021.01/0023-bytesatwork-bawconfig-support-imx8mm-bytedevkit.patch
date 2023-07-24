@@ -1,0 +1,201 @@
+From 31c1ae7f0b1c5fce964c06febd5a3ddc37acfd46 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Tue, 1 Mar 2022 14:09:11 +0100
+Subject: [PATCH] bytesatwork: bawconfig: support imx8mm bytedevkit
+
+Extend preprocessor directives to handle different boards.
+Add define to set i2c bus and address of baw config EEPROM.
+If available use built in config as fallback.
+Allow bawconfig command without build in or EEPROM support.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+(cherry picked from commit 4750929ff5ead50bcb810d2603245dd7e338f3b0)
+---
+ .../baw_config/baw_config_eeprom.c            | 34 +++++++++++++------
+ .../baw_config/baw_config_eeprom.h            |  3 +-
+ board/bytesatwork/baw_config/baw_config_get.c | 14 ++++++--
+ board/bytesatwork/baw_config/cmd_baw_config.c |  6 ++--
+ 4 files changed, 39 insertions(+), 18 deletions(-)
+
+diff --git a/board/bytesatwork/baw_config/baw_config_eeprom.c b/board/bytesatwork/baw_config/baw_config_eeprom.c
+index 8198109a7b..46ed2e3a86 100644
+--- a/board/bytesatwork/baw_config/baw_config_eeprom.c
++++ b/board/bytesatwork/baw_config/baw_config_eeprom.c
+@@ -10,8 +10,8 @@
+ #include <dm/uclass.h>
+ #include <i2c.h>
+ #include <hexdump.h>
++#include <u-boot/crc.h>
+ 
+-#define EEPROM_ADDRESS		0x50
+ #define EEPROM_MAXWRITE		64	/* max. page size for writes */
+ #define MAGIC			0x6268
+ #define EEPROM_EXT_OFFSET	0x14
+@@ -81,17 +81,25 @@ int baw_config_eeprom_init(void)
+ #ifdef CONFIG_DM_I2C
+ 	int ret;
+ 
+-	ret = uclass_get_device_by_seq(UCLASS_I2C, 0, &busp);
+-	if (ret)
++	ret = uclass_get_device_by_seq(UCLASS_I2C, CONFIG_BAW_CONFIG_EEPROM_BUS,
++				       &busp);
++	if (ret) {
++		printf("%s(): uclass_get_device_by_seq(): %d\n", __func__, ret);
+ 		return ret;
++	}
+ 
+-	ret = dm_i2c_probe(busp, EEPROM_ADDRESS, 0, &baw_config_dev);
+-	if (ret)
++	ret = dm_i2c_probe(busp, CONFIG_BAW_CONFIG_EEPROM_ADDRESS, 0,
++			   &baw_config_dev);
++	if (ret) {
++		printf("%s(): dm_i2c_probe(): %d\n", __func__, ret);
+ 		return ret;
++	}
+ 
+ 	ret = i2c_set_chip_offset_len(baw_config_dev, 2);
+-	if (ret)
++	if (ret) {
++		printf("%s(): i2c_set_chip_offset_len(): %d\n", __func__, ret);
+ 		return ret;
++	}
+ 
+ #endif
+ 	return 0;
+@@ -108,7 +116,9 @@ static int i2c_write_rdy(void)
+ 
+ 	for (i = 0; ret < 0 && i < 10; ++i) {
+ #ifndef CONFIG_DM_I2C
+-		ret = i2c_write(EEPROM_ADDRESS, 0, 2, &dummy, 0);
++		i2c_set_bus_num(CONFIG_BAW_CONFIG_EEPROM_BUS);
++		ret = i2c_write(CONFIG_BAW_CONFIG_EEPROM_ADDRESS, 0, 2, &dummy,
++				0);
+ #else
+ 		ret = dm_i2c_write(baw_config_dev, 0, &dummy, 0);
+ #endif
+@@ -137,8 +147,8 @@ int i2c_long_write(struct eeprom_write_frame frame, int len)
+ 			break;
+ 		}
+ #ifndef CONFIG_DM_I2C
+-		ret = i2c_write(EEPROM_ADDRESS, off, 2, (u8 *)(&frame) + off,
+-				wlen);
++		ret = i2c_write(CONFIG_BAW_CONFIG_EEPROM_ADDRESS, off, 2,
++				(u8 *)(&frame) + off, wlen);
+ #else
+ 		ret = dm_i2c_write(baw_config_dev, off, (u8 *)(&frame) + off,
+ 				   wlen);
+@@ -161,7 +171,9 @@ int baw_config_eeprom_read(struct baw_config *config)
+ 	struct eeprom_read_frame frame;
+ 
+ #ifndef CONFIG_DM_I2C
+-	if (i2c_read(EEPROM_ADDRESS, 0, 2, (u8 *)&frame, sizeof(frame)) != 0)
++	i2c_set_bus_num(CONFIG_BAW_CONFIG_EEPROM_BUS);
++	if (i2c_read(CONFIG_BAW_CONFIG_EEPROM_ADDRESS, 0, 2, (u8 *)&frame,
++		     sizeof(frame)) != 0)
+ 		return -3;
+ #else
+ 	if (dm_i2c_read(baw_config_dev, 0, (u8 *)&frame, sizeof(frame)))
+@@ -241,7 +253,7 @@ int baw_config_eeprom_read(struct baw_config *config)
+ 	return 0;
+ }
+ 
+-#if defined(CONFIG_SKIP_LOWLEVEL_INIT)
++#if defined(CONFIG_SKIP_LOWLEVEL_INIT) || !defined(CONFIG_TARGET_BYTEENGINE_AM335X)
+ 
+ int baw_config_eeprom_write(struct baw_config *config)
+ {
+diff --git a/board/bytesatwork/baw_config/baw_config_eeprom.h b/board/bytesatwork/baw_config/baw_config_eeprom.h
+index d5ad65082b..b0ccb6c1c6 100644
+--- a/board/bytesatwork/baw_config/baw_config_eeprom.h
++++ b/board/bytesatwork/baw_config/baw_config_eeprom.h
+@@ -19,7 +19,8 @@ static inline int baw_config_eeprom_read(struct baw_config *config)
+ }
+ #endif
+ 
+-#if defined(CONFIG_BAW_CONFIG_EEPROM) && defined(CONFIG_SKIP_LOWLEVEL_INIT)
++#if defined(CONFIG_BAW_CONFIG_EEPROM) && \
++	(defined(CONFIG_SKIP_LOWLEVEL_INIT) || !defined(CONFIG_TARGET_BYTEENGINE_AM335X))
+ int baw_config_eeprom_write(struct baw_config *config);
+ int baw_config_eeprom_erase(void);
+ #else
+diff --git a/board/bytesatwork/baw_config/baw_config_get.c b/board/bytesatwork/baw_config/baw_config_get.c
+index 4327f7f22f..fb368bb201 100644
+--- a/board/bytesatwork/baw_config/baw_config_get.c
++++ b/board/bytesatwork/baw_config/baw_config_get.c
+@@ -3,8 +3,9 @@
+  * Copyright (C) 2015 bytes at work AG
+  */
+ 
+-#include <asm/arch/ddr_defs.h>
++#include <linux/types.h>
+ #include <i2c.h>
++#include <stdio.h>
+ #include "baw_config_get.h"
+ 
+ #include "baw_config_builtin.h"
+@@ -16,10 +17,15 @@ void baw_config_get(struct baw_config *config)
+ {
+ 	u8 __attribute__((unused)) reg = 0;
+ 
+-	if (baw_config_eeprom_read(config) == 0)
++	if (baw_config_eeprom_read(config) == 0) {
++#ifdef CONFIG_SPL_BUILD
++		printf("Use EEPROM RAM config: %u (%s)\n", config->ram,
++		       baw_config_get_ram_name(config->ram));
++#endif
+ 		return;
++	}
+ 
+-#ifdef CONFIG_SPL_BUILD
++#if defined(CONFIG_SPL_BUILD) && defined(CONFIG_TARGET_BYTEENGINE_AM335X)
+ 	if (i2c_read(PMIC_ADDRESS, 0x20, 1, &reg, 1) != 0) {
+ 		printf("Error: PMIC read failed\n");
+ 		goto default_config;
+@@ -53,6 +59,8 @@ default_config:
+ 			config->ram = M2_RAM_K4B2G1646EBIH9;	/* set default to legacy DDR3 */
+ 		else if (IS_ENABLED(CONFIG_TARGET_BYTEDEVKIT))
+ 			config->ram = M2_RAM_K4B4G1646DBIK0;
++		else if (IS_ENABLED(CONFIG_TARGET_IMX8MM_BYTEDEVKIT))
++			config->ram = M6_RAM_MT53E128M32D2DS_053;
+ 	}
+ 
+ 	if (IS_ENABLED(CONFIG_SPL_BUILD)) {
+diff --git a/board/bytesatwork/baw_config/cmd_baw_config.c b/board/bytesatwork/baw_config/cmd_baw_config.c
+index 1f996a392c..ded4312eb3 100644
+--- a/board/bytesatwork/baw_config/cmd_baw_config.c
++++ b/board/bytesatwork/baw_config/cmd_baw_config.c
+@@ -9,6 +9,7 @@
+ #include "baw_config_builtin.h"
+ #include "baw_config_eeprom.h"
+ 
++#if defined(CONFIG_BAW_CONFIG_BUILTIN) || defined(CONFIG_BAW_CONFIG_EEPROM)
+ static void print_config(const struct baw_config *config)
+ {
+ 	printf("PCB:   %u (%s)\n", config->pcb,
+@@ -33,6 +34,7 @@ static void print_config(const struct baw_config *config)
+ 		printf("UID:             %s\n", config->uid);
+ 	}
+ }
++#endif
+ 
+ #if defined(CONFIG_BAW_CONFIG_BUILTIN)
+ static enum command_ret_t cmd_builtin(int argc, char * const argv[])
+@@ -144,14 +146,12 @@ struct baw_config_cmd_struct {
+ static const struct baw_config_cmd_struct baw_config_cmd[] = {
+ #if defined(CONFIG_BAW_CONFIG_BUILTIN)
+ 	{ "builtin", cmd_builtin },
++	{ "builtin2eeprom", cmd_builtin2eeprom },
+ #endif
+ #if defined(CONFIG_BAW_CONFIG_EEPROM)
+ 	{ "read", cmd_read },
+ 	{ "erase", cmd_erase },
+ 	{ "write", cmd_write },
+-#if defined(CONFIG_BAW_CONFIG_BUILTIN)
+-	{ "builtin2eeprom", cmd_builtin2eeprom },
+-#endif
+ #endif
+ 	{ NULL, NULL }
+ };
+-- 
+2.39.2
+

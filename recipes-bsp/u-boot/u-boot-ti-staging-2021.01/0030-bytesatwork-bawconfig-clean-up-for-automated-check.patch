@@ -1,0 +1,170 @@
+From 8e8cfe63130c7710559fb5b87cdfca3e251ae150 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Wed, 5 Apr 2023 11:10:08 +0200
+Subject: [PATCH] bytesatwork: bawconfig: clean up for automated check
+
+Make the tool that shall not be named happier.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+(cherry picked from commit 7a1476fffe9379ebc31b5d82b474f5822f1a782e)
+---
+ board/bytesatwork/baw_config/baw_config.c     |  3 +--
+ board/bytesatwork/baw_config/baw_config.h     | 24 +++++++++----------
+ .../baw_config/baw_config_eeprom.c            | 18 +++++---------
+ board/bytesatwork/baw_config/baw_config_get.c |  9 +++----
+ 4 files changed, 24 insertions(+), 30 deletions(-)
+
+diff --git a/board/bytesatwork/baw_config/baw_config.c b/board/bytesatwork/baw_config/baw_config.c
+index 53a1fadabd..2fdd875f44 100644
+--- a/board/bytesatwork/baw_config/baw_config.c
++++ b/board/bytesatwork/baw_config/baw_config.c
+@@ -32,8 +32,7 @@ const struct baw_config_name_pair baw_config_ram_name[] = {
+ 	{ M6_RAM_MT53D512M32D2DS_053, "MT53D512M32D2DS-053 2 GB LPDDR4 @ 1500 MHz" },
+ 	{ M6_RAM_MT53E768M32D4DT_053, "MT53E768M32D4DT-053 3 GB LPDDR4 @ 1500 MHz" },
+ 	{ M6_RAM_MT53D1024M32D4DT_053, "MT53D1024M32D4DT-053 4 GB LPDDR4 @ 1500 MHz" },
+-	{ M6_RAM_MT53D1024M32D4DT_053_3GB,
+-		"MT53D1024M32D4DT-053 4 GB using 3 GB @ 1500 MHz" },
++	{ M6_RAM_MT53D1024M32D4DT_053_3GB, "MT53D1024M32D4DT-053 4 GB using 3 GB @ 1500 MHz" },
+ 	{ M8_RAM_MT53E256M16D1DS_046, "MT53E256M16D1DS-046 512 MB LPDDR4 @ 1600 MHz"},
+ 	{ M8_RAM_MT53D512M16D1DS_046, "MT53D512M16D1DS-046 1 GB LPDDR4 @ 1600 MHz"},
+ 	{ M8_RAM_MT53E1G16D1FW_046, "MT53E1G16D1FW-046 2 GB LPDDR4 @ 1600 MHz"},
+diff --git a/board/bytesatwork/baw_config/baw_config.h b/board/bytesatwork/baw_config/baw_config.h
+index d27fb0bef9..21039c1f12 100644
+--- a/board/bytesatwork/baw_config/baw_config.h
++++ b/board/bytesatwork/baw_config/baw_config.h
+@@ -9,7 +9,7 @@
+ #include <config.h>
+ #include <linux/types.h>
+ 
+-typedef enum {
++enum baw_config_pcb {
+ 	M2_PCB_REV_00 = 0,
+ 	M2_PCB_REV_01 = 1,
+ 	M2_PCB_REV_02 = 2,
+@@ -21,9 +21,9 @@ typedef enum {
+ 	M6_PCB_REV_1_1 = 8,
+ 	M8_PCB_REV_0_1 = 9,
+ 	M8_PCB_REV_1_0 = 10,
+-} baw_config_pcb_t;
++};
+ 
+-typedef enum {
++enum baw_config_ram {
+ 	M2_RAM_MT47H128M16RT25E = 1,
+ 	M2_RAM_K4B2G1646EBIH9   = 2,
+ 	M2_RAM_K4B2G1646QBCK0   = 3,
+@@ -45,21 +45,21 @@ typedef enum {
+ 	M8_RAM_MT53E4G16D4NQ_046 = 16,
+ 	M5_RAM_K4B4G1646DBIK0 = 17,
+ 	M5_RAM_MT41K512M16HA107 = 18,
+-} baw_config_ram_t;
++};
+ 
+-typedef enum {
++enum baw_config_flash {
+ 	M2_NAND_2GBIT  = 0,
+ 	M2_NAND_4GBIT  = 1,
+ 	EMMC_4GB  = 2,
+ 	EMMC_8GB  = 3,
+ 	EMMC_16GB = 4,
+ 	EMMC_32GB = 5,
+-} baw_config_flash_t;
++};
+ 
+ struct baw_config {
+-	baw_config_pcb_t pcb;
+-	baw_config_ram_t ram;
+-	baw_config_flash_t flash;
++	enum baw_config_pcb pcb;
++	enum baw_config_ram ram;
++	enum baw_config_flash flash;
+ 	bool ext_avail;
+ 	u32 artno;
+ 	u32 lot;
+@@ -83,17 +83,17 @@ extern const struct baw_config_name_pair baw_config_flash_name[];
+ 
+ const char *baw_config_get_name(u32 config, const struct baw_config_name_pair *map);
+ 
+-static inline const char *baw_config_get_pcb_name(baw_config_pcb_t config)
++static inline const char *baw_config_get_pcb_name(enum baw_config_pcb config)
+ {
+ 	return baw_config_get_name(config, baw_config_pcb_name);
+ }
+ 
+-static inline const char *baw_config_get_ram_name(baw_config_ram_t config)
++static inline const char *baw_config_get_ram_name(enum baw_config_ram config)
+ {
+ 	return baw_config_get_name(config, baw_config_ram_name);
+ }
+ 
+-static inline const char *baw_config_get_flash_name(baw_config_flash_t config)
++static inline const char *baw_config_get_flash_name(enum baw_config_flash config)
+ {
+ 	return baw_config_get_name(config, baw_config_flash_name);
+ }
+diff --git a/board/bytesatwork/baw_config/baw_config_eeprom.c b/board/bytesatwork/baw_config/baw_config_eeprom.c
+index fe07605dcf..0225e3c4b3 100644
+--- a/board/bytesatwork/baw_config/baw_config_eeprom.c
++++ b/board/bytesatwork/baw_config/baw_config_eeprom.c
+@@ -194,12 +194,9 @@ int baw_config_eeprom_read(struct baw_config *config)
+ 	config->lot = frame.content_ext.content.lot;
+ 	config->lotseq = frame.content_ext.content.lotseq;
+ 
+-	strlcpy(config->proddate, frame.content_ext.content.proddate,
+-		sizeof(config->proddate));
+-	strlcpy(config->flashdate, frame.content_ext.content.flashdate,
+-		sizeof(config->flashdate));
+-	strlcpy(config->flashuser, frame.content_ext.content.flashuser,
+-		sizeof(config->flashuser));
++	strlcpy(config->proddate, frame.content_ext.content.proddate, sizeof(config->proddate));
++	strlcpy(config->flashdate, frame.content_ext.content.flashdate, sizeof(config->flashdate));
++	strlcpy(config->flashuser, frame.content_ext.content.flashuser, sizeof(config->flashuser));
+ 
+ 	config->ext_avail = 1;
+ 
+@@ -209,8 +206,7 @@ int baw_config_eeprom_read(struct baw_config *config)
+ 		return 0;
+ 	}
+ 
+-	if (frame.content_track.header.length !=
+-			sizeof(frame.content_track.content)) {
++	if (frame.content_track.header.length != sizeof(frame.content_track.content)) {
+ 		printf("track len wrong\n");
+ 		return 0;
+ 	}
+@@ -221,10 +217,8 @@ int baw_config_eeprom_read(struct baw_config *config)
+ 		return 0;
+ 	}
+ 
+-	strlcpy(config->macaddr, frame.content_track.content.macaddr,
+-		sizeof(config->macaddr));
+-	strlcpy(config->uid, frame.content_track.content.uid,
+-		sizeof(config->uid));
++	strlcpy(config->macaddr, frame.content_track.content.macaddr, sizeof(config->macaddr));
++	strlcpy(config->uid, frame.content_track.content.uid, sizeof(config->uid));
+ 
+ 	config->track_avail = 1;
+ 
+diff --git a/board/bytesatwork/baw_config/baw_config_get.c b/board/bytesatwork/baw_config/baw_config_get.c
+index ca1ad06e60..86ccdb66a8 100644
+--- a/board/bytesatwork/baw_config/baw_config_get.c
++++ b/board/bytesatwork/baw_config/baw_config_get.c
+@@ -19,10 +19,11 @@ void baw_config_get(struct baw_config *config)
+ 	u8 __attribute__((unused)) reg = 0;
+ 
+ 	if (baw_config_eeprom_read(config) == 0) {
+-#ifdef CONFIG_SPL_BUILD
+-		printf("Use EEPROM RAM config: %u (%s)\n", config->ram,
+-		       baw_config_get_ram_name(config->ram));
+-#endif
++		if (IS_ENABLED(CONFIG_SPL_BUILD)) {
++			printf("Use EEPROM RAM config: %u (%s)\n", config->ram,
++			       baw_config_get_ram_name(config->ram));
++		}
++
+ 		return;
+ 	}
+ 
+-- 
+2.39.2
+

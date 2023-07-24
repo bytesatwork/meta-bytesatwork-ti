@@ -1,0 +1,30 @@
+From bfcb917b402e354063b5a012cdf59a11212de5c4 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Wed, 5 Apr 2023 11:11:42 +0200
+Subject: [PATCH] bytesatwork: bawconfig: update cmd function
+
+Get rid of warning by using new style cmd function prototype.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+(cherry picked from commit 72182c520c43b6944c48471d5a06545898a4651d)
+---
+ board/bytesatwork/baw_config/cmd_baw_config.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
+
+diff --git a/board/bytesatwork/baw_config/cmd_baw_config.c b/board/bytesatwork/baw_config/cmd_baw_config.c
+index f6e48f566e..ba8908eb31 100644
+--- a/board/bytesatwork/baw_config/cmd_baw_config.c
++++ b/board/bytesatwork/baw_config/cmd_baw_config.c
+@@ -189,8 +189,7 @@ static enum command_ret_t print_configurations(void)
+ 	return CMD_RET_SUCCESS;
+ }
+ 
+-enum command_ret_t do_baw_config(cmd_tbl_t *cmdtp, int flag, int argc,
+-				 char * const argv[])
++static int do_baw_config(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
+ {
+ 	if (argc >= 2) {
+ 		const struct baw_config_cmd_struct *cmd = get_cmd(argv[1]);
+-- 
+2.39.2
+

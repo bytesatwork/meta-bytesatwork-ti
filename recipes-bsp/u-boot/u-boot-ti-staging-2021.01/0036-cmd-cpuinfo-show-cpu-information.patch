@@ -1,0 +1,82 @@
+From c6f95efff5aed2771f658a42b47b0167cd894dc2 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Wed, 28 Jun 2023 13:23:19 +0200
+Subject: [PATCH] cmd: cpuinfo: show cpu information
+
+Introduce command to show CPU information.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+---
+ MAINTAINERS   |  1 +
+ cmd/Kconfig   |  7 +++++++
+ cmd/Makefile  |  1 +
+ cmd/cpuinfo.c | 15 +++++++++++++++
+ 4 files changed, 24 insertions(+)
+ create mode 100644 cmd/cpuinfo.c
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 157d54dd73..1212feeecf 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -197,6 +197,7 @@ F:	board/bytesatwork/
+ F:	board/bytesatwork/bytedevkit/
+ F:	configs/*bytedevkit*_defconfig
+ F:	include/configs/*bytedevkit*.h
++F:	cmd/cpuinfo.c
+ 
+ ARM CORTINA ACCESS CAxxxx
+ M:	Alex Nemirovsky <alex.nemirovsky@cortina-access.com>
+diff --git a/cmd/Kconfig b/cmd/Kconfig
+index f7877df702..a62bf32ac8 100644
+--- a/cmd/Kconfig
++++ b/cmd/Kconfig
+@@ -119,6 +119,13 @@ config CMD_CPU
+ 	  internal name) and clock frequency. Other information may be
+ 	  available depending on the CPU driver.
+ 
++config CMD_CPUINFO
++	bool "cpuinfo"
++	depends on DISPLAY_CPUINFO
++	help
++	  Wrapps print_cpuinfo() into a command.
++	  Print information about the CPU to the console.
++
+ config CMD_LICENSE
+ 	bool "license"
+ 	select BUILD_BIN2C
+diff --git a/cmd/Makefile b/cmd/Makefile
+index dd86675bf2..392e39f830 100644
+--- a/cmd/Makefile
++++ b/cmd/Makefile
+@@ -43,6 +43,7 @@ obj-$(CONFIG_CMD_CONFIG) += config.o
+ obj-$(CONFIG_CMD_CONITRACE) += conitrace.o
+ obj-$(CONFIG_CMD_CONSOLE) += console.o
+ obj-$(CONFIG_CMD_CPU) += cpu.o
++obj-$(CONFIG_CMD_CPUINFO) += cpuinfo.o
+ obj-$(CONFIG_DATAFLASH_MMC_SELECT) += dataflash_mmc_mux.o
+ obj-$(CONFIG_CMD_DATE) += date.o
+ obj-$(CONFIG_CMD_DEMO) += demo.o
+diff --git a/cmd/cpuinfo.c b/cmd/cpuinfo.c
+new file mode 100644
+index 0000000000..886f86a48b
+--- /dev/null
++++ b/cmd/cpuinfo.c
+@@ -0,0 +1,15 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (C) 2023 bytes at work AG - https://www.bytesatwork.io
++ */
++
++#include <common.h>
++#include <command.h>
++#include <init.h>
++
++static int do_cpuinfo(struct cmd_tbl *cmdtp, int flag, int argc, char *const argv[])
++{
++	return print_cpuinfo();
++}
++
++U_BOOT_CMD(cpuinfo, 2, 1, do_cpuinfo, "show cpu info", "");
+-- 
+2.39.2
+

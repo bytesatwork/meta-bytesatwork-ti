@@ -1,0 +1,57 @@
+From 1b276060e0836dfee48ddc0ffcabc7ba03649625 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Thu, 13 Apr 2023 13:11:27 +0200
+Subject: [PATCH] bytesatwork: bawconfig: add stm32mp1 ram types
+
+Use dedicated RAM enums and descriptions for STM32MP1 module.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+(cherry picked from commit 3cb80a7bf41b58e77f5f80dc71cf5942d3c0cf4b)
+---
+ board/bytesatwork/baw_config/baw_config.c     | 2 ++
+ board/bytesatwork/baw_config/baw_config.h     | 2 ++
+ board/bytesatwork/baw_config/baw_config_get.c | 2 +-
+ 3 files changed, 5 insertions(+), 1 deletion(-)
+
+diff --git a/board/bytesatwork/baw_config/baw_config.c b/board/bytesatwork/baw_config/baw_config.c
+index e49fcf122f..53a1fadabd 100644
+--- a/board/bytesatwork/baw_config/baw_config.c
++++ b/board/bytesatwork/baw_config/baw_config.c
+@@ -38,6 +38,8 @@ const struct baw_config_name_pair baw_config_ram_name[] = {
+ 	{ M8_RAM_MT53D512M16D1DS_046, "MT53D512M16D1DS-046 1 GB LPDDR4 @ 1600 MHz"},
+ 	{ M8_RAM_MT53E1G16D1FW_046, "MT53E1G16D1FW-046 2 GB LPDDR4 @ 1600 MHz"},
+ 	{ M8_RAM_MT53E4G16D4NQ_046, "MT53E4G16D4NQ-046 8 GB LPDDR4 @ 1600 MHz"},
++	{ M5_RAM_K4B4G1646DBIK0,   "K4B4G1646DBIK0 512 MB DDR3 @ 533MHz" },
++	{ M5_RAM_MT41K512M16HA107, "MT41K512M16HA107 1024 MB DDR3 @ 533MHz" },
+ 	{ -1, NULL },
+ };
+ 
+diff --git a/board/bytesatwork/baw_config/baw_config.h b/board/bytesatwork/baw_config/baw_config.h
+index 14f333a750..d27fb0bef9 100644
+--- a/board/bytesatwork/baw_config/baw_config.h
++++ b/board/bytesatwork/baw_config/baw_config.h
+@@ -43,6 +43,8 @@ typedef enum {
+ 	M8_RAM_MT53D512M16D1DS_046 = 14,
+ 	M8_RAM_MT53E1G16D1FW_046 = 15,
+ 	M8_RAM_MT53E4G16D4NQ_046 = 16,
++	M5_RAM_K4B4G1646DBIK0 = 17,
++	M5_RAM_MT41K512M16HA107 = 18,
+ } baw_config_ram_t;
+ 
+ typedef enum {
+diff --git a/board/bytesatwork/baw_config/baw_config_get.c b/board/bytesatwork/baw_config/baw_config_get.c
+index fb368bb201..87ba08a85d 100644
+--- a/board/bytesatwork/baw_config/baw_config_get.c
++++ b/board/bytesatwork/baw_config/baw_config_get.c
+@@ -58,7 +58,7 @@ default_config:
+ 		if (IS_ENABLED(CONFIG_TARGET_BYTEENGINE_AM335X))
+ 			config->ram = M2_RAM_K4B2G1646EBIH9;	/* set default to legacy DDR3 */
+ 		else if (IS_ENABLED(CONFIG_TARGET_BYTEDEVKIT))
+-			config->ram = M2_RAM_K4B4G1646DBIK0;
++			config->ram = M5_RAM_K4B4G1646DBIK0;
+ 		else if (IS_ENABLED(CONFIG_TARGET_IMX8MM_BYTEDEVKIT))
+ 			config->ram = M6_RAM_MT53E128M32D2DS_053;
+ 	}
+-- 
+2.39.2
+

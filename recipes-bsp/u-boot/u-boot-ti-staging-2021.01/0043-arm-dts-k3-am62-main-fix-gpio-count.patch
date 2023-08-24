@@ -1,0 +1,38 @@
+From e11a8a9fafe201492bea7e91cdab6ac2a5975da4 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Thu, 17 Aug 2023 14:27:33 +0200
+Subject: [PATCH] arm: dts: k3-am62-main fix gpio count
+
+Set the correct number of GPIOs per bank.
+Copied from upstream branch ti-u-boot-2023.04.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+---
+ arch/arm/dts/k3-am62-main.dtsi | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm/dts/k3-am62-main.dtsi b/arch/arm/dts/k3-am62-main.dtsi
+index e7e6920112..2cd6ad26a8 100644
+--- a/arch/arm/dts/k3-am62-main.dtsi
++++ b/arch/arm/dts/k3-am62-main.dtsi
+@@ -309,7 +309,7 @@
+ 			     <193>, <194>, <195>;
+ 		interrupt-controller;
+ 		#interrupt-cells = <2>;
+-		ti,ngpio = <87>;
++		ti,ngpio = <92>;
+ 		ti,davinci-gpio-unbanked = <0>;
+ 		power-domains = <&k3_pds 77 TI_SCI_PD_EXCLUSIVE>;
+ 		clocks = <&k3_clks 77 0>;
+@@ -326,7 +326,7 @@
+ 			     <183>, <184>, <185>;
+ 		interrupt-controller;
+ 		#interrupt-cells = <2>;
+-		ti,ngpio = <88>;
++		ti,ngpio = <52>;
+ 		ti,davinci-gpio-unbanked = <0>;
+ 		power-domains = <&k3_pds 78 TI_SCI_PD_EXCLUSIVE>;
+ 		clocks = <&k3_clks 78 0>;
+-- 
+2.39.2
+

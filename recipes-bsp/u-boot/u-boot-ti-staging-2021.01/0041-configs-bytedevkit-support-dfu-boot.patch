@@ -1,0 +1,87 @@
+From 72742f801fd7fb0b50d8feeb0fe126ef2d5edf82 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Stephan=20D=C3=BCnner?= <stephan.duenner@bytesatwork.ch>
+Date: Fri, 18 Aug 2023 08:12:25 +0200
+Subject: [PATCH] configs: bytedevkit: support dfu boot
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Enable necessary CONFIGs for DFU boot.
+Remove unused or unsupported CONFIGs.
+
+Signed-off-by: Stephan Dünner <stephan.duenner@bytesatwork.ch>
+---
+ configs/am62x_bytedevkit_a53_defconfig |  1 +
+ configs/am62x_bytedevkit_r5_defconfig  | 25 +++++++++++++++++++++++--
+ 2 files changed, 24 insertions(+), 2 deletions(-)
+
+diff --git a/configs/am62x_bytedevkit_a53_defconfig b/configs/am62x_bytedevkit_a53_defconfig
+index 869c56ee34..33f18c7725 100644
+--- a/configs/am62x_bytedevkit_a53_defconfig
++++ b/configs/am62x_bytedevkit_a53_defconfig
+@@ -139,6 +139,7 @@ CONFIG_SPL_DM_USB_GADGET=y
+ CONFIG_USB_XHCI_HCD=y
+ CONFIG_USB_DWC3=y
+ CONFIG_USB_DWC3_GENERIC=y
++CONFIG_USB_DWC3_PHY_OMAP=y
+ CONFIG_USB_STORAGE=y
+ CONFIG_USB_GADGET=y
+ CONFIG_USB_GADGET_MANUFACTURER="Texas Instruments"
+diff --git a/configs/am62x_bytedevkit_r5_defconfig b/configs/am62x_bytedevkit_r5_defconfig
+index 0548f0cb5e..50c3248bb9 100644
+--- a/configs/am62x_bytedevkit_r5_defconfig
++++ b/configs/am62x_bytedevkit_r5_defconfig
+@@ -40,8 +40,8 @@ CONFIG_SPL_POWER_DOMAIN=y
+ CONFIG_SPL_RAM_SUPPORT=y
+ CONFIG_SPL_RAM_DEVICE=y
+ CONFIG_SPL_REMOTEPROC=y
+-CONFIG_SPL_THERMAL=y
+-CONFIG_SPL_YMODEM_SUPPORT=y
++CONFIG_SPL_USB_GADGET=y
++CONFIG_SPL_DFU=y
+ CONFIG_HUSH_PARSER=y
+ CONFIG_CMD_ASKENV=y
+ CONFIG_CMD_DFU=y
+@@ -63,12 +63,15 @@ CONFIG_SPL_DM=y
+ CONFIG_SPL_DM_SEQ_ALIAS=y
+ CONFIG_REGMAP=y
+ CONFIG_SPL_REGMAP=y
++CONFIG_SYSCON=y
++CONFIG_SPL_SYSCON=y
+ CONFIG_SPL_OF_TRANSLATE=y
+ CONFIG_CLK=y
+ CONFIG_SPL_CLK=y
+ CONFIG_SPL_CLK_CCF=y
+ CONFIG_SPL_CLK_K3=y
+ CONFIG_SPL_CLK_K3_PLL=y
++CONFIG_SYS_DFU_DATA_BUF_SIZE=0x80000
+ CONFIG_DMA_CHANNELS=y
+ CONFIG_TI_K3_NAVSS_UDMA=y
+ CONFIG_TI_SCI_PROTOCOL=y
+@@ -104,5 +107,23 @@ CONFIG_DM_THERMAL=y
+ CONFIG_TIMER=y
+ CONFIG_SPL_TIMER=y
+ CONFIG_OMAP_TIMER=y
++CONFIG_USB=y
++CONFIG_DM_USB=y
++CONFIG_DM_USB_GADGET=y
++CONFIG_SPL_DM_USB_GADGET=y
++CONFIG_USB_XHCI_HCD=y
++CONFIG_USB_XHCI_DWC3=y
++CONFIG_USB_XHCI_DWC3_OF_SIMPLE=y
++CONFIG_USB_EHCI_HCD=y
++CONFIG_USB_EHCI_GENERIC=y
++CONFIG_USB_DWC2=y
++CONFIG_USB_CDNS3=y
++CONFIG_USB_CDNS3_HOST=y
++CONFIG_USB_DWC3=y
++CONFIG_USB_DWC3_GENERIC=y
++CONFIG_USB_DWC3_PHY_OMAP=y
++CONFIG_USB_GADGET=y
++CONFIG_USB_GADGET_DOWNLOAD=y
++CONFIG_USB_FUNCTION_MASS_STORAGE=y
+ CONFIG_LIB_RATIONAL=y
+ CONFIG_SPL_LIB_RATIONAL=y
+-- 
+2.39.2
+

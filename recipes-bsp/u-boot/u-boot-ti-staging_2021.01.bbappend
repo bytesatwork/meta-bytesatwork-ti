@@ -1,4 +1,4 @@
-PR = "r1"
+PR = "r2"
 
 SRCREV = "2dd2e1d366acf7f41bbd8f2d1dbe6cf5e1bcbad6"
 
@@ -42,6 +42,12 @@ SRC_URI += " \
 	file://0036-cmd-cpuinfo-show-cpu-information.patch \
 	file://0037-configs-bytedevkit-enable-info-commands.patch \
 	file://0038-include-configs-bytedevkit-enable-oldi.patch \
+	file://0039-arm-dts-bytedevkit-change-usb-role.patch \
+	file://0040-include-configs-bytedevkit-add-dfu_alt_info.patch \
+	file://0041-configs-bytedevkit-support-dfu-boot.patch \
+	file://0042-gpio-da8xx_gpio-Fix-gpio-name-with-address.patch \
+	file://0043-arm-dts-k3-am62-main-fix-gpio-count.patch \
+	file://0044-configs-bytedevkit-enable-gpio-support.patch \
 "
 
 SPL_UART_BINARY:bytedevkit-am62x-k3r5 = "u-boot-spl.bin"

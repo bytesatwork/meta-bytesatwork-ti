@@ -1,0 +1,56 @@
+From 32ecb1784f14552c75cd92fe97ee45a1d99edfb9 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Tue, 2 May 2023 06:52:42 +0200
+Subject: [PATCH] bytesatwork: bawconfig: init config to zero
+
+Avoid undefined behavior if struct members are not written.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+(cherry picked from commit 7daca48726d352c688be16cfd5d169f71419b9af)
+---
+ board/bytesatwork/baw_config/cmd_baw_config.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
+
+diff --git a/board/bytesatwork/baw_config/cmd_baw_config.c b/board/bytesatwork/baw_config/cmd_baw_config.c
+index 2cff981a92..1f996a392c 100644
+--- a/board/bytesatwork/baw_config/cmd_baw_config.c
++++ b/board/bytesatwork/baw_config/cmd_baw_config.c
+@@ -37,7 +37,7 @@ static void print_config(const struct baw_config *config)
+ #if defined(CONFIG_BAW_CONFIG_BUILTIN)
+ static enum command_ret_t cmd_builtin(int argc, char * const argv[])
+ {
+-	struct baw_config config;
++	struct baw_config config = {0};
+ 
+ 	if (argc != 0)
+ 		return CMD_RET_USAGE;
+@@ -56,7 +56,7 @@ static enum command_ret_t cmd_builtin(int argc, char * const argv[])
+ #if defined(CONFIG_BAW_CONFIG_EEPROM)
+ static enum command_ret_t cmd_read(int argc, char * const argv[])
+ {
+-	struct baw_config config;
++	struct baw_config config = {0};
+ 	int ret;
+ 
+ 	if (argc != 0)
+@@ -73,7 +73,7 @@ static enum command_ret_t cmd_read(int argc, char * const argv[])
+ 
+ static enum command_ret_t cmd_write(int argc, char * const argv[])
+ {
+-	struct baw_config config;
++	struct baw_config config = {0};
+ 
+ 	if (argc != 11)
+ 		return CMD_RET_USAGE;
+@@ -116,7 +116,7 @@ static enum command_ret_t cmd_erase(int argc, char * const argv[])
+ #if defined(CONFIG_BAW_CONFIG_BUILTIN)
+ static enum command_ret_t cmd_builtin2eeprom(int argc, char * const argv[])
+ {
+-	struct baw_config config;
++	struct baw_config config = {0};
+ 
+ 	if (argc != 0)
+ 		return CMD_RET_USAGE;
+-- 
+2.39.2
+

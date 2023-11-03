@@ -1,0 +1,305 @@
+From 35d5edb78de81facc55ad1f390dc77e761ebc5d0 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Wed, 2 Aug 2023 13:53:12 +0200
+Subject: [PATCH] arm: dts: bytedevkit: Move to new driver model schema
+
+See commit 0a06d7106195 ("dm: doc: Move to new driver model schema")'
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+---
+ arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi | 94 +++++++++-----------
+ arch/arm/dts/k3-am625-r5-bytedevkit.dts      | 15 ++--
+ 2 files changed, 51 insertions(+), 58 deletions(-)
+
+diff --git a/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi b/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi
+index 92534c040c..c9ff5f94b8 100644
+--- a/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi
++++ b/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi
+@@ -18,118 +18,106 @@
+ 	};
+ 
+ 	memory@80000000 {
+-		u-boot,dm-spl;
++		bootph-pre-ram;
+ 	};
+ };
+ 
+ &cbass_main{
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ 
+ 	timer1: timer@2400000 {
+ 		compatible = "ti,omap5430-timer";
+ 		reg = <0x00 0x2400000 0x00 0x80>;
+ 		ti,timer-alwon;
+ 		clock-frequency = <25000000>;
+-		u-boot,dm-spl;
++		bootph-pre-ram;
+ 	};
+ };
+ 
+ &dmss {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &secure_proxy_main {
+-	u-boot,dm-spl;
+-};
+-
+-&dmsc {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &k3_pds {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &k3_clks {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &k3_reset {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &wkup_conf {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &chipid {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &main_pmx0 {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &main_uart0 {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &main_uart0_pins_default {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &cbass_mcu {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &cbass_wakeup {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &mcu_pmx0 {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &main_i2c0 {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &main_i2c0_pins_default {
+-	u-boot,dm-spl;
+-};
+-
+-&main_i2c1 {
+-	u-boot,dm-spl;
+-};
+-
+-&main_i2c1_pins_default {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &sdhci0 {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &sdhci1 {
+ 	sdhci-caps-mask = <0x00000007 0x00000000>;
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &main_mmc1_pins_default {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &usbss0 {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &usb0 {
+ 	dr_mode = "peripheral";
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &main_usb0_pins_default {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &cpsw3g {
+@@ -137,51 +125,55 @@
+ 	      <0x0 0x43000200 0x0 0x8>;
+ 	reg-names = "cpsw_nuss", "mac_efuse";
+ 	/delete-property/ ranges;
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ 
+ 	cpsw-phy-sel@04044 {
+ 		compatible = "ti,am64-phy-gmii-sel";
+ 		reg = <0x0 0x00104044 0x0 0x8>;
+-		u-boot,dm-spl;
++		bootph-pre-ram;
+ 	};
+ };
+ 
+ &main_bcdma {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &main_pktdma {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &fss {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &cpsw_port1 {
+-	u-boot,dm-spl;
+-};
+-
+-&cpsw_port2 {
+-	status = "disabled";
++	bootph-pre-ram;
+ };
+ 
+ &main_rmii1_pins_default {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &main_mdio1_pins_default {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &cpsw3g_phy0 {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ };
+ 
+ &dmsc {
+-	u-boot,dm-spl;
++	bootph-pre-ram;
+ 	k3_sysreset: sysreset-controller {
+ 		compatible = "ti,sci-sysreset";
+-		u-boot,dm-spl;
++		bootph-pre-ram;
+ 	};
+ };
++
++&main_i2c1 {
++	bootph-pre-ram;
++};
++
++&main_i2c1_pins_default {
++	bootph-pre-ram;
++};
+diff --git a/arch/arm/dts/k3-am625-r5-bytedevkit.dts b/arch/arm/dts/k3-am625-r5-bytedevkit.dts
+index 4fc7f76968..3f0b82d466 100644
+--- a/arch/arm/dts/k3-am625-r5-bytedevkit.dts
++++ b/arch/arm/dts/k3-am625-r5-bytedevkit.dts
+@@ -27,7 +27,7 @@
+ 		/* 2G RAM */
+ 		reg = <0x00000000 0x80000000 0x00000000 0x80000000>;
+ 
+-		u-boot,dm-spl;
++		bootph-pre-ram;
+ 	};
+ 
+ 	reserved-memory {
+@@ -55,7 +55,7 @@
+ 		ti,sci = <&dmsc>;
+ 		ti,sci-proc-id = <32>;
+ 		ti,sci-host-id = <10>;
+-		u-boot,dm-spl;
++		bootph-pre-ram;
+ 	};
+ 
+ 	dm_tifs: dm-tifs {
+@@ -65,7 +65,7 @@
+ 		mbox-names = "rx", "tx";
+ 		mboxes= <&secure_proxy_main 22>,
+ 			<&secure_proxy_main 23>;
+-		u-boot,dm-spl;
++		bootph-pre-ram;
+ 	};
+ };
+ 
+@@ -83,13 +83,13 @@
+ 		compatible = "ti,j721e-esm";
+ 		reg = <0x0 0x4100000 0x0 0x1000>;
+ 		ti,esm-pins = <0>, <1>, <2>, <85>;
+-		u-boot,dm-spl;
++		bootph-pre-ram;
+ 	};
+ };
+ 
+ &cbass_main {
+ 	sa3_secproxy: secproxy@44880000 {
+-		u-boot,dm-spl;
++		bootph-pre-ram;
+ 		compatible = "ti,am654-secure-proxy";
+ 		#mbox-cells = <1>;
+ 		reg-names = "rt", "scfg", "target_data";
+@@ -102,14 +102,14 @@
+ 		compatible = "ti,am654-system-controller";
+ 		mboxes= <&secure_proxy_main 1>, <&secure_proxy_main 0>, <&sa3_secproxy 0>;
+ 		mbox-names = "tx", "rx", "boot_notify";
+-		u-boot,dm-spl;
++		bootph-pre-ram;
+ 	};
+ 
+ 	main_esm: esm@420000 {
+ 		compatible = "ti,j721e-esm";
+ 		reg = <0x0 0x420000 0x0 0x1000>;
+ 		ti,esm-pins = <160>, <161>, <162>, <163>, <177>, <178>;
+-		u-boot,dm-spl;
++		bootph-pre-ram;
+ 	};
+ };
+ 
+@@ -119,5 +119,6 @@
+ 
+ &main_bcdma {
+ 	ti,sci = <&dm_tifs>;
++	bootph-pre-ram;
+ };
+ 
+-- 
+2.39.2
+

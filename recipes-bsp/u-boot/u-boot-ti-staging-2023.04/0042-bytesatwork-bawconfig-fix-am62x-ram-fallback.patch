@@ -1,0 +1,29 @@
+From fd115aaafd306f051d1b07c0f9998ac65cc4b1d7 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Thu, 16 Nov 2023 11:43:16 +0100
+Subject: [PATCH] bytesatwork: bawconfig: fix am62x ram fallback
+
+Use the correct target for fallback.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+(cherry picked from commit b81f301b13521cdff6ba3bf1243e50d76d8531a7)
+---
+ board/bytesatwork/baw_config/baw_config_get.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/board/bytesatwork/baw_config/baw_config_get.c b/board/bytesatwork/baw_config/baw_config_get.c
+index bf171fa39e..fbb4be72dd 100644
+--- a/board/bytesatwork/baw_config/baw_config_get.c
++++ b/board/bytesatwork/baw_config/baw_config_get.c
+@@ -87,7 +87,7 @@ default_config:
+ 			config->ram = M5_RAM_K4B4G1646DBIK0;
+ 		else if (IS_ENABLED(CONFIG_TARGET_IMX8MM_BYTEDEVKIT))
+ 			config->ram = M6_RAM_MT53E128M32D2DS_053;
+-		else if (IS_ENABLED(CONFIG_TARGET_IMX8MM_BYTEDEVKIT))
++		else if (IS_ENABLED(CONFIG_TARGET_AM62X_BYTEDEVKIT_A53))
+ 			config->ram = M8_RAM_MT53E256M16D1DS_046;
+ 	}
+ 
+-- 
+2.39.2
+

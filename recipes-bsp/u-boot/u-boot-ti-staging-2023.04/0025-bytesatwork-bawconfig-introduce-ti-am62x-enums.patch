@@ -1,0 +1,65 @@
+From 1ca6e0e97c00044d2ca82bb755f060e30d65d948 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Wed, 5 Apr 2023 10:48:25 +0200
+Subject: [PATCH] bytesatwork: bawconfig: introduce ti am62x enums
+
+Add PCB revisions, RAM types and descriptions.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+(cherry picked from commit 315aa987432913c3b316c10340f6b8c9f9a4f4ac)
+---
+ board/bytesatwork/baw_config/baw_config.c | 6 ++++++
+ board/bytesatwork/baw_config/baw_config.h | 6 ++++++
+ 2 files changed, 12 insertions(+)
+
+diff --git a/board/bytesatwork/baw_config/baw_config.c b/board/bytesatwork/baw_config/baw_config.c
+index f5e229cea7..e49fcf122f 100644
+--- a/board/bytesatwork/baw_config/baw_config.c
++++ b/board/bytesatwork/baw_config/baw_config.c
+@@ -15,6 +15,8 @@ const struct baw_config_name_pair baw_config_pcb_name[] = {
+ 	{ M5_PCB_REV_1_2, "M5 Rev 1.2" },
+ 	{ M6_PCB_REV_1_0, "M6 Rev 1.0" },
+ 	{ M6_PCB_REV_1_1, "M6 Rev 1.1" },
++	{ M8_PCB_REV_0_1, "M8 Rev 0.1" },
++	{ M8_PCB_REV_1_0, "M8 Rev 1.0" },
+ 	{ -1, NULL },
+ };
+ 
+@@ -32,6 +34,10 @@ const struct baw_config_name_pair baw_config_ram_name[] = {
+ 	{ M6_RAM_MT53D1024M32D4DT_053, "MT53D1024M32D4DT-053 4 GB LPDDR4 @ 1500 MHz" },
+ 	{ M6_RAM_MT53D1024M32D4DT_053_3GB,
+ 		"MT53D1024M32D4DT-053 4 GB using 3 GB @ 1500 MHz" },
++	{ M8_RAM_MT53E256M16D1DS_046, "MT53E256M16D1DS-046 512 MB LPDDR4 @ 1600 MHz"},
++	{ M8_RAM_MT53D512M16D1DS_046, "MT53D512M16D1DS-046 1 GB LPDDR4 @ 1600 MHz"},
++	{ M8_RAM_MT53E1G16D1FW_046, "MT53E1G16D1FW-046 2 GB LPDDR4 @ 1600 MHz"},
++	{ M8_RAM_MT53E4G16D4NQ_046, "MT53E4G16D4NQ-046 8 GB LPDDR4 @ 1600 MHz"},
+ 	{ -1, NULL },
+ };
+ 
+diff --git a/board/bytesatwork/baw_config/baw_config.h b/board/bytesatwork/baw_config/baw_config.h
+index d689fa1a97..14f333a750 100644
+--- a/board/bytesatwork/baw_config/baw_config.h
++++ b/board/bytesatwork/baw_config/baw_config.h
+@@ -19,6 +19,8 @@ typedef enum {
+ 	M5_PCB_REV_1_2 = 6,
+ 	M6_PCB_REV_1_0 = 7,
+ 	M6_PCB_REV_1_1 = 8,
++	M8_PCB_REV_0_1 = 9,
++	M8_PCB_REV_1_0 = 10,
+ } baw_config_pcb_t;
+ 
+ typedef enum {
+@@ -37,6 +39,10 @@ typedef enum {
+ 	 * 3 GB RAM. Therefore define dedicated enum to use 4 GB as 3 GB RAM.
+ 	 */
+ 	M6_RAM_MT53D1024M32D4DT_053_3GB = 12,
++	M8_RAM_MT53E256M16D1DS_046 = 13,
++	M8_RAM_MT53D512M16D1DS_046 = 14,
++	M8_RAM_MT53E1G16D1FW_046 = 15,
++	M8_RAM_MT53E4G16D4NQ_046 = 16,
+ } baw_config_ram_t;
+ 
+ typedef enum {
+-- 
+2.39.2
+

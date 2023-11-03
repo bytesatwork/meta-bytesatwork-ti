@@ -1,0 +1,77 @@
+From 2f9ce7144ed73e59eb811d6a20917b42cd3ed451 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Wed, 17 May 2023 15:23:23 +0200
+Subject: [PATCH] board: bytesatwork/bytedevkit: calculate 2nd mac address
+
+Only the first MAC address can be located in the OTP memory.
+Therefore increment this address for the 2nd port.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+(cherry picked from commit 297f342b7f0aa4dc1243ab7895d0ab740d68508b)
+---
+ board/bytesatwork/bytedevkit/Kconfig          |  1 +
+ .../bytesatwork/bytedevkit/am62x_bytedevkit.c | 29 +++++++++++++++++++
+ 2 files changed, 30 insertions(+)
+
+diff --git a/board/bytesatwork/bytedevkit/Kconfig b/board/bytesatwork/bytedevkit/Kconfig
+index 8f632cc20f..5e029c4ad9 100644
+--- a/board/bytesatwork/bytedevkit/Kconfig
++++ b/board/bytesatwork/bytedevkit/Kconfig
+@@ -14,6 +14,7 @@ config TARGET_AM62X_BYTEDEVKIT_A53
+ 	bool "byteENGINE-AM62x on byteDEVKIT running on A53"
+ 	select ARM64
+ 	select SOC_K3_AM625
++	select LAST_STAGE_INIT
+ 	imply BOARD
+ 	imply SPL_BOARD
+ 
+diff --git a/board/bytesatwork/bytedevkit/am62x_bytedevkit.c b/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
+index 020d0efae0..3ef0f768c5 100644
+--- a/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
++++ b/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
+@@ -17,6 +17,7 @@
+ #include <asm/arch/hardware.h>
+ #include <asm/arch/sys_proto.h>
+ #include <env.h>
++#include <net.h>
+ 
+ #include "../baw_config/baw_config_eeprom.h"
+ 
+@@ -111,6 +112,34 @@ int board_late_init(void)
+ }
+ #endif
+ 
++int last_stage_init(void)
++{
++	unsigned char ethaddr[6] = {0};
++	int ret;
++
++	/* Manually increase 2nd MAC address by one */
++	ret = eth_env_get_enetaddr_by_index("eth", 0, ethaddr);
++	if (ret) {
++		for (int i = 5; i > 2; i--) {
++			ethaddr[i]++;
++			if (ethaddr[i])
++				break;
++		}
++	} else {
++		printf("Invalid MAC address at index 0!");
++	}
++
++	ret = eth_env_set_enetaddr_by_index("eth", 1, ethaddr);
++	if (ret) {
++		if (ret == -EEXIST)
++			printf("Use MAC address at index 1 from env.\n");
++		else
++			printf("Set env MAC address at index 1 failed! (%d)\n", ret);
++	}
++
++	return 0;
++}
++
+ #define CTRLMMR_USB0_PHY_CTRL	0x43004008
+ #define CTRLMMR_USB1_PHY_CTRL	0x43004018
+ #define CORE_VOLTAGE		0x80000000
+-- 
+2.39.2
+

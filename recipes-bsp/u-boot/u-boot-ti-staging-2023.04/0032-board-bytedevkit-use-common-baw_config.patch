@@ -1,0 +1,59 @@
+From b6fe5bc05a38f15ddd5ab592c812d1fbb29ed5b4 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Wed, 28 Jun 2023 11:51:54 +0200
+Subject: [PATCH] board: bytedevkit: use common baw_config
+
+baw_config was moved out of tree and uses own Makefile.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+---
+ board/bytesatwork/bytedevkit/Makefile           | 1 +
+ board/bytesatwork/bytedevkit/am62x_bytedevkit.c | 9 +++++++++
+ 2 files changed, 10 insertions(+)
+
+diff --git a/board/bytesatwork/bytedevkit/Makefile b/board/bytesatwork/bytedevkit/Makefile
+index 0ea7ec7e64..c03b63a0a3 100644
+--- a/board/bytesatwork/bytedevkit/Makefile
++++ b/board/bytesatwork/bytedevkit/Makefile
+@@ -7,3 +7,4 @@
+ #	Suman Anna <s-anna@ti.com>
+ 
+ obj-y	+= am62x_bytedevkit.o
++obj-y	+= ../baw_config/
+diff --git a/board/bytesatwork/bytedevkit/am62x_bytedevkit.c b/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
+index 857c15ffe3..020d0efae0 100644
+--- a/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
++++ b/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
+@@ -18,6 +18,8 @@
+ #include <asm/arch/sys_proto.h>
+ #include <env.h>
+ 
++#include "../baw_config/baw_config_eeprom.h"
++
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+ int board_init(void)
+@@ -99,6 +101,12 @@ void spl_perform_fixups(struct spl_image_info *spl_image)
+ #ifdef CONFIG_BOARD_LATE_INIT
+ int board_late_init(void)
+ {
++	int ret;
++
++	ret = baw_config_eeprom_init();
++	if (ret)
++		printf("Initialize byteENGINE EEPROM failed! (%d)\n", ret);
++
+ 	return 0;
+ }
+ #endif
+@@ -131,6 +139,7 @@ void spl_board_init(void)
+ 	writel(MCU_CTRL_DEVICE_CLKOUT_LFOSC_SELECT_VAL,
+ 	       MCU_CTRL_DEVICE_CLKOUT_32K_CTRL);
+ 
++	baw_config_eeprom_init();
+ 	/* Init DRAM size for R5/A53 SPL */
+ 	dram_init_banksize();
+ }
+-- 
+2.39.2
+

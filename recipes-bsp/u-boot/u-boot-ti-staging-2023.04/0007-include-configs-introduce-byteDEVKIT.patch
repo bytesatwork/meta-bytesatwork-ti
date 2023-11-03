@@ -1,0 +1,52 @@
+From b1ac8345dcc3e69a9f7b62a1e86dc5d7c17da858 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Mon, 18 Jul 2022 08:38:14 +0200
+Subject: [PATCH] include: configs: introduce byteDEVKIT
+
+Introduce bytes at work AM625 module on byteDEVKIT.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+---
+ include/configs/am62x_bytedevkit.h | 11 ++++++-----
+ 1 file changed, 6 insertions(+), 5 deletions(-)
+
+diff --git a/include/configs/am62x_bytedevkit.h b/include/configs/am62x_bytedevkit.h
+index 8f4f7b93c0..8dfafecfa4 100644
+--- a/include/configs/am62x_bytedevkit.h
++++ b/include/configs/am62x_bytedevkit.h
+@@ -1,13 +1,14 @@
+ /* SPDX-License-Identifier: GPL-2.0+ */
+ /*
+- * Configuration header file for K3 AM625 SoC family
++ * Copyright (C) 2022 bytes at work AG - https://www.bytesatwork.io
+  *
++ * Based on am62x_evm.c
+  * Copyright (C) 2020-2022 Texas Instruments Incorporated - https://www.ti.com/
+  *	Suman Anna <s-anna@ti.com>
+  */
+ 
+-#ifndef __CONFIG_AM625_EVM_H
+-#define __CONFIG_AM625_EVM_H
++#ifndef __CONFIG_AM62X_BYTEDEVKIT_H
++#define __CONFIG_AM62X_BYTEDEVKIT_H
+ 
+ #include <linux/sizes.h>
+ #include <config_distro_bootcmd.h>
+@@ -22,7 +23,7 @@
+ #define CONFIG_SPL_FS_LOAD_PAYLOAD_NAME	"tispl.bin"
+ #endif
+ 
+-#if defined(CONFIG_TARGET_AM625_A53_EVM)
++#if defined(CONFIG_TARGET_AM62X_BYTEDEVKIT_A53)
+ #define CONFIG_SPL_MAX_SIZE		SZ_1M
+ #define CONFIG_SYS_INIT_SP_ADDR         (CONFIG_SPL_TEXT_BASE + SZ_4M)
+ #else
+@@ -393,4 +394,4 @@
+ #endif
+ #define CONFIG_SYS_MALLOC_LEN           SZ_128M
+ 
+-#endif /* __CONFIG_AM625_EVM_H */
++#endif /* __CONFIG_AM62X_BYTEDEVKIT_H */
+-- 
+2.39.2
+

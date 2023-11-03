@@ -1,0 +1,183 @@
+From 16f82d31bfdb47f1870e1895ce01b555cc2fac28 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Wed, 5 Apr 2023 11:07:13 +0200
+Subject: [PATCH] bytesatwork: bawconfig: remove legacy i2c support, use driver
+ model
+
+Due to warnings and errors remove support of non driver model i2c support.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+(cherry picked from commit 96614941ec833baeac7b212739168074b938bb5d)
+---
+ .../baw_config/baw_config_eeprom.c            | 30 ++--------
+ board/bytesatwork/baw_config/baw_config_get.c | 55 ++++++++++++++-----
+ 2 files changed, 44 insertions(+), 41 deletions(-)
+
+diff --git a/board/bytesatwork/baw_config/baw_config_eeprom.c b/board/bytesatwork/baw_config/baw_config_eeprom.c
+index 46ed2e3a86..fe07605dcf 100644
+--- a/board/bytesatwork/baw_config/baw_config_eeprom.c
++++ b/board/bytesatwork/baw_config/baw_config_eeprom.c
+@@ -11,6 +11,7 @@
+ #include <i2c.h>
+ #include <hexdump.h>
+ #include <u-boot/crc.h>
++#include <linux/delay.h>
+ 
+ #define EEPROM_MAXWRITE		64	/* max. page size for writes */
+ #define MAGIC			0x6268
+@@ -78,18 +79,15 @@ struct eeprom_read_frame {
+ 
+ int baw_config_eeprom_init(void)
+ {
+-#ifdef CONFIG_DM_I2C
+ 	int ret;
+ 
+-	ret = uclass_get_device_by_seq(UCLASS_I2C, CONFIG_BAW_CONFIG_EEPROM_BUS,
+-				       &busp);
++	ret = uclass_get_device_by_seq(UCLASS_I2C, CONFIG_BAW_CONFIG_EEPROM_BUS, &busp);
+ 	if (ret) {
+ 		printf("%s(): uclass_get_device_by_seq(): %d\n", __func__, ret);
+ 		return ret;
+ 	}
+ 
+-	ret = dm_i2c_probe(busp, CONFIG_BAW_CONFIG_EEPROM_ADDRESS, 0,
+-			   &baw_config_dev);
++	ret = dm_i2c_probe(busp, CONFIG_BAW_CONFIG_EEPROM_ADDRESS, 0, &baw_config_dev);
+ 	if (ret) {
+ 		printf("%s(): dm_i2c_probe(): %d\n", __func__, ret);
+ 		return ret;
+@@ -101,7 +99,6 @@ int baw_config_eeprom_init(void)
+ 		return ret;
+ 	}
+ 
+-#endif
+ 	return 0;
+ }
+ 
+@@ -115,13 +112,7 @@ static int i2c_write_rdy(void)
+ 	u8 dummy = 0xff; /* i2c_write doesn't like to write NULL pointers */
+ 
+ 	for (i = 0; ret < 0 && i < 10; ++i) {
+-#ifndef CONFIG_DM_I2C
+-		i2c_set_bus_num(CONFIG_BAW_CONFIG_EEPROM_BUS);
+-		ret = i2c_write(CONFIG_BAW_CONFIG_EEPROM_ADDRESS, 0, 2, &dummy,
+-				0);
+-#else
+ 		ret = dm_i2c_write(baw_config_dev, 0, &dummy, 0);
+-#endif
+ 		if (ret != 0)
+ 			udelay(500);
+ 	}
+@@ -146,14 +137,8 @@ int i2c_long_write(struct eeprom_write_frame frame, int len)
+ 			ret = -EIO;
+ 			break;
+ 		}
+-#ifndef CONFIG_DM_I2C
+-		ret = i2c_write(CONFIG_BAW_CONFIG_EEPROM_ADDRESS, off, 2,
+-				(u8 *)(&frame) + off, wlen);
+-#else
+-		ret = dm_i2c_write(baw_config_dev, off, (u8 *)(&frame) + off,
+-				   wlen);
+-#endif
+ 
++		ret = dm_i2c_write(baw_config_dev, off, (u8 *)(&frame) + off, wlen);
+ 		if (ret != 0) {
+ 			ret = -EIO;
+ 			break;
+@@ -170,15 +155,8 @@ int baw_config_eeprom_read(struct baw_config *config)
+ {
+ 	struct eeprom_read_frame frame;
+ 
+-#ifndef CONFIG_DM_I2C
+-	i2c_set_bus_num(CONFIG_BAW_CONFIG_EEPROM_BUS);
+-	if (i2c_read(CONFIG_BAW_CONFIG_EEPROM_ADDRESS, 0, 2, (u8 *)&frame,
+-		     sizeof(frame)) != 0)
+-		return -3;
+-#else
+ 	if (dm_i2c_read(baw_config_dev, 0, (u8 *)&frame, sizeof(frame)))
+ 		return -12;
+-#endif
+ 
+ 	if (frame.content.header.magic != MAGIC)
+ 		return -4;
+diff --git a/board/bytesatwork/baw_config/baw_config_get.c b/board/bytesatwork/baw_config/baw_config_get.c
+index 87ba08a85d..ca1ad06e60 100644
+--- a/board/bytesatwork/baw_config/baw_config_get.c
++++ b/board/bytesatwork/baw_config/baw_config_get.c
+@@ -6,6 +6,7 @@
+ #include <linux/types.h>
+ #include <i2c.h>
+ #include <stdio.h>
++#include <dm/uclass.h>
+ #include "baw_config_get.h"
+ 
+ #include "baw_config_builtin.h"
+@@ -25,26 +26,50 @@ void baw_config_get(struct baw_config *config)
+ 		return;
+ 	}
+ 
+-#if defined(CONFIG_SPL_BUILD) && defined(CONFIG_TARGET_BYTEENGINE_AM335X)
+-	if (i2c_read(PMIC_ADDRESS, 0x20, 1, &reg, 1) != 0) {
+-		printf("Error: PMIC read failed\n");
+-		goto default_config;
+-	} else {
+-		if (reg == 0x05) {
+-			config->ram = M2_RAM_MT47H128M16RT25E;	/* set DDR2 */
+-			printf("DDR2 detected\n");
+-		} else if (reg == 0x01) {
+-			config->ram = M2_RAM_K4B2G1646EBIH9;	/* set legacy DDR3 */
+-			printf("DDR3 detected\n");
+-		} else {
++	if (IS_ENABLED(CONFIG_SPL_BUILD) && IS_ENABLED(CONFIG_TARGET_BYTEENGINE_AM335X) &&
++	    IS_ENABLED(CONFIG_DM_I2C)) {
++		struct udevice *pmic;
++		struct udevice *bus;
++		int ret;
++
++		ret = uclass_get_device_by_seq(UCLASS_I2C, CONFIG_BAW_CONFIG_EEPROM_BUS, &bus);
++		if (ret) {
++			printf("%s(): uclass_get_device_by_seq(): %d\n", __func__, ret);
+ 			goto default_config;
+ 		}
+-	}
+ 
+-	return;
++		ret = dm_i2c_probe(bus, PMIC_ADDRESS, 0, &pmic);
++		if (ret) {
++			printf("%s(): dm_i2c_probe(): %d\n", __func__, ret);
++			goto default_config;
++		}
++
++		ret = i2c_set_chip_offset_len(pmic, 1);
++		if (ret) {
++			printf("%s(): i2c_set_chip_offset_len(): %d\n", __func__, ret);
++			goto default_config;
++		}
++
++		ret = dm_i2c_read(pmic, 0x20, &reg, 1);
++		if (ret) {
++			printf("Error: PMIC read failed\n");
++			goto default_config;
++		} else {
++			if (reg == 0x05) {
++				config->ram = M2_RAM_MT47H128M16RT25E;	/* set DDR2 */
++				printf("DDR2 detected\n");
++			} else if (reg == 0x01) {
++				config->ram = M2_RAM_K4B2G1646EBIH9;	/* set legacy DDR3 */
++				printf("DDR3 detected\n");
++			} else {
++				goto default_config;
++			}
++		}
++
++		return;
++	}
+ 
+ default_config:
+-#endif
+ 
+ 	if (IS_ENABLED(CONFIG_BAW_CONFIG_BUILTIN)) {
+ 		config->ram = BAW_CONFIG_BUILTIN_RAM;
+-- 
+2.39.2
+

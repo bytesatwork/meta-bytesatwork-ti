@@ -1,0 +1,238 @@
+From 5fccf06a60fff1351755b6ffdcfbf5be93382745 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Thu, 1 Feb 2024 10:27:18 +0100
+Subject: [PATCH] board: bytesatwork/bytedevkit: Update readme
+
+Keep it up to date with links to the current TI build instructions.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+---
+ board/bytesatwork/bytedevkit/README.md | 189 +++----------------------
+ 1 file changed, 17 insertions(+), 172 deletions(-)
+
+diff --git a/board/bytesatwork/bytedevkit/README.md b/board/bytesatwork/bytedevkit/README.md
+index 9f69ff36c6..6f4f71447c 100644
+--- a/board/bytesatwork/bytedevkit/README.md
++++ b/board/bytesatwork/bytedevkit/README.md
+@@ -3,193 +3,37 @@
+ This file describes how to build u-boot for the byteENGINE AM625 module mounted
+ on the byteDEVKIT.
+ 
+-## Install Dependencies
+ 
+-Cross toolchain:
++## Install and get Dependencies
+ 
+-```bash
+-sudo apt install gcc-aarch64-linux-gnu gcc-arm-linux-gnueabihf
+-```
+-
+-## ti-linux-firmware
+-
+-### Download TI Firmware
+-
+-```bash
+-git clone https://git.ti.com/git/processor-firmware/ti-linux-firmware.git
+-cd ti-linux-firmware
+-git checkout 08.04.01.005
+-```
+-
+-## arm-trusted-firmware
+-
+-### Download TF-A
+-
+-```bash
+-git clone https://git.ti.com/git/atf/arm-trusted-firmware.git
+-cd arm-trusted-firmware
+-git checkout 08.04.00.002
+-```
+-
+-### Build TF-A
+-
+-```bash
+-make CROSS_COMPILE=aarch64-linux-gnu- PLAT=k3 TARGET_BOARD=lite SPD=opteed all
+-```
+-
+-```bash
+-make ARCH=aarch64 CROSS_COMPILE=aarch64-linux-gnu- PLAT=k3 TARGET_BOARD=lite SPD=opteed K3_PM_SYSTEM_SUSPEND=1
+-```
+-
+-**NOTE:** build with "new" debian toolchain needs following change:
+-
+-```diff
+-diff --git a/Makefile b/Makefile
+-index f4d623eca..d0b3fdb9a 100644
+---- a/Makefile
+-+++ b/Makefile
+-@@ -468,7 +468,7 @@ TF_LDFLAGS          +=      $(subst --,-Xlinker --,$(TF_LDFLAGS_$(ARCH)))
+-
+- # LD = gcc-ld (ld) or llvm-ld (ld.lld) or other
+- else
+--TF_LDFLAGS             +=      --fatal-warnings -O1
+-+TF_LDFLAGS             +=      --fatal-warnings -O1 --no-warn-rwx-segments
+- TF_LDFLAGS             +=      --gc-sections
+- # ld.lld doesn't recognize the errata flags,
+- # therefore don't add those in that case
+-```
+-
+-## optee-os
+-
+-### Download OP-TEE Trusted OS
+-
+-```bash
+-git clone https://git.ti.com/git/optee/ti-optee-os.git
+-cd ti-optee-os
+-git checkout 08.04.00.002
+-```
+-
+-### Build OP-TEE OS
+-
+-```bash
+-make ARCH=arm CROSS_COMPILE64=aarch64-linux-gnu- PLATFORM=k3-j721e CFG_ARM64_core=y all
+-```
+-
+-```bash
+-make CROSS_COMPILE64=aarch64-linux-gnu- CROSS_COMPILE=arm-linux-gnueabihf- PLATFORM=k3-am62x CFG_ARM64_core=y
+-```
+-
+-**NOTE:** On fail check for missing python dependencies, e.g. `python3-pycryptodome`.
+-
+-## u-boot
+-
+-### Download bytes at work u-boot
++[Cross toolchain](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/09_01_00_08/exports/docs/linux/Overview/GCC_ToolChain.html#location-in-sdk)
+ 
+-```bash
+-git clone https://github.com/bytesatwork/u-boot-ti.git ti-u-boot
+-cd ti-u-boot
+-git checkout baw-ti-u-boot-2021.01
+-```
++[TI-linux-firmware](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/09_01_00_08/exports/docs/devices/AM62X/linux/Release_Specific_Release_Notes.html#ti-linux-firmware)
+ 
+-**NOTE:** Uses binman which uses jsonschema `apt install python3-jsonschema`
++[TF-A](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/09_01_00_08/exports/docs/devices/AM62X/linux/Release_Specific_Release_Notes.html#tf-a)
+ 
+-### Build u-boot for R5
++[OP-TEE](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/09_01_00_08/exports/docs/devices/AM62X/linux/Release_Specific_Release_Notes.html#op-tee)
+ 
+-```bash
+-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- am62x_bytedevkit_r5_defconfig O=build-r5
+-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- O=build-r5 -j`nproc`
+-```
++## Build TF-A
+ 
+-**NOTE:** Clean command: `make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- O=build-r5 distclean`
++[TI TF-A build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/09_01_00_08/exports/docs/linux/Foundational_Components_ATF.html#arm-trusted-firmware-a)
+ 
+-```bash
+-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- O=build-r5 am62x_bytedevkit_r5_defconfig
+-```
++## Build OP-TEE
+ 
+-```bash
+-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- O=build-r5 distclean
+-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- O=build-r5 am62x_bytedevkit_r5_defconfig
+-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- O=build-r5 BINMAN_INDIRS=`pwd`/../ti-linux-firmware -j `nproc`
+-```
++[TI OP-TEE build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/09_01_00_08/exports/docs/linux/Foundational_Components_OPTEE.html#op-tee)
+ 
+-### Build u-boot for A53
+-
+-You should have downloaded [TI Firmware](#download-ti-firmware) and built
+-[TF-A](#build-tf-a), [optee-os](#build-op-tee-os) already.
+-Commands imply [folder structure](#folder-structure).
+-
+-```bash
+-make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- am62x_bytedevkit_a53_defconfig O=build-a53
+-make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- \
+-ATF=`pwd`/../arm-trusted-firmware/build/k3/lite/release/bl31.bin \
+-TEE=`pwd`/../ti-optee-os/out/arm-plat-k3/core/tee-pager_v2.bin \
+-DM=`pwd`/../ti-linux-firmware/ti-dm/am62xx/ipc_echo_testb_mcu1_0_release_strip.xer5f \
+-O=build-a53 -j`nproc`
+-```
++## Build u-boot
+ 
+-```bash
+-make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- O=build-a53 distclean
+-make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- O=build-a53 am62x_bytedevkit_a53_defconfig
+-make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- BL31=`pwd`/../arm-trusted-firmware/build/k3/lite/release/bl31.bin TEE=`pwd`/../ti-optee-os/out/arm-plat-k3/core/tee-pager_v2.bin O=build-a53 BINMAN_INDIRS=`pwd`/../ti-linux-firmware -j `nproc`
+-```
++You should have downloaded `TI-linux-firmware` and built [TF-A](#build-tf-a), [OP-TEE OS](#build-op-tee) already.
+ 
+-all in one:
++[TI u-boot build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/09_01_00_08/exports/docs/linux/Foundational_Components/U-Boot/UG-General-Info.html#build-u-boot)
+ 
+-```bash
+-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- O=build-r5 distclean && \
+-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- O=build-r5 am62x_bytedevkit_r5_defconfig && \
+-make ARCH=arm CROSS_COMPILE=arm-linux-gnueabihf- O=build-r5 BINMAN_INDIRS=`pwd`/../ti-linux-firmware -j `nproc` && \
+-make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- O=build-a53 distclean && \
+-make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- O=build-a53 am62x_bytedevkit_a53_defconfig && \
+-make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- BL31=`pwd`/../arm-trusted-firmware/build/k3/lite/release/bl31.bin TEE=`pwd`/../ti-optee-os/out/arm-plat-k3/core/tee-pager_v2.bin O=build-a53 BINMAN_INDIRS=`pwd`/../ti-linux-firmware -j `nproc`
+-```
++**IMPORTANT:** Use `am62x_bytedevkit_r5_defconfig` or `am62x_bytedevkit_a53_defconfig` instead of the TI defconfigs.
+ 
+ **NOTE:** Clean command: `make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- O=build-a53 distclean`
+ 
+-## k3-image-gen
+-
+-### Download System Firmware Image Generator
+-
+-```bash
+-git clone https://git.ti.com/git/k3-image-gen/k3-image-gen.git
+-cd k3-image-gen
+-git checkout 08.04.01.005
+-```
+-
+-### Build tiboot3.bin
+-
+-You should have downloaded [TI Firmware](#download-ti-firmware) and built
+-[u-boot for R5](#build-u-boot-for-r5) already.
+-Command imply [folder structure](#folder-structure).
+-
+-```bash
+-make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- \
+-SYSFW_PATH=`pwd`/../ti-linux-firmware/ti-sysfw/ti-fs-firmware-am62x-gp.bin \
+-SOC=am62x SBL=`pwd`/../ti-u-boot/build-r5/spl/u-boot-spl.bin
+-```
+-
+-**NOTE:** Clean command: `make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- clean`
+-
+-## Result
+-
+-### Copy Files to SD
+-
+-```bash
+-cp -vp k3-image-gen/tiboot3.bin <path-to-SD-boot-partition>/
+-cp -vp ti-u-boot/build-a53/tispl.bin <path-to-SD-boot-partition>/
+-cp -vp ti-u-boot/build-a53/u-boot.img <path-to-SD-boot-partition>/
+-```
+-
+-### Folder Structure
+-
+-```txt
+-.
+-├── arm-trusted-firmware
+-├── k3-image-gen
+-├── ti-linux-firmware
+-├── ti-optee-os
+-└── ti-u-boot
+-```
++Copy the related files to SD card, see end of section
++[TI u-boot build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/09_01_00_08/exports/docs/linux/Foundational_Components/U-Boot/UG-General-Info.html#build-u-boot)
+ 
+ ## Prepare eMMC boot
+ 
+@@ -203,7 +47,8 @@ eMMC.
+ The bootloader needs to be stored in the boot0 hardware partition of the eMMC.
+ The layout of boot0 is defined so that it fits within 4 MiB, defined in blocks
+ of 512 Bytes:
+-```
++
++```txt
+                 start   end     size    size
+ tiboot3.bin     0x0000  0x0400  0x0400   512 KiB
+ tispl.bin       0x0400  0x1000  0x0C00  1536 KiB
+-- 
+2.39.2
+

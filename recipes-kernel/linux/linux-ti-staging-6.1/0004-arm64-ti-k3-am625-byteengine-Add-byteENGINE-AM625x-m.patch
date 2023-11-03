@@ -1,0 +1,277 @@
+From 21b3fa0d64e80388f88906a0361b9b3809662f62 Mon Sep 17 00:00:00 2001
+From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+Date: Tue, 5 Apr 2022 15:06:17 +0200
+Subject: [PATCH] arm64: ti: k3-am625-byteengine: Add byteENGINE AM625x module
+ support
+
+This SOM is based on the Texas Instruments AM625 SoC.
+
+Signed-off-by: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+---
+ MAINTAINERS                                   |   1 +
+ .../boot/dts/ti/k3-am625-byteengine.dtsi      | 241 ++++++++++++++++++
+ 2 files changed, 242 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 4b4f5ea42abc..803da1c28bf1 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4502,6 +4502,7 @@ M:	Daniel Ammann <daniel.ammann@bytesatwork.ch>
+ S:	Maintained
+ F:	.github/workflows/checkpatch.yml
+ F:	Documentation/devicetree/bindings/arm/bytesatwork/bytesatwork.yaml
++F:	arch/arm64/boot/dts/ti/*byteengine*
+ 
+ C-MEDIA CMI8788 DRIVER
+ M:	Clemens Ladisch <clemens@ladisch.de>
+diff --git a/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi b/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
+new file mode 100644
+index 000000000000..83c433142a0d
+--- /dev/null
++++ b/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
+@@ -0,0 +1,241 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2022 bytes at work AG - https://www.bytesatwork.io
++ *
++ * based on k3-am625-sk.dts:
++ *
++ * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
++ */
++
++#include "k3-am625.dtsi"
++
++/ {
++	compatible = "bytesatwork,byteengine-am62x", "ti,am625";
++
++	aliases {
++		mmc0 = &sdhci0;
++		spi0 = &ospi0;
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		/* 2G RAM */
++		reg = <0x00000000 0x80000000 0x00000000 0x80000000>;
++	};
++
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		rtos_ipc_memory_region: ipc-memories@9c800000 {
++			compatible = "shared-dma-pool";
++			reg = <0x00 0x9c800000 0x00 0x00300000>;
++			no-map;
++		};
++
++		mcu_m4fss_dma_memory_region: m4f-dma-memory@9cb00000 {
++			compatible = "shared-dma-pool";
++			reg = <0x00 0x9cb00000 0x00 0x100000>;
++			no-map;
++		};
++
++		mcu_m4fss_memory_region: m4f-memory@9cc00000 {
++			compatible = "shared-dma-pool";
++			reg = <0x00 0x9cc00000 0x00 0xe00000>;
++			no-map;
++		};
++
++		wkup_r5fss0_core0_dma_memory_region: r5f-dma-memory@9da00000 {
++			compatible = "shared-dma-pool";
++			reg = <0x00 0x9da00000 0x00 0x00100000>;
++			no-map;
++		};
++
++		wkup_r5fss0_core0_memory_region: r5f-memory@9db00000 {
++			compatible = "shared-dma-pool";
++			reg = <0x00 0x9db00000 0x00 0x00c00000>;
++			no-map;
++		};
++
++		lpm_ctx_ddr: lpm-memory@9e700000 {
++			reg = <0x00 0x9e700000 0x00 0x80000>;
++			alignment = <0x1000>;
++		};
++
++		secure_tfa_ddr: tfa@9e780000 {
++			reg = <0x00 0x9e780000 0x00 0x80000>;
++			alignment = <0x1000>;
++			no-map;
++		};
++
++		secure_ddr: optee@9e800000 {
++			reg = <0x00 0x9e800000 0x00 0x01800000>; /* for OP-TEE */
++			alignment = <0x1000>;
++			no-map;
++		};
++	};
++};
++
++&main_pmx0 {
++	main_i2c0_pins_default: main-i2c0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x1e0, PIN_INPUT_PULLUP, 0) /* (B16) I2C0_SCL */
++			AM62X_IOPAD(0x1e4, PIN_INPUT_PULLUP, 0) /* (A16) I2C0_SDA */
++		>;
++	};
++
++	main_mmc0_pins_default: main-mmc0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x220, PIN_INPUT, 0) /* (Y3) MMC0_CMD */
++			AM62X_IOPAD(0x218, PIN_INPUT, 0) /* (AB1) MMC0_CLK */
++			AM62X_IOPAD(0x214, PIN_INPUT, 0) /* (AA2) MMC0_DAT0 */
++			AM62X_IOPAD(0x210, PIN_INPUT, 0) /* (AA1) MMC0_DAT1 */
++			AM62X_IOPAD(0x20c, PIN_INPUT, 0) /* (AA3) MMC0_DAT2 */
++			AM62X_IOPAD(0x208, PIN_INPUT, 0) /* (Y4) MMC0_DAT3 */
++			AM62X_IOPAD(0x204, PIN_INPUT, 0) /* (AB2) MMC0_DAT4 */
++			AM62X_IOPAD(0x200, PIN_INPUT, 0) /* (AC1) MMC0_DAT5 */
++			AM62X_IOPAD(0x1fc, PIN_INPUT, 0) /* (AD2) MMC0_DAT6 */
++			AM62X_IOPAD(0x1f8, PIN_INPUT, 0) /* (AC2) MMC0_DAT7 */
++		>;
++	};
++
++	ospi0_pins_default: ospi0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x000, PIN_OUTPUT, 0) /* (H24) OSPI0_CLK */
++			AM62X_IOPAD(0x02c, PIN_OUTPUT, 0) /* (F23) OSPI0_CSn0 */
++			AM62X_IOPAD(0x00c, PIN_INPUT, 0) /* (E25) OSPI0_D0 */
++			AM62X_IOPAD(0x010, PIN_INPUT, 0) /* (G24) OSPI0_D1 */
++			AM62X_IOPAD(0x014, PIN_INPUT, 0) /* (F25) OSPI0_D2 */
++			AM62X_IOPAD(0x018, PIN_INPUT, 0) /* (F24) OSPI0_D3 */
++		>;
++	};
++};
++
++&wkup_uart0 {
++	status = "disabled";
++};
++
++&mcu_uart0 {
++	status = "disabled";
++};
++
++&main_uart1 {
++	status = "disabled";
++};
++
++&main_uart2 {
++	status = "disabled";
++};
++
++&main_uart3 {
++	status = "disabled";
++};
++
++&main_uart4 {
++	status = "disabled";
++};
++
++&main_uart5 {
++	status = "disabled";
++};
++
++&main_uart6 {
++	status = "disabled";
++};
++
++&mcu_i2c0 {
++	status = "disabled";
++};
++
++&wkup_i2c0 {
++	status = "disabled";
++};
++
++&main_i2c0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_i2c0_pins_default>;
++	clock-frequency = <400000>;
++};
++
++&main_i2c2 {
++	status = "disabled";
++};
++
++&main_i2c3 {
++	status = "disabled";
++};
++
++&sdhci0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_mmc0_pins_default>;
++	ti,driver-strength-ohm = <50>;
++	disable-wp;
++	no-1-8-v;
++};
++
++&mailbox0_cluster0 {
++	mbox_m4_0: mbox-m4-0 {
++		ti,mbox-rx = <0 0 0>;
++		ti,mbox-tx = <1 0 0>;
++	};
++
++	mbox_r5_0: mbox-r5-0 {
++		ti,mbox-rx = <2 0 0>;
++		ti,mbox-tx = <3 0 0>;
++	};
++};
++
++&ospi0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&ospi0_pins_default>;
++	status = "okay";
++
++	flash@0{
++		compatible = "jedec,spi-nor";
++		reg = <0x0>;
++		spi-tx-bus-width = <4>;
++		spi-rx-bus-width = <4>;
++		spi-max-frequency = <25000000>;
++		cdns,tshsl-ns = <60>;
++		cdns,tsd2d-ns = <60>;
++		cdns,tchsh-ns = <60>;
++		cdns,tslch-ns = <60>;
++		cdns,read-delay = <4>;
++		cdns,phy-mode;
++	};
++};
++
++&mcu_m4fss {
++	mboxes = <&mailbox0_cluster0 &mbox_m4_0>;
++	memory-region = <&mcu_m4fss_dma_memory_region>,
++			<&mcu_m4fss_memory_region>;
++};
++
++&wkup_r5fss0_core0 {
++	mboxes = <&mailbox0_cluster0 &mbox_r5_0>;
++	memory-region = <&wkup_r5fss0_core0_dma_memory_region>,
++			<&wkup_r5fss0_core0_memory_region>;
++};
++
++&mcu_rti0 {
++	/* MCU RTI0 is used by M4F firmware */
++	status = "reserved";
++};
++
++&wkup_rti0 {
++	/* WKUP RTI0 is used by DM firmware */
++	status = "reserved";
++};
++
++&mcasp0 {
++	status = "disabled";
++};
++
++&mcasp1 {
++	status = "disabled";
++};
++
++&mcasp2 {
++	status = "disabled";
++};
+-- 
+2.39.2
+

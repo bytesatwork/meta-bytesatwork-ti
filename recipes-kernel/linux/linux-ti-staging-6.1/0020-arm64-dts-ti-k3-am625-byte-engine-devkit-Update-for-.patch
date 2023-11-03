@@ -1,0 +1,175 @@
+From ecc30d811559fe599173cb73ab5f9649983bcfb2 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Thu, 10 Aug 2023 15:58:24 +0200
+Subject: [PATCH] arm64: dts: ti: k3-am625-byte(engine|devkit): Update for
+ Linux 6.1
+
+Note: Move usbss nodes to k3-am625-byteengine.dtsi since they are module
+specific.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+---
+ .../arm64/boot/dts/ti/k3-am625-bytedevkit.dts | 13 ++++--
+ .../boot/dts/ti/k3-am625-byteengine.dtsi      | 45 +++++++++++++++++++
+ 2 files changed, 54 insertions(+), 4 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts b/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts
+index 12465067ae8a..99c45b57d544 100644
+--- a/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts
++++ b/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts
+@@ -33,6 +33,7 @@ extcon_usb1: extcon-usb1 {
+ 		id-gpios = <&main_gpio1 8 GPIO_ACTIVE_HIGH>;
+ 		pinctrl-names = "default";
+ 		pinctrl-0 = <&main_usb1_gpio_id_pins_default>;
++		status = "okay";
+ 	};
+ 
+ 	display0: display {
+@@ -160,12 +161,14 @@ AM62X_IOPAD(0x1d4, PIN_INPUT, 7) /* (B15) GPIO1_23 UART0_RTSN Touch Int */
+ };
+ 
+ &main_uart0 {
++	status = "okay";
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&main_uart0_pins_default>;
+ };
+ 
+ /* SD/MMC */
+ &sdhci1 {
++	status = "okay";
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&main_mmc1_pins_default>;
+ 	ti,driver-strength-ohm = <50>;
+@@ -180,10 +183,6 @@ &usb0 {
+ 	status = "okay";
+ };
+ 
+-&usbss1 {
+-	ti,vbus-divider;
+-};
+-
+ &usb1 {
+ 	dr_mode = "otg";
+ 	pinctrl-names = "default";
+@@ -194,6 +193,7 @@ &usb1 {
+ };
+ 
+ &cpsw3g {
++	status = "okay";
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&main_mdio1_pins_default
+ 		     &main_rmii1_pins_default
+@@ -203,14 +203,18 @@ &main_rmii1_pins_default
+ &cpsw_port1 {
+ 	phy-mode = "rmii";
+ 	phy-handle = <&cpsw3g_phy0>;
++	status = "okay";
+ };
+ 
+ &cpsw_port2 {
+ 	phy-mode = "rmii";
+ 	phy-handle = <&cpsw3g_phy1>;
++	status = "okay";
+ };
+ 
+ &cpsw3g_mdio {
++	status = "okay";
++
+ 	cpsw3g_phy0: ethernet-phy@0 {
+ 		reg = <0>;
+ 	};
+@@ -223,6 +227,7 @@ cpsw3g_phy1: ethernet-phy@3 {
+ &dss {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&oldi0_pins_default>;
++	status = "okay";
+ };
+ 
+ &dss_ports {
+diff --git a/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi b/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
+index 55944a30ebe1..4ccb5bd26245 100644
+--- a/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
++++ b/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
+@@ -28,6 +28,23 @@ reserved-memory {
+ 		#size-cells = <2>;
+ 		ranges;
+ 
++		ramoops@9c700000 {
++			compatible = "ramoops";
++			reg = <0x00 0x9c700000 0x00 0x00100000>;
++			record-size = <0x8000>;
++			console-size = <0x8000>;
++			ftrace-size = <0x00>;
++			pmsg-size = <0x8000>;
++		};
++
++		/* global cma region */
++		linux,cma {
++			compatible = "shared-dma-pool";
++			reusable;
++			size = <0x00 0x8000000>;
++			linux,cma-default;
++		};
++
+ 		rtos_ipc_memory_region: ipc-memories@9c800000 {
+ 			compatible = "shared-dma-pool";
+ 			reg = <0x00 0x9c800000 0x00 0x00300000>;
+@@ -74,6 +91,20 @@ secure_ddr: optee@9e800000 {
+ 			alignment = <0x1000>;
+ 			no-map;
+ 		};
++
++		framebuffer: framebuffer@ff700000 {
++			reg = <0x00 0xff700000 0x00 0x008ca000>;
++			no-map;
++		};
++	};
++
++	vdd_core: regulator-1 {
++		compatible = "regulator-fixed";
++		regulator-name = "vdd_core";
++		regulator-min-microvolt = <750000>;
++		regulator-max-microvolt = <750000>;
++		regulator-always-on;
++		regulator-boot-on;
+ 	};
+ };
+ 
+@@ -145,6 +176,7 @@ &main_i2c0 {
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&main_i2c0_pins_default>;
+ 	clock-frequency = <400000>;
++	status = "okay";
+ };
+ 
+ &main_i2c2 {
+@@ -156,6 +188,7 @@ &main_i2c3 {
+ };
+ 
+ &sdhci0 {
++	status = "okay";
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&main_mmc0_pins_default>;
+ 	ti,driver-strength-ohm = <50>;
+@@ -197,6 +230,18 @@ &wkup_rti0 {
+ 	status = "reserved";
+ };
+ 
++&usbss0 {
++	ti,vbus-divider;
++	vddcore-supply = <&vdd_core>;
++	status = "okay";
++};
++
++&usbss1 {
++	ti,vbus-divider;
++	vddcore-supply = <&vdd_core>;
++	status = "okay";
++};
++
+ &mcasp0 {
+ 	status = "disabled";
+ };
+-- 
+2.39.2
+

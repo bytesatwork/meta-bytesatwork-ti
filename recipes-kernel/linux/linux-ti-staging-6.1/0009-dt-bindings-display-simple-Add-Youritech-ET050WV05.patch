@@ -1,0 +1,28 @@
+From d20a0fbe627c8ce9df26069908d7a9dd53e66f7b Mon Sep 17 00:00:00 2001
+From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+Date: Tue, 6 Jun 2023 12:34:06 +0200
+Subject: [PATCH] dt-bindings: display: simple: Add Youritech ET050WV05
+
+Add Youritech ET050WV05 5" WVGA (800x480) TFT LCD panel.
+
+Signed-off-by: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+---
+ .../devicetree/bindings/display/panel/panel-simple.yaml         | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/display/panel/panel-simple.yaml b/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
+index c0b1705a63b2..0b57a083f88d 100644
+--- a/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
++++ b/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
+@@ -347,6 +347,8 @@ properties:
+       - winstar,wf35ltiacd
+         # Yes Optoelectronics YTC700TLAG-05-201C 7" TFT LCD panel
+       - yes-optoelectronics,ytc700tlag-05-201c
++        # Youritech ET050WV05 5" WVGA (800x480) TFT LCD panel
++      - youritech,et050WV05
+ 
+   backlight: true
+   ddc-i2c-bus: true
+-- 
+2.39.2
+

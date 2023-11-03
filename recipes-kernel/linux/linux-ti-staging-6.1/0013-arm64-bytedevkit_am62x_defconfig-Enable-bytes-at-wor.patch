@@ -1,0 +1,40 @@
+From a499f58c3d28c5159810f59590255893a0d541ee Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Stephan=20D=C3=BCnner?= <stephan.duenner@bytesatwork.ch>
+Date: Fri, 2 Jun 2023 13:31:52 +0200
+Subject: [PATCH] arm64: bytedevkit_am62x_defconfig: Enable bytes at work logo
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Use the LVDS panel driver as statically linked module,
+this allows showing the boot up screen earlier.
+
+Signed-off-by: Stephan Dünner <stephan.duenner@bytesatwork.ch>
+---
+ arch/arm64/configs/bytedevkit_am62x_defconfig | 3 ++-
+ 1 file changed, 2 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/configs/bytedevkit_am62x_defconfig b/arch/arm64/configs/bytedevkit_am62x_defconfig
+index 91af4f5558c7..5d4c0ca92c03 100644
+--- a/arch/arm64/configs/bytedevkit_am62x_defconfig
++++ b/arch/arm64/configs/bytedevkit_am62x_defconfig
+@@ -587,7 +587,7 @@ CONFIG_DRM=y
+ CONFIG_DRM_I2C_NXP_TDA998X=y
+ CONFIG_DRM_MALI_DISPLAY=m
+ CONFIG_DRM_RCAR_DW_HDMI=m
+-CONFIG_DRM_PANEL_LVDS=m
++CONFIG_DRM_PANEL_LVDS=y
+ CONFIG_DRM_PANEL_SIMPLE=y
+ CONFIG_DRM_PANEL_OSD_OSD101T2587_53TS=y
+ CONFIG_DRM_PANEL_RAYDIUM_RM67191=m
+@@ -621,6 +621,7 @@ CONFIG_FRAMEBUFFER_CONSOLE=y
+ CONFIG_LOGO=y
+ # CONFIG_LOGO_LINUX_MONO is not set
+ # CONFIG_LOGO_LINUX_VGA16 is not set
++# CONFIG_LOGO_LINUX_CLUT224 is not set
+ CONFIG_SOUND=y
+ CONFIG_SND=y
+ # CONFIG_SND_SPI is not set
+-- 
+2.39.2
+

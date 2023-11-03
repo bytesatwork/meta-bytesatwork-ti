@@ -1,0 +1,67 @@
+From e17286a849a01b3cc07f184f912223917f19d02b Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Stephan=20D=C3=BCnner?= <stephan.duenner@bytesatwork.ch>
+Date: Fri, 2 Jun 2023 13:06:13 +0200
+Subject: [PATCH] drm/panel: simple: Add Youritech ET050WV05 panel
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add Youritech ET050WV05 5" WVGA (800x480) LVDS TFT LCD panel.
+
+Signed-off-by: Stephan Dünner <stephan.duenner@bytesatwork.ch>
+---
+ drivers/gpu/drm/panel/panel-simple.c | 31 ++++++++++++++++++++++++++++
+ 1 file changed, 31 insertions(+)
+
+diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
+index 2000cc3bd846..61d2ff32b693 100644
+--- a/drivers/gpu/drm/panel/panel-simple.c
++++ b/drivers/gpu/drm/panel/panel-simple.c
+@@ -4022,6 +4022,34 @@ static const struct panel_desc yes_optoelectronics_ytc700tlag_05_201c = {
+ 	.connector_type = DRM_MODE_CONNECTOR_LVDS,
+ };
+ 
++static const struct drm_display_mode youritech_et050WV05_ct_mode = {
++	.clock = 25000,
++	.hdisplay = 800,
++	.hsync_start = 800 + 8,
++	.hsync_end = 800 + 8 + 8,
++	.htotal = 800 + 8 + 8 + 4,
++	.vdisplay = 480,
++	.vsync_start = 480 + 8,
++	.vsync_end = 480 + 8 + 8,
++	.vtotal = 480 + 8 + 8 + 4,
++};
++
++static const struct panel_desc youritech_et050WV05_ct = {
++	.modes = &youritech_et050WV05_ct_mode,
++	.bpc = 8,
++	.num_modes = 1,
++	.size = {
++		.width = 108,
++		.height = 64,
++	},
++	.delay = {
++		.prepare = 50,
++		.disable = 50,
++	},
++	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_SPWG,
++	.connector_type = DRM_MODE_CONNECTOR_LVDS,
++};
++
+ static const struct drm_display_mode arm_rtsm_mode[] = {
+ 	{
+ 		.clock = 65000,
+@@ -4451,6 +4479,9 @@ static const struct of_device_id platform_of_match[] = {
+ 	}, {
+ 		.compatible = "yes-optoelectronics,ytc700tlag-05-201c",
+ 		.data = &yes_optoelectronics_ytc700tlag_05_201c,
++	}, {
++		.compatible = "youritech,et050WV05",
++		.data = &youritech_et050WV05_ct,
+ 	}, {
+ 		/* Must be the last entry */
+ 		.compatible = "panel-dpi",
+-- 
+2.39.2
+

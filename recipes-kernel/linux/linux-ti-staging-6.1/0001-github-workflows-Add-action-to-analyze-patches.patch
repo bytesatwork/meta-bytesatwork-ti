@@ -1,0 +1,169 @@
+From 484c38e51c9ee3be09d0fe78b3e79f9a9d62ff45 Mon Sep 17 00:00:00 2001
+From: Michael Meister <michael.meister@bytesatwork.ch>
+Date: Mon, 11 Jul 2022 16:02:24 +0200
+Subject: [PATCH] github: workflows: Add action to analyze patches
+
+Add github action running checkpatch on pull request.
+
+Signed-off-by: Michael Meister <michael.meister@bytesatwork.ch>
+---
+ .checkpatch.conf                 |   2 +
+ .github/workflows/checkpatch.yml | 120 +++++++++++++++++++++++++++++++
+ MAINTAINERS                      |   5 ++
+ 3 files changed, 127 insertions(+)
+ create mode 100644 .checkpatch.conf
+ create mode 100644 .github/workflows/checkpatch.yml
+
+diff --git a/.checkpatch.conf b/.checkpatch.conf
+new file mode 100644
+index 000000000000..433d9264673c
+--- /dev/null
++++ b/.checkpatch.conf
+@@ -0,0 +1,2 @@
++# 1 line of Kconfig help
++--min-conf-desc-length=1
+diff --git a/.github/workflows/checkpatch.yml b/.github/workflows/checkpatch.yml
+new file mode 100644
+index 000000000000..dc75adb9e0ac
+--- /dev/null
++++ b/.github/workflows/checkpatch.yml
+@@ -0,0 +1,120 @@
++# Copyright (c) 2022 bytes at work AG. All rights reserved.
++
++
++# Changelog
++#
++# [1.0.0] - 2022-03-31: Initial version
++# [1.0.1] - 2022-07-15: Install required Python packages 'ply' and 'GitPython'
++# [1.1.0] - 2022-07-18: Extend to handle Zephyr project repos as well
++# [1.2.0] - 2022-09-02: Extend to handle Zephyr module repos as well
++# [2.0.0] - 2022-09-02: Check each patch file in a separate job
++# [2.0.1] - 2022-09-28: Change cache key so that restoring works properly
++# [2.0.2] - 2022-12-20: Replace deprecated 'set-output' with 'GITHUB_OUTPUT' environment file
++# [2.0.3] - 2023-09-04: Fix checkout
++# [2.0.4] - 2023-09-13: Update to checkout action v4
++
++# This Github action checks a pull request using checkpatch
++name: checkpatch
++on: pull_request
++jobs:
++  setup-checkpatch:
++    name: Setup Checkpatch
++    runs-on: ubuntu-22.04
++    env:
++      ZEPHYR_DEFAULT_VERSION: v3.1.0
++    outputs:
++      matrix: ${{ steps.set-matrix.outputs.patches }}
++
++    steps:
++      - name: Checkout repository
++        uses: actions/checkout@v4
++        with:
++          fetch-depth: 100
++
++      - name: Install dependencies
++        run: |
++          sudo apt-get update && sudo apt-get install -y jq
++
++      - name: Checkout Zephyr project repository
++        # if the repository contains a Zephyr project (if west.yml exists)
++        # or a Zephyr module (if zephyr folder exists), the Zephyr project
++        # repository must be cloned in order to get the checkpatch script
++        run: |
++          if [[ -f "west.yml" ]]
++          then
++            ZEPHYR_VERSION=$(grep -A 3 "name: zephyr$" west.yml | grep "revision:" | grep -Eo "v[0-9]+\.[0-9]+\.[0-9]+") || true
++            if [[ -z "${ZEPHYR_VERSION}" ]]
++            then
++              ZEPHYR_VERSION=${ZEPHYR_DEFAULT_VERSION}
++            fi
++          else
++            ZEPHYR_VERSION=${ZEPHYR_DEFAULT_VERSION}
++          fi
++          git clone --depth 1 --branch ${ZEPHYR_VERSION} https://github.com/zephyrproject-rtos/zephyr.git zephyr-rtos
++        if: hashFiles('west.yml') != '' || hashFiles('zephyr/*') != ''
++
++      - name: Create patch file(s)
++        # create patch file(s) of new commits (between base and head)
++        run: git format-patch ${{ github.event.pull_request.base.sha }}..${{ github.event.pull_request.head.sha }} || exit 1
++
++      - name: Store files to cache
++        # cache all files required for checkpatch to make them available for other jobs
++        uses: actions/cache@v3
++        with:
++          path: |
++            ${{ github.workspace }}/scripts/*
++            ${{ github.workspace }}/zephyr-rtos/scripts/*
++            ${{ github.workspace }}/.checkpatch.conf
++            ${{ github.workspace }}/zephyr-rtos/.checkpatch.conf
++            ${{ github.workspace }}/west.yml
++            ${{ github.workspace }}/zephyr/*
++            ${{ github.workspace }}/*.patch
++          key: checkpatch-files-${{ github.event.pull_request.head.sha }}
++
++      - name: Set list of patch filenames as output
++        id: set-matrix
++        run: |
++          echo "patches=$(ls *.patch | jq -R -s -c 'split("\n")[:-1]')" >> $GITHUB_OUTPUT
++
++  run-checkpatch:
++    name: Run Checkpatch
++    runs-on: ubuntu-22.04
++    needs: setup-checkpatch
++    strategy:
++      fail-fast: false
++      matrix:
++        patch: ${{ fromJSON(needs.setup-checkpatch.outputs.matrix) }}
++
++    steps:
++      - name: Get files from cache
++        # restore all cached files required for checkpatch
++        uses: actions/cache@v3
++        with:
++          path: |
++            ${{ github.workspace }}/scripts/*
++            ${{ github.workspace }}/zephyr-rtos/scripts/*
++            ${{ github.workspace }}/.checkpatch.conf
++            ${{ github.workspace }}/zephyr-rtos/.checkpatch.conf
++            ${{ github.workspace }}/west.yml
++            ${{ github.workspace }}/zephyr/*
++            ${{ github.workspace }}/*.patch
++          key: checkpatch-files-${{ github.event.pull_request.head.sha }}
++
++      - name: Install dependencies
++        run: |
++          sudo apt-get update && sudo apt-get install -y perl python3
++          python3 -m pip install ply
++          python3 -m pip install GitPython
++
++      - name: Run checkpatch
++        # if the repository contains a Zephyr project (if west.yml exists)
++        # or a Zephyr module (if zephyr folder exists), the checkpatch script
++        # is located in the Zephyr folder
++        run: |
++          if [[ -f "west.yml" || -d "zephyr" ]]
++          then
++            cd zephyr-rtos
++            ./scripts/checkpatch.pl --no-tree ../${{ matrix.patch }}
++          else
++            ./scripts/checkpatch.pl --no-tree ${{ matrix.patch }}
++          fi
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 05f431642b5a..152b3170d81a 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4497,6 +4497,11 @@ S:	Maintained
+ F:	drivers/scsi/BusLogic.*
+ F:	drivers/scsi/FlashPoint.*
+ 
++BYTES AT WORK MODULES AND BOARDS
++M:	Daniel Ammann <daniel.ammann@bytesatwork.ch>
++S:	Maintained
++F:	.github/workflows/checkpatch.yml
++
+ C-MEDIA CMI8788 DRIVER
+ M:	Clemens Ladisch <clemens@ladisch.de>
+ L:	alsa-devel@alsa-project.org (moderated for non-subscribers)
+-- 
+2.39.2
+

@@ -1,0 +1,64 @@
+From 26e05571478e176048f1f43a9148d05b8e25bb5d Mon Sep 17 00:00:00 2001
+From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+Date: Thu, 7 Dec 2023 11:44:43 +0100
+Subject: [PATCH] arm64: ti: k3-am625-byteengine: Remove SPI-NOR flash
+
+It is no longer present on hardware Rev 1.1.
+
+Signed-off-by: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+---
+ .../boot/dts/ti/k3-am625-byteengine.dtsi      | 31 -------------------
+ 1 file changed, 31 deletions(-)
+
+diff --git a/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi b/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
+index 83c433142a0d..55944a30ebe1 100644
+--- a/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
++++ b/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
+@@ -99,17 +99,6 @@ AM62X_IOPAD(0x1fc, PIN_INPUT, 0) /* (AD2) MMC0_DAT6 */
+ 			AM62X_IOPAD(0x1f8, PIN_INPUT, 0) /* (AC2) MMC0_DAT7 */
+ 		>;
+ 	};
+-
+-	ospi0_pins_default: ospi0-pins-default {
+-		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x000, PIN_OUTPUT, 0) /* (H24) OSPI0_CLK */
+-			AM62X_IOPAD(0x02c, PIN_OUTPUT, 0) /* (F23) OSPI0_CSn0 */
+-			AM62X_IOPAD(0x00c, PIN_INPUT, 0) /* (E25) OSPI0_D0 */
+-			AM62X_IOPAD(0x010, PIN_INPUT, 0) /* (G24) OSPI0_D1 */
+-			AM62X_IOPAD(0x014, PIN_INPUT, 0) /* (F25) OSPI0_D2 */
+-			AM62X_IOPAD(0x018, PIN_INPUT, 0) /* (F24) OSPI0_D3 */
+-		>;
+-	};
+ };
+ 
+ &wkup_uart0 {
+@@ -186,26 +175,6 @@ mbox_r5_0: mbox-r5-0 {
+ 	};
+ };
+ 
+-&ospi0 {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&ospi0_pins_default>;
+-	status = "okay";
+-
+-	flash@0{
+-		compatible = "jedec,spi-nor";
+-		reg = <0x0>;
+-		spi-tx-bus-width = <4>;
+-		spi-rx-bus-width = <4>;
+-		spi-max-frequency = <25000000>;
+-		cdns,tshsl-ns = <60>;
+-		cdns,tsd2d-ns = <60>;
+-		cdns,tchsh-ns = <60>;
+-		cdns,tslch-ns = <60>;
+-		cdns,read-delay = <4>;
+-		cdns,phy-mode;
+-	};
+-};
+-
+ &mcu_m4fss {
+ 	mboxes = <&mailbox0_cluster0 &mbox_m4_0>;
+ 	memory-region = <&mcu_m4fss_dma_memory_region>,
+-- 
+2.39.2
+

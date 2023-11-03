@@ -1,0 +1,28 @@
+From 6ac783d00962dc5115717b3ab5ba4523941eb360 Mon Sep 17 00:00:00 2001
+From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+Date: Wed, 24 May 2023 10:16:10 +0200
+Subject: [PATCH] dt-bindings: vendor-prefixes: Add youritech
+
+Document the Youritech vendor prefix.
+
+Signed-off-by: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+---
+ Documentation/devicetree/bindings/vendor-prefixes.yaml | 2 ++
+ 1 file changed, 2 insertions(+)
+
+diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
+index 794e7022f7f5..8323d07c5b54 100644
+--- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
++++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
+@@ -1492,6 +1492,8 @@ patternProperties:
+     description: YSH & ATIL
+   "^yones-toptech,.*":
+     description: Yones Toptech Co., Ltd.
++  "^youritech,.*":
++    description: Youritech
+   "^ys,.*":
+     description: Shenzhen Yashi Changhua Intelligent Technology Co., Ltd.
+   "^ysoft,.*":
+-- 
+2.39.2
+

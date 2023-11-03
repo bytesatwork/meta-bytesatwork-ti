@@ -1,0 +1,47 @@
+From 714659b75221742ad58fad3543ab18d77f743c85 Mon Sep 17 00:00:00 2001
+From: =?UTF-8?q?Stephan=20D=C3=BCnner?= <stephan.duenner@bytesatwork.ch>
+Date: Wed, 7 Jun 2023 14:05:52 +0200
+Subject: [PATCH] arm64: ti: k3-am625-bytedevkit: support USB-OTG
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add support for USB-OTG.
+
+Signed-off-by: Stephan Dünner <stephan.duenner@bytesatwork.ch>
+---
+ arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts b/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts
+index ae7fd98738cf..f27c8ed6d766 100644
+--- a/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts
++++ b/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts
+@@ -115,7 +115,7 @@ AM62X_IOPAD(0x164, PIN_OUTPUT, 1) /* (AA19) RMII2_TX_EN */
+ 
+ 	main_usb0_pins_default: main-usb0-pins-default {
+ 		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x0254, PIN_INPUT, 0) /* (C20) USB0_DRVVBUS */
++			AM62X_IOPAD(0x0254, PIN_OUTPUT, 0) /* (C20) USB0_DRVVBUS */
+ 		>;
+ 	};
+ 
+@@ -177,6 +177,7 @@ &usb0 {
+ 	dr_mode = "host";
+ 	pinctrl-names = "default";
+ 	pinctrl-0 = <&main_usb0_pins_default>;
++	status = "okay";
+ };
+ 
+ &usbss1 {
+@@ -189,6 +190,7 @@ &usb1 {
+ 	pinctrl-0 = <&main_usb1_pins_default>;
+ 	extcon = <&extcon_usb1>;
+ 	usb-role-switch;
++	status = "okay";
+ };
+ 
+ &cpsw3g {
+-- 
+2.39.2
+

@@ -3,7 +3,7 @@
 
 ## Introduction
 
-This is the official OpenEmbedded/Yocto BSP layer for byteDEVKIT AM335x and byteDEVKIT AM62x by
+This is the official OpenEmbedded/Yocto BSP layer for byteDEVKIT AM62x by
 [bytes at work AG](https://www.bytesatwork.io/).
 
 It is hosted on [github](https://github.com/bytesatwork/meta-bytesatwork-ti.git).
@@ -17,9 +17,9 @@ This layer depends on:
 
 ## BSP
 
-This meta layer provides the Board Support Package (U-Boot and Linux kernel) for byteDEVKIT AM335x
-and byteDEVKIT AM62x by bytes at work AG. Simply set the variable MACHINE to `bytedevkit-am335x`
-or `bytedevkit-am62x` to use this BSP.
+This meta layer provides the Board Support Package (U-Boot and Linux kernel) for
+byteDEVKIT AM62x by bytes at work AG. Simply set the variable MACHINE to
+`bytedevkit-am62x` to use this BSP.
 
 Linux Kernel recipe: linux-ti-staging
 
@@ -34,12 +34,12 @@ with the image `bytesatwork-minimal-image` from
 environment:
 
 	cd $BUILDDIR
-	gunzip -c tmp/deploy/images/bytedevkit-am335x/bytesatwork-minimal-image-bytedevkit-am335x.wic.gz | dd of=/dev/sdX bs=1M && sync
+	gunzip -c deploy-ti/images/bytedevkit-am62x/bytesatwork-minimal-image-bytedevkit-am62x.wic.gz | dd of=/dev/sdX bs=1M && sync
 
 or using `bmap-tools`:
 
 	cd $BUILDDIR
-	bmaptool copy tmp/deploy/images/bytedevkit-am335x/bytesatwork-minimal-image-bytedevkit-am335x.wic.bmap /dev/sdX
+	bmaptool copy deploy-ti/images/bytedevkit-am62x/bytesatwork-minimal-image-bytedevkit-am62x.wic.gz /dev/sdX
 
 You can find more information on `bmap-tools` in the [Yocto Project documentation](https://docs.yoctoproject.org/4.0/dev-manual/common-tasks.html#flashing-images-using-bmaptool).
 

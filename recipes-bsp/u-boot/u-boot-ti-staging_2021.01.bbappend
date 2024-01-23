@@ -1,4 +1,4 @@
-PR = "r2"
+PR = "r3"
 
 SRCREV = "2dd2e1d366acf7f41bbd8f2d1dbe6cf5e1bcbad6"
 
@@ -48,6 +48,8 @@ SRC_URI += " \
 	file://0042-gpio-da8xx_gpio-Fix-gpio-name-with-address.patch \
 	file://0043-arm-dts-k3-am62-main-fix-gpio-count.patch \
 	file://0044-configs-bytedevkit-enable-gpio-support.patch \
+	file://0045-bytesatwork-bawconfig-fix-am62x-ram-fallback.patch \
+	file://0046-bytesatwork-bawconfig-add-ti-am62x-revision.patch \
 "
 
 SPL_UART_BINARY:bytedevkit-am62x-k3r5 = "u-boot-spl.bin"

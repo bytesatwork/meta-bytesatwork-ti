@@ -1,0 +1,41 @@
+From 59a8b2c1973517aea5860f5d152aa46dc6fef245 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Thu, 16 Nov 2023 11:53:21 +0100
+Subject: [PATCH] bytesatwork: bawconfig: add ti am62x revision
+
+New hardware revision of bytes at work TI AM62x SoM.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+(cherry picked from commit cac51ab069decd5f895391b2bd199fcf2c639e9e)
+---
+ board/bytesatwork/baw_config/baw_config.c | 1 +
+ board/bytesatwork/baw_config/baw_config.h | 1 +
+ 2 files changed, 2 insertions(+)
+
+diff --git a/board/bytesatwork/baw_config/baw_config.c b/board/bytesatwork/baw_config/baw_config.c
+index 2fdd875f44..73a59952e6 100644
+--- a/board/bytesatwork/baw_config/baw_config.c
++++ b/board/bytesatwork/baw_config/baw_config.c
+@@ -17,6 +17,7 @@ const struct baw_config_name_pair baw_config_pcb_name[] = {
+ 	{ M6_PCB_REV_1_1, "M6 Rev 1.1" },
+ 	{ M8_PCB_REV_0_1, "M8 Rev 0.1" },
+ 	{ M8_PCB_REV_1_0, "M8 Rev 1.0" },
++	{ M8_PCB_REV_1_1, "M8 Rev 1.1" },
+ 	{ -1, NULL },
+ };
+ 
+diff --git a/board/bytesatwork/baw_config/baw_config.h b/board/bytesatwork/baw_config/baw_config.h
+index 21039c1f12..9e08586610 100644
+--- a/board/bytesatwork/baw_config/baw_config.h
++++ b/board/bytesatwork/baw_config/baw_config.h
+@@ -21,6 +21,7 @@ enum baw_config_pcb {
+ 	M6_PCB_REV_1_1 = 8,
+ 	M8_PCB_REV_0_1 = 9,
+ 	M8_PCB_REV_1_0 = 10,
++	M8_PCB_REV_1_1 = 11,
+ };
+ 
+ enum baw_config_ram {
+-- 
+2.39.2
+

@@ -1,0 +1,37 @@
+From d4c2f2b0f2b24f65d7934c1ffa1fe6d423d4d117 Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Thu, 11 Apr 2024 11:02:15 +0200
+Subject: [PATCH] include: configs: am62x_bytedevkit: change update_emmc env
+ variable
+
+Write the eMMC boot files from the rootfs partition instead of the boot
+partition. This allows to write different boot files to the eMMC compared
+to the SD card.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+---
+ include/configs/am62x_bytedevkit.h | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
+
+diff --git a/include/configs/am62x_bytedevkit.h b/include/configs/am62x_bytedevkit.h
+index 435d621b6a5..b7bae383e12 100644
+--- a/include/configs/am62x_bytedevkit.h
++++ b/include/configs/am62x_bytedevkit.h
+@@ -60,11 +60,11 @@
+ 	"\0" \
+ 	"update_emmc=echo Writing bootloader to eMMC; " \
+ 		"mmc dev 0 1; " \
+-		"load mmc 1 ${loadaddr} tiboot3.bin; " \
++		"load mmc 1:2 ${loadaddr} tiboot3.bin; " \
+ 		"mmc write ${loadaddr} 0x0 0x400; " \
+-		"load mmc 1 ${loadaddr} tispl.bin; " \
++		"load mmc 1:2 ${loadaddr} tispl.bin; " \
+ 		"mmc write ${loadaddr} 0x400 0xC00; " \
+-		"load mmc 1 ${loadaddr} u-boot.img; " \
++		"load mmc 1:2 ${loadaddr} u-boot.img; " \
+ 		"mmc write ${loadaddr} 0x1000 0x1000; " \
+ 		"mmc dev 0 0; " \
+ 	"\0" \
+-- 
+2.39.2
+

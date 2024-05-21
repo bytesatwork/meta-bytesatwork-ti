@@ -53,7 +53,8 @@ SRC_URI += " \
 	file://0051-board-bytesatwork-bytedevkit-Update-readme.patch \
 	file://0052-bytesatwork-bawconfig-introduce-nxp-imx8mp.patch \
 	file://0053-bytesatwork-bawconfig-introduce-ti-am62px.patch \
+	file://0054-include-configs-am62x_bytedevkit-change-update_emmc-.patch \
 "
 
-PR = "r0"
+PR = "r1"
 UBOOT_LOCALVERSION .= "-${PR}"

@@ -1,0 +1,27 @@
+From 9b2ebd0deafd770e695fc0b26018f103a96ea5e3 Mon Sep 17 00:00:00 2001
+From: Marco Widmer <marco.widmer@bytesatwork.ch>
+Date: Tue, 13 Aug 2024 17:40:58 +0200
+Subject: [PATCH] net: ti: am65-cpsw-nuss: select PAGE_POOL
+
+TI_K3_AM65_CPSW_NUSS requires PAGE_POOL. Select it.
+
+Signed-off-by: Marco Widmer <marco.widmer@bytesatwork.ch>
+---
+ drivers/net/ethernet/ti/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
+
+diff --git a/drivers/net/ethernet/ti/Kconfig b/drivers/net/ethernet/ti/Kconfig
+index ef35caa520a5..08ac4557eb5b 100644
+--- a/drivers/net/ethernet/ti/Kconfig
++++ b/drivers/net/ethernet/ti/Kconfig
+@@ -111,6 +111,7 @@ config TI_K3_AM65_CPSW_NUSS
+ 	tristate "TI K3 AM654x/J721E CPSW Ethernet driver"
+ 	depends on ARCH_K3 && OF && TI_K3_UDMA_GLUE_LAYER
+ 	select NET_DEVLINK
++	select PAGE_POOL
+ 	select TI_DAVINCI_MDIO
+ 	select PHYLINK
+ 	select TI_K3_CPPI_DESC_POOL
+-- 
+2.39.5
+

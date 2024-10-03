@@ -1,0 +1,742 @@
+From 24a0f94e0035820d53262e8e111ffd631a2e9418 Mon Sep 17 00:00:00 2001
+From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+Date: Tue, 5 Apr 2022 15:06:17 +0200
+Subject: [PATCH] arm64: ti: k3-am625-byteengine/bytedevkit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add necessary dts + dtsi to use all features from byteDEVKIT.
+
+Signed-off-by: Daniel Ammann <daniel.ammann@bytesatwork.ch>
+Signed-off-by: Stephan Dünner <stephan.duenner@bytesatwork.ch>
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+---
+ MAINTAINERS                                   |   2 +
+ arch/arm64/boot/dts/ti/Makefile               |   1 +
+ .../arm64/boot/dts/ti/k3-am625-bytedevkit.dts | 332 +++++++++++++++++
+ .../boot/dts/ti/k3-am625-byteengine.dtsi      | 348 ++++++++++++++++++
+ 4 files changed, 683 insertions(+)
+ create mode 100644 arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts
+ create mode 100644 arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 140c4ae894a5..793cfa32e1c7 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -4442,6 +4442,8 @@ M:	Daniel Ammann <daniel.ammann@bytesatwork.ch>
+ S:	Maintained
+ F:	.github/workflows/checkpatch.yml
+ F:	Documentation/devicetree/bindings/arm/bytesatwork/bytesatwork.yaml
++F:	arch/arm64/boot/dts/ti/*bytedevkit*
++F:	arch/arm64/boot/dts/ti/*byteengine*
+ F:	drivers/video/logo/logo_baw_clut224.ppm
+ 
+ C-MEDIA CMI8788 DRIVER
+diff --git a/arch/arm64/boot/dts/ti/Makefile b/arch/arm64/boot/dts/ti/Makefile
+index 6f5353121fc7..ed055972deec 100644
+--- a/arch/arm64/boot/dts/ti/Makefile
++++ b/arch/arm64/boot/dts/ti/Makefile
+@@ -13,6 +13,7 @@ dtb-$(CONFIG_ARCH_K3) += k3-am625-beagleplay.dtb
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-beagleplay-csi2-ov5640.dtbo
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-beagleplay-csi2-tevi-ov5640.dtbo
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-beagleplay-lincolntech-lcd185-panel.dtbo
++dtb-$(CONFIG_ARCH_K3) += k3-am625-bytedevkit.dtb
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-phyboard-lyra-rdk.dtb
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-sk.dtb
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-sk-ecap-capture.dtbo
+diff --git a/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts b/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts
+new file mode 100644
+index 000000000000..23318a90b7c6
+--- /dev/null
++++ b/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts
+@@ -0,0 +1,332 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2024 bytesatwork AG - https://www.bytesatwork.io
++ *
++ * based on k3-am625-sk.dts:
++ *
++ * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
++ */
++
++/dts-v1/;
++
++#include <dt-bindings/gpio/gpio.h>
++#include "k3-am625-byteengine.dtsi"
++
++/ {
++	compatible = "bytesatwork,bytedevkit-am62x", "bytesatwork,byteengine-am62x", "ti,am625";
++	model = "bytesatwork byteDEVKIT with byteENGINE AM62x";
++
++	aliases {
++		serial2 = &main_uart0;
++		mmc1 = &sdhci1;
++		usb0 = &usb0;
++		usb1 = &usb1;
++	};
++
++	chosen {
++		stdout-path = "serial2:115200n8";
++		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
++	};
++
++	extcon_usb1: extcon-usb1 {
++		compatible = "linux,extcon-usb-gpio";
++		id-gpios = <&main_gpio1 8 GPIO_ACTIVE_HIGH>;
++		pinctrl-names = "default";
++		pinctrl-0 = <&main_usb1_gpio_id_pins_default>;
++		status = "okay";
++	};
++
++	display0: display {
++		compatible = "youritech,et050WV05";
++		backlight = <&lcd_bl>;
++		enable-gpios = <&main_gpio0 77 GPIO_ACTIVE_HIGH>, <&main_gpio0 78 GPIO_ACTIVE_HIGH>;
++		status = "okay";
++
++		ports {
++			#address-cells = <1>;
++			#size-cells = <0>;
++
++			port@0 {
++				reg = <0>;
++				lcd_in0: endpoint {
++					remote-endpoint = <&oldi_0_out>;
++				};
++			};
++			port@1 {
++				reg = <1>;
++				lcd_in1: endpoint {
++					remote-endpoint = <&oldi_1_out>;
++				};
++			};
++		};
++	};
++
++	lcd_bl: backlight {
++		compatible = "gpio-backlight";
++		gpios = <&main_gpio1 13 GPIO_ACTIVE_HIGH>;
++		default-on;
++	};
++};
++
++&main_pmx0 {
++	main_uart0_pins_default: main-uart0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x1c8, PIN_INPUT, 0) /* (D14) UART0_RXD */
++			AM62X_IOPAD(0x1cc, PIN_OUTPUT, 0) /* (E14) UART0_TXD */
++		>;
++	};
++
++	main_i2c1_pins_default: main-i2c1-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x1e8, PIN_INPUT, 0) /* (B17) I2C1_SCL */
++			AM62X_IOPAD(0x1ec, PIN_INPUT, 0) /* (A17) I2C1_SDA */
++		>;
++	};
++
++	main_mmc1_pins_default: main-mmc1-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x23c, PIN_INPUT, 0) /* (A21) MMC1_CMD */
++			AM62X_IOPAD(0x234, PIN_INPUT, 0) /* (B22) MMC1_CLK */
++			AM62X_IOPAD(0x230, PIN_INPUT, 0) /* (A22) MMC1_DAT0 */
++			AM62X_IOPAD(0x22c, PIN_INPUT, 0) /* (B21) MMC1_DAT1 */
++			AM62X_IOPAD(0x228, PIN_INPUT, 0) /* (C21) MMC1_DAT2 */
++			AM62X_IOPAD(0x224, PIN_INPUT, 0) /* (D22) MMC1_DAT3 */
++			AM62X_IOPAD(0x240, PIN_INPUT, 0) /* (D17) MMC1_SDCD */
++		>;
++	};
++
++	main_mdio1_pins_default: main-mdio1-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x160, PIN_OUTPUT, 0) /* (AD24) MDIO0_MDC */
++			AM62X_IOPAD(0x15c, PIN_INPUT, 0) /* (AB22) MDIO0_MDIO */
++		>;
++	};
++
++	main_rmii1_pins_default: main-rmii1-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x14c, PIN_INPUT, 1) /* (AB17) RMII1_RD0 */
++			AM62X_IOPAD(0x150, PIN_INPUT, 1) /* (AC17) RMII1_RD1 */
++			AM62X_IOPAD(0x148, PIN_INPUT, 1) /* (AD17) RMII1_REF_CLK */
++			AM62X_IOPAD(0x134, PIN_OUTPUT, 1) /* (AE20) RMII1_TD0 */
++			AM62X_IOPAD(0x138, PIN_OUTPUT, 1) /* (AD20) RMII1_TD1 */
++			AM62X_IOPAD(0x130, PIN_INPUT, 1) /* (AE19) RMII1_CRS_DV */
++			AM62X_IOPAD(0x12c, PIN_OUTPUT, 1) /* (AD19) RMII1_TX_EN */
++		>;
++	};
++
++	main_rmii2_pins_default: main-rmii2-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x184, PIN_INPUT, 1) /* (AE23) RMII2_RD0 */
++			AM62X_IOPAD(0x188, PIN_INPUT, 1) /* (AB20) RMII2_RD1 */
++			AM62X_IOPAD(0x180, PIN_INPUT, 1) /* (AD23) RMII2_REF_CLK */
++			AM62X_IOPAD(0x16c, PIN_OUTPUT, 1) /* (Y18) RMII2_TD0 */
++			AM62X_IOPAD(0x170, PIN_OUTPUT, 1) /* (AA18) RMII2_TD1 */
++			AM62X_IOPAD(0x168, PIN_INPUT, 1) /* (AE21) RMII2_CRS_DV */
++			AM62X_IOPAD(0x164, PIN_OUTPUT, 1) /* (AA19) RMII2_TX_EN */
++		>;
++	};
++
++	main_usb0_pins_default: main-usb0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x0254, PIN_OUTPUT, 0) /* (C20) USB0_DRVVBUS */
++		>;
++	};
++
++	main_usb1_pins_default: main-usb1-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x0258, PIN_OUTPUT, 0) /* (F18) USB1_DRVVBUS */
++		>;
++	};
++
++	main_usb1_gpio_id_pins_default: main-usb1-gpio-id-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x0198, PIN_INPUT, 0) /* (A19) MCASP0_AXR2 */
++		>;
++	};
++
++	oldi0_pins_default: oldi0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x260, PIN_OUTPUT, 0) /* (AA5) OLDI0_A0N */
++			AM62X_IOPAD(0x25c, PIN_OUTPUT, 0) /* (Y6) OLDI0_A0P */
++			AM62X_IOPAD(0x268, PIN_OUTPUT, 0) /* (AD3) OLDI0_A1N */
++			AM62X_IOPAD(0x264, PIN_OUTPUT, 0) /* (AB4) OLDI0_A1P */
++			AM62X_IOPAD(0x270, PIN_OUTPUT, 0) /* (Y8) OLDI0_A2N */
++			AM62X_IOPAD(0x26c, PIN_OUTPUT, 0) /* (AA8) OLDI0_A2P */
++			AM62X_IOPAD(0x278, PIN_OUTPUT, 0) /* (AB6) OLDI0_A3N */
++			AM62X_IOPAD(0x274, PIN_OUTPUT, 0) /* (AA7) OLDI0_A3P */
++			AM62X_IOPAD(0x2a0, PIN_OUTPUT, 0) /* (AD4) OLDI0_CLK0N */
++			AM62X_IOPAD(0x29c, PIN_OUTPUT, 0) /* (AE3) OLDI0_CLK0P */
++			AM62X_IOPAD(0x13c, PIN_OUTPUT, 7) /* (AA15) GPIO0_77 Display enable */
++			AM62X_IOPAD(0x140, PIN_OUTPUT, 7) /* (AA15) GPIO0_78 Display reset */
++			AM62X_IOPAD(0x1ac, PIN_OUTPUT, 7) /* (B18) GPIO1_13 Display1 pwm */
++			AM62X_IOPAD(0x19c, PIN_OUTPUT, 7) /* (B18) GPIO1_9 Display2 pwm */
++			AM62X_IOPAD(0x174, PIN_OUTPUT, 7) /* (AD21) GPIO0_91 Display2 enable */
++		>;
++	};
++
++	touch_pins_default: touch-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x1d0, PIN_OUTPUT, 7) /* (A15) GPIO1_22 UART0_CTSN Touch Rst */
++			AM62X_IOPAD(0x1d4, PIN_INPUT, 7) /* (B15) GPIO1_23 UART0_RTSN Touch Int */
++		>;
++	};
++};
++
++&main_uart0 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_uart0_pins_default>;
++};
++
++/* SD/MMC */
++&sdhci1 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_mmc1_pins_default>;
++	ti,driver-strength-ohm = <50>;
++	disable-wp;
++	no-1-8-v;
++};
++
++&usb0 {
++	dr_mode = "host";
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_usb0_pins_default>;
++	status = "okay";
++};
++
++&usb1 {
++	dr_mode = "otg";
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_usb1_pins_default>;
++	extcon = <&extcon_usb1>;
++	usb-role-switch;
++	status = "okay";
++};
++
++&cpsw3g {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_mdio1_pins_default
++		     &main_rmii1_pins_default
++		     &main_rmii2_pins_default>;
++};
++
++&cpsw_port1 {
++	phy-mode = "rmii";
++	phy-handle = <&cpsw3g_phy0>;
++	status = "okay";
++};
++
++&cpsw_port2 {
++	phy-mode = "rmii";
++	phy-handle = <&cpsw3g_phy1>;
++	status = "okay";
++};
++
++&cpsw3g_mdio {
++	status = "okay";
++
++	cpsw3g_phy0: ethernet-phy@0 {
++		reg = <0>;
++	};
++
++	cpsw3g_phy1: ethernet-phy@3 {
++		reg = <3>;
++	};
++};
++
++&dss {
++	pinctrl-names = "default";
++	pinctrl-0 = <&oldi0_pins_default>;
++	status = "okay";
++};
++
++&oldi0 {
++	status = "okay";
++};
++
++&oldi1 {
++	status = "okay";
++};
++
++&oldi0_ports {
++	#address-cells = <1>;
++	#size-cells = <0>;
++
++	port@0 {
++		reg = <0>;
++		oldi_0_in: endpoint {
++			remote-endpoint = <&dpi0_out0>;
++		};
++	};
++
++	port@1 {
++		reg = <1>;
++		oldi_0_out: endpoint {
++			remote-endpoint = <&lcd_in0>;
++		};
++	};
++};
++
++&oldi1_ports {
++	#address-cells = <1>;
++	#size-cells = <0>;
++
++	port@0 {
++		reg = <0>;
++		oldi_1_in: endpoint {
++			remote-endpoint = <&dpi0_out1>;
++		};
++	};
++
++	port@1 {
++		reg = <1>;
++		oldi_1_out: endpoint {
++			remote-endpoint = <&lcd_in1>;
++		};
++	};
++};
++
++&dss_ports {
++	#address-cells = <1>;
++	#size-cells = <0>;
++	status = "okay";
++
++	port@0 {
++		reg = <0>;
++		#address-cells = <1>;
++		#size-cells = <0>;
++
++		dpi0_out0: endpoint@0 {
++			reg = <0>;
++			remote-endpoint = <&oldi_0_in>;
++		};
++		dpi0_out1: endpoint@1 {
++			reg = <1>;
++			remote-endpoint = <&oldi_1_in>;
++		};
++	};
++};
++
++&main_i2c1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_i2c1_pins_default
++		     &touch_pins_default>;
++	clock-frequency = <400000>;
++	status = "okay";
++
++	gt911@5d {
++		compatible = "goodix,gt911";
++		reg = <0x5d>;
++		interrupt-parent = <&main_gpio1>;
++		interrupts = <23 0>;
++		irq-gpios = <&main_gpio1 23 0>;
++		reset-gpios = <&main_gpio1 22 0>;
++	};
++
++	eeprom: eeprom@57 {
++		compatible = "atmel,24c256";
++		reg = <0x57>;
++	};
++};
+diff --git a/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi b/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
+new file mode 100644
+index 000000000000..808b87f2dd6d
+--- /dev/null
++++ b/arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
+@@ -0,0 +1,348 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2024 bytesatwork AG - https://www.bytesatwork.io
++ *
++ * based on k3-am625-sk.dts:
++ *
++ * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
++ */
++
++#include "k3-am625.dtsi"
++
++/ {
++	compatible = "bytesatwork,byteengine-am62x", "ti,am625";
++
++	aliases {
++		mmc0 = &sdhci0;
++		spi0 = &ospi0;
++	};
++
++	memory@80000000 {
++		device_type = "memory";
++		/* 2G RAM */
++		reg = <0x00000000 0x80000000 0x00000000 0x80000000>;
++	};
++
++	reserved-memory {
++		#address-cells = <2>;
++		#size-cells = <2>;
++		ranges;
++
++		ramoops@9c700000 {
++			compatible = "ramoops";
++			reg = <0x00 0x9c700000 0x00 0x00100000>;
++			record-size = <0x8000>;
++			console-size = <0x8000>;
++			ftrace-size = <0x00>;
++			pmsg-size = <0x8000>;
++		};
++
++		/* global cma region */
++		linux,cma {
++			compatible = "shared-dma-pool";
++			reusable;
++			size = <0x00 0x8000000>;
++			linux,cma-default;
++		};
++
++		rtos_ipc_memory_region: ipc-memories@9c800000 {
++			compatible = "shared-dma-pool";
++			reg = <0x00 0x9c800000 0x00 0x00300000>;
++			no-map;
++		};
++
++		mcu_m4fss_dma_memory_region: m4f-dma-memory@9cb00000 {
++			compatible = "shared-dma-pool";
++			reg = <0x00 0x9cb00000 0x00 0x100000>;
++			no-map;
++		};
++
++		mcu_m4fss_memory_region: m4f-memory@9cc00000 {
++			compatible = "shared-dma-pool";
++			reg = <0x00 0x9cc00000 0x00 0xe00000>;
++			no-map;
++		};
++
++		wkup_r5fss0_core0_dma_memory_region: r5f-dma-memory@9da00000 {
++			compatible = "shared-dma-pool";
++			reg = <0x00 0x9da00000 0x00 0x00100000>;
++			no-map;
++		};
++
++		wkup_r5fss0_core0_memory_region: r5f-memory@9db00000 {
++			compatible = "shared-dma-pool";
++			reg = <0x00 0x9db00000 0x00 0x00c00000>;
++			no-map;
++		};
++
++		lpm_ctx_ddr: lpm-memory@9e700000 {
++			reg = <0x00 0x9e700000 0x00 0x80000>;
++			alignment = <0x1000>;
++		};
++
++		secure_tfa_ddr: tfa@9e780000 {
++			reg = <0x00 0x9e780000 0x00 0x80000>;
++			alignment = <0x1000>;
++			no-map;
++		};
++
++		secure_ddr: optee@9e800000 {
++			reg = <0x00 0x9e800000 0x00 0x01800000>; /* for OP-TEE */
++			alignment = <0x1000>;
++			no-map;
++		};
++
++		framebuffer: framebuffer@ff700000 {
++			reg = <0x00 0xff700000 0x00 0x008ca000>;
++			no-map;
++		};
++	};
++
++	vdd_core: regulator-1 {
++		compatible = "regulator-fixed";
++		regulator-name = "vdd_core";
++		regulator-min-microvolt = <750000>;
++		regulator-max-microvolt = <750000>;
++		regulator-always-on;
++		regulator-boot-on;
++	};
++
++	vsys: main-supply {
++		compatible = "regulator-fixed";
++		regulator-name = "vsys";
++		regulator-min-microvolt = <5000000>;
++		regulator-max-microvolt = <5000000>;
++		regulator-always-on;
++		regulator-boot-on;
++	};
++};
++
++&main_pmx0 {
++	main_i2c0_pins_default: main-i2c0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x1e0, PIN_INPUT_PULLUP, 0) /* (B16) I2C0_SCL */
++			AM62X_IOPAD(0x1e4, PIN_INPUT_PULLUP, 0) /* (A16) I2C0_SDA */
++		>;
++	};
++
++	main_mmc0_pins_default: main-mmc0-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x220, PIN_INPUT, 0) /* (Y3) MMC0_CMD */
++			AM62X_IOPAD(0x218, PIN_INPUT, 0) /* (AB1) MMC0_CLK */
++			AM62X_IOPAD(0x214, PIN_INPUT, 0) /* (AA2) MMC0_DAT0 */
++			AM62X_IOPAD(0x210, PIN_INPUT, 0) /* (AA1) MMC0_DAT1 */
++			AM62X_IOPAD(0x20c, PIN_INPUT, 0) /* (AA3) MMC0_DAT2 */
++			AM62X_IOPAD(0x208, PIN_INPUT, 0) /* (Y4) MMC0_DAT3 */
++			AM62X_IOPAD(0x204, PIN_INPUT, 0) /* (AB2) MMC0_DAT4 */
++			AM62X_IOPAD(0x200, PIN_INPUT, 0) /* (AC1) MMC0_DAT5 */
++			AM62X_IOPAD(0x1fc, PIN_INPUT, 0) /* (AD2) MMC0_DAT6 */
++			AM62X_IOPAD(0x1f8, PIN_INPUT, 0) /* (AC2) MMC0_DAT7 */
++		>;
++	};
++
++	pmic_irq_pins_default: pmic-irq-pins-default {
++		pinctrl-single,pins = <
++			AM62X_IOPAD(0x01f4, PIN_INPUT_PULLUP, 0) /* (D16) EXTINTn */
++		>;
++	};
++};
++
++&wkup_uart0 {
++	status = "disabled";
++};
++
++&mcu_uart0 {
++	status = "disabled";
++};
++
++&main_uart1 {
++	status = "disabled";
++};
++
++&main_uart2 {
++	status = "disabled";
++};
++
++&main_uart3 {
++	status = "disabled";
++};
++
++&main_uart4 {
++	status = "disabled";
++};
++
++&main_uart5 {
++	status = "disabled";
++};
++
++&main_uart6 {
++	status = "disabled";
++};
++
++&mcu_i2c0 {
++	status = "disabled";
++};
++
++&wkup_i2c0 {
++	status = "disabled";
++};
++
++&main_i2c0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_i2c0_pins_default>;
++	clock-frequency = <400000>;
++	status = "okay";
++
++	tps65219: pmic@30 {
++		compatible = "ti,tps65219";
++		reg = <0x30>;
++		buck1-supply = <&vsys>;
++		buck2-supply = <&vsys>;
++		buck3-supply = <&vsys>;
++		ldo1-supply = <&buck2_reg>;
++		ldo2-supply = <&buck2_reg>;
++		ldo3-supply = <&buck2_reg>;
++		ldo4-supply = <&buck2_reg>;
++
++		pinctrl-names = "default";
++		pinctrl-0 = <&pmic_irq_pins_default>;
++		interrupt-parent = <&gic500>;
++		interrupts = <GIC_SPI 224 IRQ_TYPE_LEVEL_HIGH>;
++		interrupt-controller;
++		#interrupt-cells = <1>;
++
++		system-power-controller;
++		ti,power-button;
++
++		regulators {
++			buck1_reg: buck1 {
++				regulator-name = "VDD_CORE";
++				regulator-min-microvolt = <750000>;
++				regulator-max-microvolt = <750000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			buck2_reg: buck2 {
++				regulator-name = "VDD_3V3";
++				regulator-min-microvolt = <3300000>;
++				regulator-max-microvolt = <3300000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			buck3_reg: buck3 {
++				regulator-name = "VDD_DDR";
++				regulator-min-microvolt = <1100000>;
++				regulator-max-microvolt = <1100000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			ldo1_reg: ldo1 {
++				regulator-name = "VDDSHV_SD_IO_PMIC";
++				regulator-min-microvolt = <33000000>;
++				regulator-max-microvolt = <33000000>;
++			};
++
++			ldo2_reg: ldo2 {
++				regulator-name = "VDDR_CORE";
++				regulator-min-microvolt = <850000>;
++				regulator-max-microvolt = <850000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			ldo3_reg: ldo3 {
++				regulator-name = "VDDA_1V8";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++
++			ldo4_reg: ldo4 {
++				regulator-name = "VDD_1V8";
++				regulator-min-microvolt = <1800000>;
++				regulator-max-microvolt = <1800000>;
++				regulator-boot-on;
++				regulator-always-on;
++			};
++		};
++	};
++};
++
++&main_i2c2 {
++	status = "disabled";
++};
++
++&main_i2c3 {
++	status = "disabled";
++};
++
++&sdhci0 {
++	status = "okay";
++	pinctrl-names = "default";
++	pinctrl-0 = <&main_mmc0_pins_default>;
++	ti,driver-strength-ohm = <50>;
++	disable-wp;
++	no-1-8-v;
++};
++
++&mailbox0_cluster0 {
++	mbox_m4_0: mbox-m4-0 {
++		ti,mbox-rx = <0 0 0>;
++		ti,mbox-tx = <1 0 0>;
++	};
++
++	mbox_r5_0: mbox-r5-0 {
++		ti,mbox-rx = <2 0 0>;
++		ti,mbox-tx = <3 0 0>;
++	};
++};
++
++&mcu_m4fss {
++	mboxes = <&mailbox0_cluster0 &mbox_m4_0>;
++	memory-region = <&mcu_m4fss_dma_memory_region>,
++			<&mcu_m4fss_memory_region>;
++};
++
++&wkup_r5fss0_core0 {
++	mboxes = <&mailbox0_cluster0 &mbox_r5_0>;
++	memory-region = <&wkup_r5fss0_core0_dma_memory_region>,
++			<&wkup_r5fss0_core0_memory_region>;
++};
++
++&mcu_rti0 {
++	/* MCU RTI0 is used by M4F firmware */
++	status = "reserved";
++};
++
++&wkup_rti0 {
++	/* WKUP RTI0 is used by DM firmware */
++	status = "reserved";
++};
++
++&usbss0 {
++	ti,vbus-divider;
++	vddcore-supply = <&vdd_core>;
++	status = "okay";
++};
++
++&usbss1 {
++	ti,vbus-divider;
++	vddcore-supply = <&vdd_core>;
++	status = "okay";
++};
++
++&mcasp0 {
++	status = "disabled";
++};
++
++&mcasp1 {
++	status = "disabled";
++};
++
++&mcasp2 {
++	status = "disabled";
++};
+-- 
+2.39.5
+

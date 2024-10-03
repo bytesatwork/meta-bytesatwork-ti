@@ -4,7 +4,7 @@
 ## Introduction
 
 This is the official OpenEmbedded/Yocto BSP layer for byteDEVKIT AM62x by
-[bytes at work AG](https://www.bytesatwork.io/).
+[bytesatwork AG](https://www.bytesatwork.io/).
 
 It is hosted on [github](https://github.com/bytesatwork/meta-bytesatwork-ti.git).
 
@@ -12,13 +12,13 @@ This layer depends on:
 
 	URI: https://git.yoctoproject.org/git/meta-ti
 	layer: meta-ti-bsp
-	branch: kirkstone
+	branch: scarthgap
 
 
 ## BSP
 
 This meta layer provides the Board Support Package (U-Boot and Linux kernel) for
-byteDEVKIT AM62x by bytes at work AG. Simply set the variable MACHINE to
+byteDEVKIT AM62x by bytesatwork AG. Simply set the variable MACHINE to
 `bytedevkit-am62x` to use this BSP.
 
 Linux Kernel recipe: linux-ti-staging

@@ -1,0 +1,1234 @@
+From fce2516ba2f8b44498456d28f57091d155175f2f Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Wed, 2 Feb 2022 09:16:56 +0100
+Subject: [PATCH] board: bytesatwork: import bawconfig
+
+Bytesatwork tool to store production data in EEPROM.
+
+Used cherry picked commits:
+3578ec17f4 bytesatwork: m2config: verbatim import
+42230a9c17 bytesatwork: m2config: rename to baw config
+7daca48726 bytesatwork: bawconfig: init config to zero
+8aa81503bc bytesatwork: bawconfig: adapt PCB, RAM and flash enums
+8fb2cc005e bytesatwork: bawconfig: stm32mp1 ram fallback
+4750929ff5 bytesatwork: bawconfig: support imx8mm bytedevkit
+c2b7c6e802 bytesatwork: bawconfig: fix build without EEPROM enabled
+1d017f3668 bytesatwork: bawconfig: add 4 GB as 3 GB RAM
+315aa98743 bytesatwork: bawconfig: introduce ti am62x enums
+d83cf89382 bytesatwork: bawconfig: introduce Makefile
+3cb80a7bf4 bytesatwork: bawconfig: add stm32mp1 ram types
+96614941ec bytesatwork: bawconfig: remove legacy i2c support, use driver
+7a1476fffe bytesatwork: bawconfig: clean up for automated check
+72182c520c bytesatwork: bawconfig: update cmd function
+1ded65d639 bytesatwork: bawconfig: ti am62x ram fallback
+b81f301b13 bytesatwork: bawconfig: fix am62x ram fallback
+cac51ab069 bytesatwork: bawconfig: add ti am62x revision
+97c39a73a1 bytesatwork: bawconfig: introduce nxp imx8mp
+7a56df4a0d bytesatwork: bawconfig: introduce ti am62px
+08d0ffb1a8 bytesatwork: bawconfig: introduce Kconfig, unify copyrights
+c4ef2a83a6 bytesatwork: bawconfig: add HW revisions and RAM types
+8e8ee20896 bytesatwork: bawconfig: add I2C config options
+81f05f22c8e bytesatwork: bawconfig: add imx8mp 6GB ram type
+ce864843561 bytesatwork: bawconfig: Remove common.h includes
+4d95af5b93d bytesatwork: bawconfig: Add legacy i2c support for SPL
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
+---
+ board/bytesatwork/baw_config/Kconfig          |  72 ++++
+ board/bytesatwork/baw_config/MAINTAINERS      |   6 +
+ board/bytesatwork/baw_config/Makefile         |  15 +
+ board/bytesatwork/baw_config/README           |  71 ++++
+ board/bytesatwork/baw_config/baw_config.c     |  83 +++++
+ board/bytesatwork/baw_config/baw_config.h     | 120 +++++++
+ .../baw_config/baw_config_builtin.c           |  15 +
+ .../baw_config/baw_config_builtin.h           |  21 ++
+ .../baw_config/baw_config_eeprom.c            | 307 ++++++++++++++++++
+ .../baw_config/baw_config_eeprom.h            |  38 +++
+ board/bytesatwork/baw_config/baw_config_get.c | 104 ++++++
+ board/bytesatwork/baw_config/baw_config_get.h |  13 +
+ board/bytesatwork/baw_config/cmd_baw_config.c | 223 +++++++++++++
+ 13 files changed, 1088 insertions(+)
+ create mode 100644 board/bytesatwork/baw_config/Kconfig
+ create mode 100644 board/bytesatwork/baw_config/MAINTAINERS
+ create mode 100644 board/bytesatwork/baw_config/Makefile
+ create mode 100644 board/bytesatwork/baw_config/README
+ create mode 100644 board/bytesatwork/baw_config/baw_config.c
+ create mode 100644 board/bytesatwork/baw_config/baw_config.h
+ create mode 100644 board/bytesatwork/baw_config/baw_config_builtin.c
+ create mode 100644 board/bytesatwork/baw_config/baw_config_builtin.h
+ create mode 100644 board/bytesatwork/baw_config/baw_config_eeprom.c
+ create mode 100644 board/bytesatwork/baw_config/baw_config_eeprom.h
+ create mode 100644 board/bytesatwork/baw_config/baw_config_get.c
+ create mode 100644 board/bytesatwork/baw_config/baw_config_get.h
+ create mode 100644 board/bytesatwork/baw_config/cmd_baw_config.c
+
+diff --git a/board/bytesatwork/baw_config/Kconfig b/board/bytesatwork/baw_config/Kconfig
+new file mode 100644
+index 00000000000..b49e5f36d8c
+--- /dev/null
++++ b/board/bytesatwork/baw_config/Kconfig
+@@ -0,0 +1,72 @@
++# SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++# Copyright (C) 2024 bytesatwork AG - https://www.bytesatwork.io
++
++menu "bytesatwork production data tool"
++
++config CMD_BAW_CONFIG
++	bool "bawconfig command"
++	default y
++	help
++	  Enable bawconfig command functionality for
++	  running commands from the u-boot console.
++
++config BAW_CONFIG_EEPROM
++	bool "bawconfig EEPROM support"
++	default y
++	help
++	  Enable bawconfig EEPROM read/write functionality.
++	  Read, write and erase production data on the SoM EEPROM.
++
++config BAW_CONFIG_EEPROM_BUS
++	int "bawconfig I2C bus number"
++	default 0
++	help
++	  I2C bus number of configuration EEPROM
++	  used on the SoM.
++
++config BAW_CONFIG_EEPROM_BUS_NAME
++	string "device tree I2C bus name"
++	default ""
++	help
++	  I2C controller name where the configuration EEPROM of the SoM is
++	  attached. Takes priority over BAW_CONFIG_EEPROM_BUS, because the bus
++	  number could be different in SPL and u-boot.
++
++config BAW_CONFIG_EEPROM_ADDRESS
++	hex "bawconfig I2C address"
++	default 0x50
++	help
++	  I2C address of configuration EEPROM
++	  placed on the SoM.
++
++config BAW_CONFIG_EEPROM_ADDRESS_BYTES
++	int "bawconfig I2C EEPROM memory address bytes"
++	default 2
++	help
++	  Number of memory address bytes of configuration EEPROM
++	  placed on the SoM.
++
++config BAW_CONFIG_EEPROM_MAX_WRITE
++	int "bawconfig I2C EEPROM max burst write"
++	default 64
++	help
++	  Maximum number of bytes sent in one I2C transfer to configuration
++	  EEPROM placed on the SoM.
++
++config BAW_CONFIG_EEPROM_WRITE_DELAY_MS
++	int "bawconfig I2C EEPROM delay between writes"
++	default 0
++	help
++	  Fixed delay between I2C (burst) transfers to configuration EEPROM
++	  placed on the SoM. Without delay the EEPROM is polled for ACK which
++	  some devices do not support.
++
++config BAW_CONFIG_BUILTIN
++	bool "bawconfig builtin support"
++	default y
++	help
++	  Enable bawconfig builtin configuration functionality. Additinonally,
++	  this allows to write the built-in configuration to the EEPROM if
++	  BAW_CONFIG_EEPROM is enabled.
++
++endmenu
+diff --git a/board/bytesatwork/baw_config/MAINTAINERS b/board/bytesatwork/baw_config/MAINTAINERS
+new file mode 100644
+index 00000000000..27dd16973ba
+--- /dev/null
++++ b/board/bytesatwork/baw_config/MAINTAINERS
+@@ -0,0 +1,6 @@
++BYTESATWORK BAWCONFIG
++M:	Rico Ganahl <rico.ganahl@bytesatwork.ch>
++S:	Maintained
++F:	board/bytesatwork/baw_config/*
++F:	board/bytesatwork/baw_config/Makefile
++F:	board/bytesatwork/baw_config/Kconfig
+diff --git a/board/bytesatwork/baw_config/Makefile b/board/bytesatwork/baw_config/Makefile
+new file mode 100644
+index 00000000000..3f02428a879
+--- /dev/null
++++ b/board/bytesatwork/baw_config/Makefile
+@@ -0,0 +1,15 @@
++# SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++# Copyright (C) 2023 bytesatwork AG - https://www.bytesatwork.io
++
++ifdef CONFIG_SPL_BUILD
++obj-y += baw_config.o
++obj-y += baw_config_get.o
++else
++ifneq ($(or $(CONFIG_CMD_BAW_CONFIG), $(CONFIG_BAW_CONFIG_BUILTIN), $(CONFIG_BAW_CONFIG_EEPROM)),)
++obj-y += baw_config.o
++endif
++endif
++
++obj-$(CONFIG_CMD_BAW_CONFIG) += cmd_baw_config.o
++obj-$(CONFIG_BAW_CONFIG_EEPROM) += baw_config_eeprom.o
++obj-$(CONFIG_BAW_CONFIG_BUILTIN) += baw_config_builtin.o
+diff --git a/board/bytesatwork/baw_config/README b/board/bytesatwork/baw_config/README
+new file mode 100644
+index 00000000000..518d2a94ec8
+--- /dev/null
++++ b/board/bytesatwork/baw_config/README
+@@ -0,0 +1,71 @@
++# SPDX-License-Identifier: (GPL-2.0+ OR BSD-3-Clause)
++# Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
++
++Configuration options:
++
++CONFIG_CMD_BAW_CONFIG
++If defined, add the u-boot command bawconfig to read and write the
++configuration.
++
++CONFIG_BAW_CONFIG_EEPROM
++If defined, add method to read (SPL) and write (SPL and u-boot) the
++configuration from the eeprom.
++
++CONFIG_BAW_CONFIG_BUILTIN
++If defined, add built-in configuration values. Define the following names:
++  BAW_CONFIG_BUILTIN_PCB
++  BAW_CONFIG_BUILTIN_RAM
++  BAW_CONFIG_BUILTIN_FLASH
++
++If both CONFIG_BAW_CONFIG_EEPROM and CONFIG_BAW_CONFIG_BUILTIN are defined, the
++order is defined in baw_config_get.
++
++At least one of CONFIG_BAW_CONFIG_EEPROM or CONFIG_BAW_CONFIG_BUILTIN has to be
++defined.
++
++
++EEPROM format
++
++Byte order is the native byte order of the CPU. The format is:
++
++Bytes  Usage
++  2    Magic
++  2    length
++  4    PCB
++  4    RAM
++  4    Flash
++  4    CRC
++
++Magic is 0x6268. CRC is the native u-boot crc32.
++
++
++Extended data EEPROM format
++
++Byte order is the native byte order of the CPU. The format is:
++
++Bytes  Usage
++  2    Magic ext.
++  2    length
++  4    CRC
++  4    Article number
++  4    Lot
++  1    Lot sequence number
++ 12    Production date
++  6    Flash date
++  6    Flash user
++
++Magic is 0x6235. CRC is the native u-boot crc32.
++
++
++Tracking data EEPROM format
++
++Byte order is the native byte order of the CPU. The format is:
++
++Bytes  Usage
++  2    Magic (tracking data)
++  2    length
++  4    CRC
++ 18    MAC address
++ 16    UID
++
++Magic is 0x6e4a. CRC is the native u-boot crc32.
+diff --git a/board/bytesatwork/baw_config/baw_config.c b/board/bytesatwork/baw_config/baw_config.c
+new file mode 100644
+index 00000000000..87024b01eb2
+--- /dev/null
++++ b/board/bytesatwork/baw_config/baw_config.c
+@@ -0,0 +1,83 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
++ */
++
++#include "baw_config.h"
++
++const struct baw_config_name_pair baw_config_pcb_name[] = {
++	{ M2_PCB_REV_00, "M2 Rev.00" },
++	{ M2_PCB_REV_01, "M2 Rev.01" },
++	{ M2_PCB_REV_02, "M2 Rev.02" },
++	{ M2_PCB_REV_03, "M2 Rev.03" },
++	{ M2_PCB_REV_04, "M2 Rev.04" },
++	{ M5_PCB_REV_1_0, "M5 Rev 1.0" },
++	{ M5_PCB_REV_1_2, "M5 Rev 1.2" },
++	{ M6_PCB_REV_1_0, "M6 Rev 1.0" },
++	{ M6_PCB_REV_1_1, "M6 Rev 1.1" },
++	{ M8_PCB_REV_0_1, "M8 Rev 0.1" },
++	{ M8_PCB_REV_1_0, "M8 Rev 1.0" },
++	{ M8_PCB_REV_1_1, "M8 Rev 1.1" },
++	{ M7_PCB_REV_1_0, "M7 Rev 1.0" },
++	{ M8P_PCB_REV_1_0, "M8P Rev 1.0" },
++	{ M8P_PCB_REV_1_1, "M8P Rev 1.1" },
++	{ M9_PCB_REV_1_0, "M9 Rev 1.0" },
++	{ M9_PCB_REV_2_0, "M9 Rev 2.0" },
++	{ -1, NULL },
++};
++
++const struct baw_config_name_pair baw_config_ram_name[] = {
++	{ M2_RAM_MT47H128M16RT25E, "MT47H128M16RT25E 256 MB DDR2 @ 266MHz" },
++	{ M2_RAM_K4B2G1646EBIH9,   "K4B2G1646EBIH9 legacy DDR3 @ 303MHz" },
++	{ M2_RAM_K4B2G1646QBCK0,   "K4B2G1646QBCK0 256 MB DDR3 @ 400Mhz" },
++	{ M2_RAM_K4B4G1646DBIK0,   "K4B4G1646DBIK0 512 MB DDR3 @ 400MHz" },
++	{ M2_RAM_MT41K512M16HA107, "MT41K512M16HA107 1024MB DDR3 @ 303MHz" },
++	{ M6_RAM_MT53E128M32D2DS_053, "MT53E128M32D2DS-053 512 MB LPDDR4 @ 1500 MHz" },
++	{ M6_RAM_MT53E256M32D2DS_053, "MT53E256M32D2DS-053 1 GB LPDDR4 @ 1500 MHz" },
++	{ M6_RAM_MT53E384M32D2DS_053, "MT53E384M32D2DS-053 1.5 GB LPDDR4 @ 1500 MHz" },
++	{ M6_RAM_MT53D512M32D2DS_053, "MT53D512M32D2DS-053 2 GB LPDDR4 @ 1500 MHz" },
++	{ M6_RAM_MT53E768M32D4DT_053, "MT53E768M32D4DT-053 3 GB LPDDR4 @ 1500 MHz" },
++	{ M6_RAM_MT53D1024M32D4DT_053, "MT53D1024M32D4DT-053 4 GB LPDDR4 @ 1500 MHz" },
++	{ M6_RAM_MT53D1024M32D4DT_053_3GB, "MT53D1024M32D4DT-053 4 GB using 3 GB @ 1500 MHz" },
++	{ M8_RAM_MT53E256M16D1DS_046, "MT53E256M16D1DS-046 512 MB LPDDR4 @ 1600 MHz"},
++	{ M8_RAM_MT53D512M16D1DS_046, "MT53D512M16D1DS-046 1 GB LPDDR4 @ 1600 MHz"},
++	{ M8_RAM_MT53E1G16D1FW_046, "MT53E1G16D1FW-046 2 GB LPDDR4 @ 1600 MHz"},
++	{ M8_RAM_MT53E4G16D4NQ_046, "MT53E4G16D4NQ-046 8 GB LPDDR4 @ 1600 MHz"},
++	{ M5_RAM_K4B4G1646DBIK0,   "K4B4G1646DBIK0 512 MB DDR3 @ 533MHz" },
++	{ M5_RAM_MT41K512M16HA107, "MT41K512M16HA107 1024 MB DDR3 @ 533MHz" },
++	{ M7_RAM_MT53E128M32D2DS_053, "MT53E128M32D2DS-053 512 MB LPDDR4 @ 2000 MHz" },
++	{ M7_RAM_MT53E256M32D2DS_053, "MT53E256M32D2DS-053 1 GB LPDDR4 @ 2000 MHz" },
++	{ M7_RAM_MT53E384M32D2DS_053, "MT53E384M32D2DS-053 1.5 GB LPDDR4 @ 2000 MHz" },
++	{ M7_RAM_MT53D512M32D2DS_053, "MT53D512M32D2DS-053 2 GB LPDDR4 @ 2000 MHz" },
++	{ M7_RAM_MT53E768M32D4DT_053, "MT53E768M32D4DT-053 3 GB LPDDR4 @ 2000 MHz" },
++	{ M7_RAM_MT53E1G32D2FW_046, "MT53E1G32D2FW-046 4 GB LPDDR4 @ 2000 MHz" },
++	{ M8P_RAM_MT53E2G32D4DE_046, "MT53E2G32D4DE-046 8 GB LPDDR4 @ 1600 MHz" },
++	{ M9_RAM_MT53E256M16D1DS_046, "MT53E256M16D1DS-046 512 MB LPDDR4X @ 1866 MHz" },
++	{ M9_RAM_MT53D512M16D1DS_046, "MT53D512M16D1DS-046 1 GB LPDDR4X @ 1866 MHz" },
++	{ M9_RAM_MT53E1G16D1FW_046, "MT53E1G16D1FW-046 2 GB LPDDR4X @ 1866 MHz" },
++	{ M7_RAM_MT53E1536M32D4DE_046, "MT53E1536M32D4DE-046 6 GB LPDDR4 @ 2000 MHz"},
++	{ -1, NULL },
++};
++
++const struct baw_config_name_pair baw_config_flash_name[] = {
++	{ M2_NAND_2GBIT, "Nand 2 GBit" },
++	{ M2_NAND_4GBIT, "Nand 4 GBit" },
++	{ EMMC_4GB, "EMMC 4 GB" },
++	{ EMMC_8GB, "EMMC 8 GB" },
++	{ EMMC_16GB, "EMMC 16 GB" },
++	{ EMMC_32GB, "EMMC 32 GB" },
++	{ EMMC_64GB, "EMMC 64 GB" },
++	{ EMMC_128GB, "EMMC 128 GB" },
++	{ -1, NULL },
++};
++
++const char *baw_config_get_name(u32 config, const struct baw_config_name_pair *map)
++{
++	const struct baw_config_name_pair *itr;
++
++	for (itr = map; itr->name; itr++)
++		if (itr->config == config)
++			return itr->name;
++
++	return "unknown";
++}
+diff --git a/board/bytesatwork/baw_config/baw_config.h b/board/bytesatwork/baw_config/baw_config.h
+new file mode 100644
+index 00000000000..f1f32623869
+--- /dev/null
++++ b/board/bytesatwork/baw_config/baw_config.h
+@@ -0,0 +1,120 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
++ */
++
++#ifndef BAW_CONFIG_H
++#define BAW_CONFIG_H
++
++#include <config.h>
++#include <linux/types.h>
++
++enum baw_config_pcb {
++	M2_PCB_REV_00 = 0,
++	M2_PCB_REV_01 = 1,
++	M2_PCB_REV_02 = 2,
++	M2_PCB_REV_03 = 3,
++	M2_PCB_REV_04 = 4,
++	M5_PCB_REV_1_0 = 5,
++	M5_PCB_REV_1_2 = 6,
++	M6_PCB_REV_1_0 = 7,
++	M6_PCB_REV_1_1 = 8,
++	M8_PCB_REV_0_1 = 9,
++	M8_PCB_REV_1_0 = 10,
++	M8_PCB_REV_1_1 = 11,
++	M7_PCB_REV_1_0 = 12,
++	M8P_PCB_REV_1_0 = 13,
++	M8P_PCB_REV_1_1 = 14,
++	M9_PCB_REV_1_0 = 15,
++	M9_PCB_REV_2_0 = 16,
++};
++
++enum baw_config_ram {
++	M2_RAM_MT47H128M16RT25E = 1,
++	M2_RAM_K4B2G1646EBIH9   = 2,
++	M2_RAM_K4B2G1646QBCK0   = 3,
++	M2_RAM_K4B4G1646DBIK0   = 4,
++	M2_RAM_MT41K512M16HA107 = 5,
++	M6_RAM_MT53E128M32D2DS_053 = 6,
++	M6_RAM_MT53E256M32D2DS_053 = 7,
++	M6_RAM_MT53E384M32D2DS_053 = 8,
++	M6_RAM_MT53D512M32D2DS_053 = 9,
++	M6_RAM_MT53E768M32D4DT_053 = 10,
++	M6_RAM_MT53D1024M32D4DT_053 = 11,
++	/* According to the imx8mm datasheet only Quad-A53 supports more than
++	 * 3 GB RAM. Therefore define dedicated enum to use 4 GB as 3 GB RAM.
++	 */
++	M6_RAM_MT53D1024M32D4DT_053_3GB = 12,
++	M8_RAM_MT53E256M16D1DS_046 = 13,
++	M8_RAM_MT53D512M16D1DS_046 = 14,
++	M8_RAM_MT53E1G16D1FW_046 = 15,
++	M8_RAM_MT53E4G16D4NQ_046 = 16,
++	M5_RAM_K4B4G1646DBIK0 = 17,
++	M5_RAM_MT41K512M16HA107 = 18,
++	M7_RAM_MT53E128M32D2DS_053 = 19,
++	M7_RAM_MT53E256M32D2DS_053 = 20,
++	M7_RAM_MT53E384M32D2DS_053 = 21,
++	M7_RAM_MT53D512M32D2DS_053 = 22,
++	M7_RAM_MT53E768M32D4DT_053 = 23,
++	M7_RAM_MT53E1G32D2FW_046 = 24,
++	M8P_RAM_MT53E2G32D4DE_046 = 25,
++	M9_RAM_MT53E256M16D1DS_046 = 26,
++	M9_RAM_MT53D512M16D1DS_046 = 27,
++	M9_RAM_MT53E1G16D1FW_046 = 28,
++	M7_RAM_MT53E1536M32D4DE_046 = 29,
++};
++
++enum baw_config_flash {
++	M2_NAND_2GBIT  = 0,
++	M2_NAND_4GBIT  = 1,
++	EMMC_4GB  = 2,
++	EMMC_8GB  = 3,
++	EMMC_16GB = 4,
++	EMMC_32GB = 5,
++	EMMC_64GB = 6,
++	EMMC_128GB = 7,
++};
++
++struct baw_config {
++	enum baw_config_pcb pcb;
++	enum baw_config_ram ram;
++	enum baw_config_flash flash;
++	bool ext_avail;
++	u32 artno;
++	u32 lot;
++	u8 lotseq;
++	char proddate[12];
++	char flashdate[6];
++	char flashuser[6];
++	bool track_avail;
++	char macaddr[18];
++	char uid[16];
++};
++
++struct baw_config_name_pair {
++	u32 config;
++	const char *name;
++};
++
++extern const struct baw_config_name_pair baw_config_pcb_name[];
++extern const struct baw_config_name_pair baw_config_ram_name[];
++extern const struct baw_config_name_pair baw_config_flash_name[];
++
++const char *baw_config_get_name(u32 config, const struct baw_config_name_pair *map);
++
++static inline const char *baw_config_get_pcb_name(enum baw_config_pcb config)
++{
++	return baw_config_get_name(config, baw_config_pcb_name);
++}
++
++static inline const char *baw_config_get_ram_name(enum baw_config_ram config)
++{
++	return baw_config_get_name(config, baw_config_ram_name);
++}
++
++static inline const char *baw_config_get_flash_name(enum baw_config_flash config)
++{
++	return baw_config_get_name(config, baw_config_flash_name);
++}
++
++#endif
+diff --git a/board/bytesatwork/baw_config/baw_config_builtin.c b/board/bytesatwork/baw_config/baw_config_builtin.c
+new file mode 100644
+index 00000000000..367078be8ef
+--- /dev/null
++++ b/board/bytesatwork/baw_config/baw_config_builtin.c
+@@ -0,0 +1,15 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
++ */
++
++#include "baw_config.h"
++#include <config.h>
++
++int baw_config_builtin(struct baw_config *config)
++{
++	config->pcb    = BAW_CONFIG_BUILTIN_PCB;
++	config->ram    = BAW_CONFIG_BUILTIN_RAM;
++	config->flash  = BAW_CONFIG_BUILTIN_FLASH;
++	return 0;
++}
+diff --git a/board/bytesatwork/baw_config/baw_config_builtin.h b/board/bytesatwork/baw_config/baw_config_builtin.h
+new file mode 100644
+index 00000000000..a44445955d7
+--- /dev/null
++++ b/board/bytesatwork/baw_config/baw_config_builtin.h
+@@ -0,0 +1,21 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
++ */
++
++#ifndef BAW_CONFIG_BUILTIN_H
++#define BAW_CONFIG_BUILTIN_H
++
++#include "baw_config.h"
++#include <config.h>
++
++#if defined(CONFIG_BAW_CONFIG_BUILTIN)
++int baw_config_builtin(struct baw_config *config);
++#else
++static inline int baw_config_builtin(struct baw_config *config)
++{
++	return -1;
++}
++#endif
++
++#endif
+diff --git a/board/bytesatwork/baw_config/baw_config_eeprom.c b/board/bytesatwork/baw_config/baw_config_eeprom.c
+new file mode 100644
+index 00000000000..68a2fb4ea26
+--- /dev/null
++++ b/board/bytesatwork/baw_config/baw_config_eeprom.c
+@@ -0,0 +1,307 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
++ */
++
++#include "baw_config_eeprom.h"
++#include "baw_config.h"
++
++#include <dm/uclass.h>
++#include <i2c.h>
++#include <hexdump.h>
++#include <u-boot/crc.h>
++#include <linux/delay.h>
++
++#define MAGIC			0x6268
++#define EEPROM_EXT_OFFSET	0x14
++#define MAGIC_EXT		0x6235
++#define EEPROM_TRACK_OFFSET	0x3d
++#define MAGIC_TRACK		0x6e4a
++
++struct udevice *baw_config_dev, *busp;
++
++struct eeprom_header {
++	u16 magic;
++	u16 length;
++} __packed;
++
++struct eeprom_content {
++	u32 pcb;
++	u32 ram;
++	u32 flash;
++} __packed;
++
++struct eeprom_content_ext {
++	u32 artno;
++	u32 lot;
++	u8 lotseq;
++	char proddate[12];
++	char flashdate[6];
++	char flashuser[6];
++} __packed;
++
++struct eeprom_content_track {
++	char macaddr[18];
++	char uid[16];	/* enable use of characters */
++} __packed;
++
++struct eeprom_data {
++	struct eeprom_header header;
++	struct eeprom_content content;
++	u32 crc;
++} __packed;
++
++struct eeprom_data_ext {
++	struct eeprom_header header;
++	u32 crc;
++	struct eeprom_content_ext content;
++} __packed;
++
++struct eeprom_data_track {
++	struct eeprom_header header;
++	u32 crc;
++	struct eeprom_content_track content;
++} __packed;
++
++struct eeprom_write_frame {
++	struct eeprom_data content;
++	struct eeprom_data_ext content_ext;
++	struct eeprom_data_track content_track;
++} __packed;
++
++struct eeprom_read_frame {
++	struct eeprom_data content;
++	struct eeprom_data_ext content_ext;
++	struct eeprom_data_track content_track;
++} __packed;
++
++int baw_config_eeprom_init(void)
++{
++#if (!IS_ENABLED(CONFIG_SPL_BUILD) || IS_ENABLED(CONFIG_SPL_DM_I2C))
++	int ret;
++
++	ret = uclass_get_device_by_name(UCLASS_I2C, CONFIG_BAW_CONFIG_EEPROM_BUS_NAME, &busp);
++	if (ret) {
++		ret = uclass_get_device_by_seq(UCLASS_I2C, CONFIG_BAW_CONFIG_EEPROM_BUS, &busp);
++		if (ret) {
++			printf("%s(): uclass_get_device_by_seq(): %d\n", __func__, ret);
++			return ret;
++		}
++	}
++
++	ret = dm_i2c_probe(busp, CONFIG_BAW_CONFIG_EEPROM_ADDRESS, 0, &baw_config_dev);
++	if (ret) {
++		printf("%s(): dm_i2c_probe(): %d\n", __func__, ret);
++		return ret;
++	}
++
++	ret = i2c_set_chip_offset_len(baw_config_dev, CONFIG_BAW_CONFIG_EEPROM_ADDRESS_BYTES);
++	if (ret) {
++		printf("%s(): i2c_set_chip_offset_len(): %d\n", __func__, ret);
++		return ret;
++	}
++#endif
++	return 0;
++}
++
++static int i2c_write_rdy(void)
++{
++	/*
++	 * Check if device is ready for write to eeprom. Write can last up to
++	 * 5 ms. Poll with empty write.
++	 */
++	int i, ret = -5;
++	u8 dummy = 0xff; /* i2c_write doesn't like to write NULL pointers */
++
++	for (i = 0; ret < 0 && i < 10; ++i) {
++#if (IS_ENABLED(CONFIG_SPL_BUILD) && IS_ENABLED(CONFIG_SPL_SYS_I2C_LEGACY))
++		i2c_set_bus_num(CONFIG_BAW_CONFIG_EEPROM_BUS);
++		ret = i2c_write(CONFIG_BAW_CONFIG_EEPROM_ADDRESS, 0,
++				CONFIG_BAW_CONFIG_EEPROM_ADDRESS_BYTES, &dummy, 0);
++#else
++		ret = dm_i2c_write(baw_config_dev, 0, &dummy, 0);
++#endif
++		if (ret != 0)
++			udelay(500);
++	}
++
++	if (ret != 0)
++		printf("Error: eeprom busy, giving up.\n");
++
++	return ret;
++}
++
++int i2c_long_write(struct eeprom_write_frame frame, int len)
++{
++	int wlen, ret, off = 0;
++
++	while (len > 0) {
++		if (len >= CONFIG_BAW_CONFIG_EEPROM_MAX_WRITE)
++			wlen = CONFIG_BAW_CONFIG_EEPROM_MAX_WRITE;
++		else
++			wlen = len;
++
++		if (CONFIG_BAW_CONFIG_EEPROM_WRITE_DELAY_MS == 0) {
++			if (i2c_write_rdy() != 0) {
++				ret = -EIO;
++				break;
++			}
++		}
++#if (IS_ENABLED(CONFIG_SPL_BUILD) && IS_ENABLED(CONFIG_SPL_SYS_I2C_LEGACY))
++		ret = i2c_write(CONFIG_BAW_CONFIG_EEPROM_ADDRESS, off,
++				CONFIG_BAW_CONFIG_EEPROM_ADDRESS_BYTES, (u8 *)(&frame) + off, wlen);
++#else
++		ret = dm_i2c_write(baw_config_dev, off, (u8 *)(&frame) + off, wlen);
++#endif
++		if (ret != 0) {
++			ret = -EIO;
++			break;
++		}
++
++		len -= wlen;
++		off += wlen;
++
++		if (CONFIG_BAW_CONFIG_EEPROM_WRITE_DELAY_MS != 0)
++			udelay(CONFIG_BAW_CONFIG_EEPROM_WRITE_DELAY_MS * 1000);
++	}
++
++	return ret;
++}
++
++int baw_config_eeprom_read(struct baw_config *config)
++{
++	struct eeprom_read_frame frame;
++
++#if (IS_ENABLED(CONFIG_SPL_BUILD) && IS_ENABLED(CONFIG_SPL_SYS_I2C_LEGACY))
++	i2c_set_bus_num(CONFIG_BAW_CONFIG_EEPROM_BUS);
++	if (i2c_read(CONFIG_BAW_CONFIG_EEPROM_ADDRESS, 0, CONFIG_BAW_CONFIG_EEPROM_ADDRESS_BYTES,
++		     (u8 *)&frame, sizeof(frame)) != 0)
++		return -3;
++#else
++	if (dm_i2c_read(baw_config_dev, 0, (u8 *)&frame, sizeof(frame)))
++		return -12;
++#endif
++	if (frame.content.header.magic != MAGIC)
++		return -4;
++
++	if (frame.content.header.length != sizeof(frame.content.content))
++		return -5;
++
++	/* Cast crc32 value to u8 because of legacy code */
++	if (frame.content.crc != (u8)crc32(0, (u8 *)&frame.content.content,
++					   sizeof(frame.content.content)))
++		return -6;
++
++	config->pcb    = frame.content.content.pcb;
++	config->ram    = frame.content.content.ram;
++	config->flash  = frame.content.content.flash;
++
++	config->ext_avail = 0;
++	if (frame.content_ext.header.magic != MAGIC_EXT) {
++		printf("ext magic wrong\n");
++		return 0;
++	}
++
++	if (frame.content_ext.header.length != sizeof(frame.content_ext.content)) {
++		printf("ext len wrong\n");
++		return 0;
++	}
++
++	if (frame.content_ext.crc != crc32(0, (u8 *)&frame.content_ext.content,
++					   sizeof(frame.content_ext.content))) {
++		printf("ext crc wrong\n");
++		return 0;
++	}
++
++	config->artno = frame.content_ext.content.artno;
++	config->lot = frame.content_ext.content.lot;
++	config->lotseq = frame.content_ext.content.lotseq;
++
++	strlcpy(config->proddate, frame.content_ext.content.proddate, sizeof(config->proddate));
++	strlcpy(config->flashdate, frame.content_ext.content.flashdate, sizeof(config->flashdate));
++	strlcpy(config->flashuser, frame.content_ext.content.flashuser, sizeof(config->flashuser));
++
++	config->ext_avail = 1;
++
++	config->track_avail = 0;
++	if (frame.content_track.header.magic != MAGIC_TRACK) {
++		printf("track magic wrong\n");
++		return 0;
++	}
++
++	if (frame.content_track.header.length != sizeof(frame.content_track.content)) {
++		printf("track len wrong\n");
++		return 0;
++	}
++
++	if (frame.content_track.crc != crc32(0, (u8 *)&frame.content_track.content,
++					     sizeof(frame.content_track.content))) {
++		printf("track crc wrong\n");
++		return 0;
++	}
++
++	strlcpy(config->macaddr, frame.content_track.content.macaddr, sizeof(config->macaddr));
++	strlcpy(config->uid, frame.content_track.content.uid, sizeof(config->uid));
++
++	config->track_avail = 1;
++
++	return 0;
++}
++
++#if defined(CONFIG_SKIP_LOWLEVEL_INIT) || !defined(CONFIG_TARGET_BYTEENGINE_AM335X)
++
++int baw_config_eeprom_write(struct baw_config *config)
++{
++	struct eeprom_write_frame   frame;
++
++	frame.content.header.magic = MAGIC;
++	frame.content.header.length = sizeof(frame.content.content);
++	frame.content.content.pcb = config->pcb;
++	frame.content.content.ram = config->ram;
++	frame.content.content.flash = config->flash;
++	/* Cast crc32 value to u8 because of legacy code */
++	frame.content.crc = (u8)crc32(0, (const u8 *)&frame.content.content,
++				      sizeof(frame.content.content));
++
++	frame.content_ext.header.magic = MAGIC_EXT;
++	frame.content_ext.header.length = sizeof(frame.content_ext.content);
++	frame.content_ext.content.artno = config->artno;
++	frame.content_ext.content.lot = config->lot;
++	frame.content_ext.content.lotseq = config->lotseq;
++	strlcpy(frame.content_ext.content.proddate, config->proddate,
++		sizeof(frame.content_ext.content.proddate));
++	strlcpy(frame.content_ext.content.flashdate, config->flashdate,
++		sizeof(frame.content_ext.content.flashdate));
++	strlcpy(frame.content_ext.content.flashuser, config->flashuser,
++		sizeof(frame.content_ext.content.flashuser));
++	frame.content_ext.crc = crc32(0, (u8 *)&frame.content_ext.content,
++				      sizeof(frame.content_ext.content));
++
++	frame.content_track.header.magic = MAGIC_TRACK;
++	frame.content_track.header.length = sizeof(frame.content_track.content);
++	strlcpy(frame.content_track.content.macaddr, config->macaddr,
++		sizeof(frame.content_track.content.macaddr));
++	strlcpy(frame.content_track.content.uid, config->uid,
++		sizeof(frame.content_track.content.uid));
++	frame.content_track.crc = crc32(0, (u8 *)&frame.content_track.content,
++					sizeof(frame.content_track.content));
++
++	if (i2c_long_write(frame, sizeof(frame)) != 0)
++		return -7;
++
++	return 0;
++}
++
++int baw_config_eeprom_erase(void)
++{
++	struct eeprom_write_frame   frame;
++
++	memset(&frame, 0xff, sizeof(frame));
++
++	if (i2c_long_write(frame, sizeof(frame)) != 0)
++		return -8;
++
++	return 0;
++}
++
++#endif
+diff --git a/board/bytesatwork/baw_config/baw_config_eeprom.h b/board/bytesatwork/baw_config/baw_config_eeprom.h
+new file mode 100644
+index 00000000000..c5d943f18c5
+--- /dev/null
++++ b/board/bytesatwork/baw_config/baw_config_eeprom.h
+@@ -0,0 +1,38 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
++ */
++
++#ifndef BAW_CONFIG_EEPROM_H
++#define BAW_CONFIG_EEPROM_H
++
++#include "baw_config.h"
++#include <config.h>
++
++#if defined(CONFIG_BAW_CONFIG_EEPROM)
++int baw_config_eeprom_read(struct baw_config *config);
++int baw_config_eeprom_init(void);
++#else
++static inline int baw_config_eeprom_read(struct baw_config *config)
++{
++	return -1;
++}
++#endif
++
++#if defined(CONFIG_BAW_CONFIG_EEPROM) && \
++	(defined(CONFIG_SKIP_LOWLEVEL_INIT) || !defined(CONFIG_TARGET_BYTEENGINE_AM335X))
++int baw_config_eeprom_write(struct baw_config *config);
++int baw_config_eeprom_erase(void);
++#else
++static inline int baw_config_eeprom_write(struct baw_config *config)
++{
++	return -1;
++}
++
++static inline int baw_config_eeprom_erase(void)
++{
++	return -1;
++}
++#endif
++
++#endif
+diff --git a/board/bytesatwork/baw_config/baw_config_get.c b/board/bytesatwork/baw_config/baw_config_get.c
+new file mode 100644
+index 00000000000..70302bdd3de
+--- /dev/null
++++ b/board/bytesatwork/baw_config/baw_config_get.c
+@@ -0,0 +1,104 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
++ */
++
++#include <linux/types.h>
++#include <i2c.h>
++#include <stdio.h>
++#include <dm/uclass.h>
++#include "baw_config_get.h"
++
++#include "baw_config_builtin.h"
++#include "baw_config_eeprom.h"
++
++#define PMIC_ADDRESS 0x2D
++
++void baw_config_get(struct baw_config *config)
++{
++	u8 __attribute__((unused)) reg = 0;
++
++	if (baw_config_eeprom_read(config) == 0) {
++		if (IS_ENABLED(CONFIG_SPL_BUILD)) {
++			printf("Use EEPROM RAM config: %u (%s)\n", config->ram,
++			       baw_config_get_ram_name(config->ram));
++		}
++
++		return;
++	}
++
++	if (IS_ENABLED(CONFIG_SPL_BUILD) && IS_ENABLED(CONFIG_TARGET_BYTEENGINE_AM335X) &&
++	    IS_ENABLED(CONFIG_DM_I2C)) {
++		struct udevice *pmic;
++		struct udevice *bus;
++		int ret;
++
++		ret = uclass_get_device_by_seq(UCLASS_I2C, CONFIG_BAW_CONFIG_EEPROM_BUS, &bus);
++		if (ret) {
++			printf("%s(): uclass_get_device_by_seq(): %d\n", __func__, ret);
++			goto default_config;
++		}
++
++		ret = dm_i2c_probe(bus, PMIC_ADDRESS, 0, &pmic);
++		if (ret) {
++			printf("%s(): dm_i2c_probe(): %d\n", __func__, ret);
++			goto default_config;
++		}
++
++		ret = i2c_set_chip_offset_len(pmic, 1);
++		if (ret) {
++			printf("%s(): i2c_set_chip_offset_len(): %d\n", __func__, ret);
++			goto default_config;
++		}
++
++		ret = dm_i2c_read(pmic, 0x20, &reg, 1);
++		if (ret) {
++			printf("Error: PMIC read failed\n");
++			goto default_config;
++		} else {
++			if (reg == 0x05) {
++				config->ram = M2_RAM_MT47H128M16RT25E;	/* set DDR2 */
++				printf("DDR2 detected\n");
++			} else if (reg == 0x01) {
++				config->ram = M2_RAM_K4B2G1646EBIH9;	/* set legacy DDR3 */
++				printf("DDR3 detected\n");
++			} else {
++				goto default_config;
++			}
++		}
++
++		return;
++	}
++
++default_config:
++
++	if (IS_ENABLED(CONFIG_BAW_CONFIG_BUILTIN)) {
++		config->ram = BAW_CONFIG_BUILTIN_RAM;
++		if (IS_ENABLED(CONFIG_SPL_BUILD)) {
++			printf("Use built in RAM config: %u (%s)\n", config->ram,
++			       baw_config_get_ram_name(config->ram));
++
++			return;
++		}
++	} else {
++		if (IS_ENABLED(CONFIG_TARGET_BYTEENGINE_AM335X))
++			config->ram = M2_RAM_K4B2G1646EBIH9;	/* set default to legacy DDR3 */
++		else if (IS_ENABLED(CONFIG_TARGET_BYTEDEVKIT))
++			config->ram = M5_RAM_K4B4G1646DBIK0;
++		else if (IS_ENABLED(CONFIG_TARGET_IMX8MM_BYTEDEVKIT))
++			config->ram = M6_RAM_MT53E128M32D2DS_053;
++		else if (IS_ENABLED(CONFIG_TARGET_AM62X_BYTEDEVKIT_A53))
++			config->ram = M8_RAM_MT53E256M16D1DS_046;
++		else if (IS_ENABLED(CONFIG_TARGET_AM62PX_BYTEDEVKIT_A53))
++			config->ram = M8P_RAM_MT53E2G32D4DE_046;
++		else if (IS_ENABLED(CONFIG_TARGET_IMX8MP_BYTEDEVKIT))
++			config->ram = M7_RAM_MT53E1G32D2FW_046;
++		else if (IS_ENABLED(CONFIG_TARGET_IMX93_BYTEDEVKIT))
++			config->ram = M9_RAM_MT53D512M16D1DS_046;
++	}
++
++	if (IS_ENABLED(CONFIG_SPL_BUILD)) {
++		printf("Error: no RAM configuration found, trying fallback config ");
++		printf("%u (%s)\n", config->ram, baw_config_get_ram_name(config->ram));
++	}
++}
+diff --git a/board/bytesatwork/baw_config/baw_config_get.h b/board/bytesatwork/baw_config/baw_config_get.h
+new file mode 100644
+index 00000000000..43ac01f14be
+--- /dev/null
++++ b/board/bytesatwork/baw_config/baw_config_get.h
+@@ -0,0 +1,13 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
++ */
++
++#ifndef BAW_CONFIG_GET_H
++#define BAW_CONFIG_GET_H
++
++#include "baw_config.h"
++
++void baw_config_get(struct baw_config *config);
++
++#endif
+diff --git a/board/bytesatwork/baw_config/cmd_baw_config.c b/board/bytesatwork/baw_config/cmd_baw_config.c
+new file mode 100644
+index 00000000000..b1076d424cc
+--- /dev/null
++++ b/board/bytesatwork/baw_config/cmd_baw_config.c
+@@ -0,0 +1,223 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
++ */
++
++#include <command.h>
++#include <post.h>
++#include <vsprintf.h>
++#include "baw_config_builtin.h"
++#include "baw_config_eeprom.h"
++
++#if defined(CONFIG_BAW_CONFIG_BUILTIN) || defined(CONFIG_BAW_CONFIG_EEPROM)
++static void print_config(const struct baw_config *config)
++{
++	printf("PCB:   %u (%s)\n", config->pcb,
++	       baw_config_get_pcb_name(config->pcb));
++	printf("RAM:   %u (%s)\n", config->ram,
++	       baw_config_get_ram_name(config->ram));
++	printf("Flash: %u (%s)\n", config->flash,
++	       baw_config_get_flash_name(config->flash));
++
++	if (config->ext_avail == 1) {
++		printf("\n");
++		printf("Article number:  %u\n", config->artno);
++		printf("Lot:             %u.%u\n", config->lot, config->lotseq);
++		printf("Production date: %s\n", config->proddate);
++		printf("Flash date:      %s\n", config->flashdate);
++		printf("Flash user:      %s\n", config->flashuser);
++	}
++
++	if (config->track_avail == 1) {
++		printf("\n");
++		printf("MAC address:     %s\n", config->macaddr);
++		printf("UID:             %s\n", config->uid);
++	}
++}
++#endif
++
++#if defined(CONFIG_BAW_CONFIG_BUILTIN)
++static enum command_ret_t cmd_builtin(int argc, char * const argv[])
++{
++	struct baw_config config = {0};
++
++	if (argc != 0)
++		return CMD_RET_USAGE;
++
++	if (baw_config_builtin(&config) != 0) {
++		printf("could not get built-in configuration\n");
++		return CMD_RET_FAILURE;
++	}
++
++	print_config(&config);
++
++	return CMD_RET_SUCCESS;
++}
++#endif
++
++#if defined(CONFIG_BAW_CONFIG_EEPROM)
++static enum command_ret_t cmd_read(int argc, char * const argv[])
++{
++	struct baw_config config = {0};
++	int ret;
++
++	if (argc != 0)
++		return CMD_RET_USAGE;
++
++	ret = baw_config_eeprom_read(&config);
++	if (ret != 0)
++		printf("no configuration in eeprom: %i\n", ret);
++	else
++		print_config(&config);
++
++	return CMD_RET_SUCCESS;
++}
++
++static enum command_ret_t cmd_write(int argc, char * const argv[])
++{
++	struct baw_config config = {0};
++
++	if (argc != 11)
++		return CMD_RET_USAGE;
++
++	config.pcb = simple_strtoul(argv[0], NULL, 10);
++	config.ram = simple_strtoul(argv[1], NULL, 10);
++	config.flash = simple_strtoul(argv[2], NULL, 10);
++
++	config.artno = simple_strtoul(argv[3], NULL, 10);
++	config.lot = simple_strtoul(argv[4], NULL, 10);
++	config.lotseq = simple_strtoul(argv[5], NULL, 10);
++	strlcpy(config.proddate, argv[6], sizeof(config.proddate));
++	strlcpy(config.flashdate, argv[7], sizeof(config.flashdate));
++	strlcpy(config.flashuser, argv[8], sizeof(config.flashuser));
++
++	strlcpy(config.macaddr, argv[9], sizeof(config.macaddr));
++	strlcpy(config.uid, argv[10], sizeof(config.uid));
++
++	if (baw_config_eeprom_write(&config) != 0) {
++		printf("could not write to EEPROM\n");
++		return CMD_RET_FAILURE;
++	}
++
++	return CMD_RET_SUCCESS;
++}
++
++static enum command_ret_t cmd_erase(int argc, char * const argv[])
++{
++	if (argc != 0)
++		return CMD_RET_USAGE;
++
++	if (baw_config_eeprom_erase() != 0) {
++		printf("could not erase configuration\n");
++		return CMD_RET_FAILURE;
++	}
++
++	return CMD_RET_SUCCESS;
++}
++
++#if defined(CONFIG_BAW_CONFIG_BUILTIN)
++static enum command_ret_t cmd_builtin2eeprom(int argc, char * const argv[])
++{
++	struct baw_config config = {0};
++
++	if (argc != 0)
++		return CMD_RET_USAGE;
++
++	if (baw_config_builtin(&config) != 0) {
++		printf("could not get built-in configuration\n");
++		return CMD_RET_FAILURE;
++	}
++
++	if (baw_config_eeprom_write(&config) != 0) {
++		printf("could not write to EEPROM\n");
++		return CMD_RET_FAILURE;
++	}
++
++	return CMD_RET_SUCCESS;
++}
++#endif
++#endif
++
++struct baw_config_cmd_struct {
++	char *name;
++	enum command_ret_t (*func)(int argc, char * const argv[]);
++};
++
++static const struct baw_config_cmd_struct baw_config_cmd[] = {
++#if defined(CONFIG_BAW_CONFIG_BUILTIN)
++	{ "builtin", cmd_builtin },
++#endif
++#if defined(CONFIG_BAW_CONFIG_EEPROM)
++#if defined(CONFIG_BAW_CONFIG_BUILTIN)
++	{ "builtin2eeprom", cmd_builtin2eeprom },
++#endif
++	{ "read", cmd_read },
++	{ "erase", cmd_erase },
++	{ "write", cmd_write },
++#endif
++	{ NULL, NULL }
++};
++
++static const struct baw_config_cmd_struct *get_cmd(const char *name)
++{
++	const struct baw_config_cmd_struct *cmd;
++
++	for (cmd = baw_config_cmd; cmd->name; cmd++)
++		if (strcmp(name, cmd->name) == 0)
++			return cmd;
++
++	return NULL;
++}
++
++static void print_config_names(const struct baw_config_name_pair *map)
++{
++	const struct baw_config_name_pair *itr;
++
++	for (itr = map; itr->name; itr++)
++		printf("  %2u (%s)\n", itr->config, itr->name);
++}
++
++static enum command_ret_t print_configurations(void)
++{
++	printf("PCB:\n");
++	print_config_names(baw_config_pcb_name);
++	printf("RAM:\n");
++	print_config_names(baw_config_ram_name);
++	printf("Flash:\n");
++	print_config_names(baw_config_flash_name);
++
++	return CMD_RET_SUCCESS;
++}
++
++static int do_baw_config(struct cmd_tbl *cmdtp, int flag, int argc, char * const argv[])
++{
++	if (argc >= 2) {
++		const struct baw_config_cmd_struct *cmd = get_cmd(argv[1]);
++
++		if (cmd)
++			return cmd->func(argc - 2, &argv[2]);
++		else
++			return CMD_RET_USAGE;
++	}
++
++	return print_configurations();
++}
++
++U_BOOT_CMD(bawconfig, 13, 0, do_baw_config,
++	   "perform baw module configuration",
++	   "- list known configuration values\n"
++#if defined(CONFIG_BAW_CONFIG_BUILTIN)
++	   "builtin  - print built-in configuration from u-boot\n"
++#endif
++#if defined(CONFIG_BAW_CONFIG_EEPROM)
++	   "read     - read configuration from EEPROM\n"
++	   "erase    - erase configuration from EEPROM\n"
++	   "write <PCB> <RAM> <Flash> <Article number> <Lot> <Lot sequence number>\n"
++	   "      <Production date> <Flash date> <Flash user> <MAC address> <UID>\n"
++	   "         - write configuration to EEPROM\n"
++#if defined(CONFIG_BAW_CONFIG_BUILTIN)
++	   "builtin2eeprom\n"
++	   "         - write built-in configuration to EEPROM\n"
++#endif
++#endif
++);
+-- 
+2.39.5
+

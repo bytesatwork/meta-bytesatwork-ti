@@ -44,6 +44,10 @@ or using `bmap-tools`:
 You can find more information on `bmap-tools` in the [Yocto Project documentation](https://docs.yoctoproject.org/4.0/dev-manual/common-tasks.html#flashing-images-using-bmaptool).
 
 
-## Reporting bugs
+## Support
 
-Send pull requests, patches, comments or questions to yocto@bytesatwork.ch.
+If you have any questions or encounter any issues while using our products or services, please don’t hesitate to reach out to our support team.
+
+Please feel free to contact us at support@bytesatwork.ch for any questions, comments or pull requests.
+
+We are here to help and will get back to you as soon as possible.

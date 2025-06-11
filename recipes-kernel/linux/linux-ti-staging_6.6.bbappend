@@ -15,15 +15,16 @@ SRC_URI += " \
 	file://0009-arm64-bytedevkit_am62x_defconfig-Add-a-basic-configu.patch \
 "
 
-PR = "r0"
+PR = "r1"
 
 kernel_do_compile:prepend() {
 	oe_runmake ${KERNEL_DEFCONFIG_INTREE}
 }
 
 kernel_do_install:append() {
-	install -d ${D}/boot
-	install -m 0644 ${B}/arch/arm64/boot/dts/ti/${KERNEL_DEVICETREE_INTREE} ${D}/boot/
+	if [ -n "${KERNEL_DEVICETREE_INTREE}" ] ;then
+		install -Dm 0644 ${B}/arch/arm64/boot/dts/ti/${KERNEL_DEVICETREE_INTREE} ${D}/boot/
+	fi
 }
 
 FILES:${KERNEL_PACKAGE_NAME} += "/boot/${KERNEL_DEVICETREE_INTREE}"

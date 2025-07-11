@@ -13,9 +13,10 @@ SRC_URI += " \
 	file://0007-video-logo-Add-bytesatwork-boot-logo.patch \
 	file://0008-arm64-ti-k3-am625-byteengine-bytedevkit.patch \
 	file://0009-arm64-bytedevkit_am62x_defconfig-Add-a-basic-configu.patch \
+	file://0010-arm64-ti-k3-am625-byteengine-bytedevkit-2-2.patch \
 "
 
-PR = "r1"
+PR = "r2"
 
 kernel_do_compile:prepend() {
 	oe_runmake ${KERNEL_DEFCONFIG_INTREE}

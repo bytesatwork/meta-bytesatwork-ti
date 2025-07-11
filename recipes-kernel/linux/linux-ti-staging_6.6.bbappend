@@ -24,8 +24,10 @@ kernel_do_compile:prepend() {
 
 kernel_do_install:append() {
 	if [ -n "${KERNEL_DEVICETREE_INTREE}" ] ;then
-		install -Dm 0644 ${B}/arch/arm64/boot/dts/ti/${KERNEL_DEVICETREE_INTREE} ${D}/boot/
+		for dtb in ${KERNEL_DEVICETREE_INTREE}; do
+			install -Dm 0644 ${B}/arch/arm64/boot/dts/ti/$dtb ${D}/boot/
+		done
 	fi
 }
 
-FILES:${KERNEL_PACKAGE_NAME} += "/boot/${KERNEL_DEVICETREE_INTREE}"
+FILES:${KERNEL_PACKAGE_NAME} += "${@' '.join(['%s%s' % ("/boot/", d) for d in d.getVar('KERNEL_DEVICETREE_INTREE').split()])}"

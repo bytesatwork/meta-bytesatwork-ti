@@ -1,4 +1,4 @@
-From accf015f15fe37ebab2be695ae2c6fa2ae6b2553 Mon Sep 17 00:00:00 2001
+From 544509927c93e0e916cef4862d5a8eb176e62e9a Mon Sep 17 00:00:00 2001
 From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 Date: Thu, 14 Jul 2022 10:14:39 +0200
 Subject: [PATCH] dt-bindings: arm: bytesatwork: Add module and board
@@ -51,10 +51,10 @@ index 000000000000..2587e61c70e4
 +
 +...
 diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-index 684790568ced..45612d6236f3 100644
+index fbfce9b4ae6b..685c570feb37 100644
 --- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
 +++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-@@ -218,6 +218,8 @@ patternProperties:
+@@ -238,6 +238,8 @@ patternProperties:
      description: B&R Industrial Automation GmbH
    "^bytedance,.*":
      description: ByteDance Ltd.
@@ -62,12 +62,12 @@ index 684790568ced..45612d6236f3 100644
 +    description: bytesatwork AG
    "^calamp,.*":
      description: CalAmp Corp.
-   "^calaosystems,.*":
+   "^calao,.*":
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 75b82008721b..28464e8802b6 100644
+index b7746890ce4e..3e75b45be03b 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -4441,6 +4441,7 @@ BYTESATWORK MODULES AND BOARDS
+@@ -4896,6 +4896,7 @@ BYTESATWORK MODULES AND BOARDS
  M:	Daniel Ammann <daniel.ammann@bytesatwork.ch>
  S:	Maintained
  F:	.github/workflows/checkpatch.yml
@@ -75,6 +75,3 @@ index 75b82008721b..28464e8802b6 100644
  
  C-MEDIA CMI8788 DRIVER
  M:	Clemens Ladisch <clemens@ladisch.de>
--- 
-2.39.5
-

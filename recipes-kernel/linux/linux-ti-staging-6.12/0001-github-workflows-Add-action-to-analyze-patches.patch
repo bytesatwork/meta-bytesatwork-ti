@@ -1,11 +1,11 @@
-From 2dcbd8d237f806d95ff0b85e65a0dce43a7f5b16 Mon Sep 17 00:00:00 2001
-From: Michael Meister <michael.meister@bytesatwork.ch>
+From 6235eeb82c7e3d113b8fa88c92d180a6b10f7eef Mon Sep 17 00:00:00 2001
+From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 Date: Mon, 11 Jul 2022 16:02:24 +0200
 Subject: [PATCH] github: workflows: Add action to analyze patches
 
 Add github action running checkpatch on pull request.
 
-Signed-off-by: Michael Meister <michael.meister@bytesatwork.ch>
+Signed-off-by: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 ---
  .checkpatch.conf                 |   2 +
  .github/workflows/checkpatch.yml | 120 +++++++++++++++++++++++++++++++
@@ -149,10 +149,10 @@ index 000000000000..dc75adb9e0ac
 +            ./scripts/checkpatch.pl --no-tree ${{ matrix.patch }}
 +          fi
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 21f1558339ce..75b82008721b 100644
+index e3f47be27db4..b7746890ce4e 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -4437,6 +4437,11 @@ S:	Maintained
+@@ -4892,6 +4892,11 @@ S:	Maintained
  F:	Documentation/devicetree/bindings/net/can/st,stm32-bxcan.yaml
  F:	drivers/net/can/bxcan.c
  
@@ -163,7 +163,4 @@ index 21f1558339ce..75b82008721b 100644
 +
  C-MEDIA CMI8788 DRIVER
  M:	Clemens Ladisch <clemens@ladisch.de>
- L:	alsa-devel@alsa-project.org (moderated for non-subscribers)
--- 
-2.39.5
-
+ L:	linux-sound@vger.kernel.org

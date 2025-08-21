@@ -1,12 +1,12 @@
-From c4c1289a3d5cdb11388fcbcead7e1ca906340a6e Mon Sep 17 00:00:00 2001
+From 9928891546f8fb642c88cf05e70c1342d26d9019 Mon Sep 17 00:00:00 2001
 From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
 Date: Mon, 18 Jul 2022 06:44:37 +0200
-Subject: [PATCH] am62x: add AM62xx bytesatwork byteDEVKIT board
+Subject: [PATCH] am62x: Add AM62xx bytesatwork byteDEVKIT board
 MIME-Version: 1.0
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
 
-Add basic AM62xx bytesatwork byteDEVKIT board support
+Add basic AM62xx bytesatwork byteDEVKIT board support.
 
 Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
 Signed-off-by: Daniel Ammann <daniel.ammann@bytesatwork.ch>
@@ -14,7 +14,7 @@ Signed-off-by: Stephan Dünner <stephan.duenner@bytesatwork.ch>
 Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
 ---
  MAINTAINERS                                   |    8 +
- arch/arm/dts/Makefile                         |    3 +
+ arch/arm/dts/Makefile                         |    4 +
  arch/arm/dts/k3-am625-bytedevkit-binman.dtsi  |  459 ++++
  arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi  |   75 +
  arch/arm/dts/k3-am625-bytedevkit.dts          |  157 ++
@@ -25,15 +25,15 @@ Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
  board/bytesatwork/bytedevkit/Kconfig          |   77 +
  board/bytesatwork/bytedevkit/Makefile         |    9 +
  board/bytesatwork/bytedevkit/README.md        |   56 +
- .../bytesatwork/bytedevkit/am62x_bytedevkit.c |  169 ++
+ .../bytesatwork/bytedevkit/am62x_bytedevkit.c |  170 ++
  board/bytesatwork/bytedevkit/board-cfg.yaml   |   36 +
  board/bytesatwork/bytedevkit/pm-cfg.yaml      |   12 +
  board/bytesatwork/bytedevkit/rm-cfg.yaml      |  981 ++++++++
  board/bytesatwork/bytedevkit/sec-cfg.yaml     |  379 +++
- configs/am62x_bytedevkit_a53_defconfig        |  163 ++
- configs/am62x_bytedevkit_r5_defconfig         |  143 ++
+ configs/am62x_bytedevkit_a53_defconfig        |  160 ++
+ configs/am62x_bytedevkit_r5_defconfig         |  139 ++
  include/configs/am62x_bytedevkit.h            |   69 +
- 20 files changed, 5235 insertions(+)
+ 20 files changed, 5230 insertions(+)
  create mode 100644 arch/arm/dts/k3-am625-bytedevkit-binman.dtsi
  create mode 100644 arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi
  create mode 100644 arch/arm/dts/k3-am625-bytedevkit.dts
@@ -53,10 +53,10 @@ Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
  create mode 100644 include/configs/am62x_bytedevkit.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 4dbbb740358..17d8d970473 100644
+index e41b8d8c1e3..3f582f9b52b 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -261,7 +261,15 @@ S:	Maintained
+@@ -267,7 +267,15 @@ S:	Maintained
  W:	https://www.bytesatwork.io/
  T:	git https://github.com/bytesatwork/u-boot-ti.git
  F:	.github/workflows/checkpatch.yml
@@ -73,19 +73,20 @@ index 4dbbb740358..17d8d970473 100644
  ARM CORTINA ACCESS CAxxxx
  M:	Alex Nemirovsky <alex.nemirovsky@cortina-access.com>
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index 4d03a0f5b30..5f232a53316 100644
+index d46c75a1001..f77be4ca649 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -1452,6 +1452,9 @@ dtb-$(CONFIG_SOC_K3_AM625) += k3-am625-sk.dtb \
- 			      k3-am62-lp-sk.dtb \
- 			      k3-am62-r5-lp-sk.dtb
+@@ -1182,6 +1182,10 @@ dtb-$(CONFIG_SOC_K3_AM625) += k3-am625-r5-sk.dtb \
+ 			      k3-am625-verdin-r5.dtb \
+ 			      k3-am625-r5-phycore-som-2gb.dtb
  
++
 +dtb-$(CONFIG_SOC_K3_AM625) += k3-am625-bytedevkit.dtb \
 +			      k3-am625-r5-bytedevkit.dtb
 +
- dtb-$(CONFIG_SOC_K3_AM62A7) += k3-am62a7-sk.dtb \
- 			      k3-am62a7-r5-sk.dtb
+ dtb-$(CONFIG_SOC_K3_AM62A7) += k3-am62a7-r5-sk.dtb
  
+ dtb-$(CONFIG_SOC_K3_AM62P5) += k3-am62p5-r5-sk.dtb
 diff --git a/arch/arm/dts/k3-am625-bytedevkit-binman.dtsi b/arch/arm/dts/k3-am625-bytedevkit-binman.dtsi
 new file mode 100644
 index 00000000000..03665eaf485
@@ -553,13 +554,13 @@ index 00000000000..03665eaf485
 +#endif
 diff --git a/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi b/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi
 new file mode 100644
-index 00000000000..5cc08cae0cd
+index 00000000000..e2db83722f7
 --- /dev/null
 +++ b/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi
 @@ -0,0 +1,75 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Copyright (C) 2024 bytesatwork AG - https://www.bytesatwork.io
++ * Copyright (C) 2025 bytesatwork AG - https://www.bytesatwork.io
 + *
 + * Based on k3-am625-sk-u-boot.dtsi
 + * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
@@ -634,13 +635,13 @@ index 00000000000..5cc08cae0cd
 +};
 diff --git a/arch/arm/dts/k3-am625-bytedevkit.dts b/arch/arm/dts/k3-am625-bytedevkit.dts
 new file mode 100644
-index 00000000000..f3a6be7edc2
+index 00000000000..169409b3f40
 --- /dev/null
 +++ b/arch/arm/dts/k3-am625-bytedevkit.dts
 @@ -0,0 +1,157 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Copyright (C) 2024 bytesatwork AG - https://www.bytesatwork.io
++ * Copyright (C) 2025 bytesatwork AG - https://www.bytesatwork.io
 + *
 + * Based on k3-am625-sk.dts and k3-am62x-sk-common.dtsi
 + * Copyright (C) 2021-2024 Texas Instruments Incorporated - https://www.ti.com/
@@ -797,13 +798,13 @@ index 00000000000..f3a6be7edc2
 +};
 diff --git a/arch/arm/dts/k3-am625-byteengine.dtsi b/arch/arm/dts/k3-am625-byteengine.dtsi
 new file mode 100644
-index 00000000000..ecf3dcf1d3c
+index 00000000000..c55c6addd93
 --- /dev/null
 +++ b/arch/arm/dts/k3-am625-byteengine.dtsi
 @@ -0,0 +1,154 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Copyright (C) 2024 bytesatwork AG - https://www.bytesatwork.io
++ * Copyright (C) 2025 bytesatwork AG - https://www.bytesatwork.io
 + *
 + * Based on k3-am62x-sk-common.dtsi
 + * Copyright (C) 2021-2024 Texas Instruments Incorporated - https://www.ti.com/
@@ -957,13 +958,13 @@ index 00000000000..ecf3dcf1d3c
 +};
 diff --git a/arch/arm/dts/k3-am625-r5-bytedevkit.dts b/arch/arm/dts/k3-am625-r5-bytedevkit.dts
 new file mode 100644
-index 00000000000..15100842279
+index 00000000000..d18dbbc6e3a
 --- /dev/null
 +++ b/arch/arm/dts/k3-am625-r5-bytedevkit.dts
 @@ -0,0 +1,95 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
-+ * Copyright (C) 2024 bytesatwork AG - https://www.bytesatwork.io
++ * Copyright (C) 2025 bytesatwork AG - https://www.bytesatwork.io
 + *
 + * Based on k3-am625-r5-sk.dts and k3-am62x-r5-sk-common.dtsi
 + * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
@@ -3252,10 +3253,10 @@ index 00000000000..35fffc609bf
 +#define DDRSS_PHY_1404_DATA 0x0089FF00
 +#define DDRSS_PHY_1405_DATA 0x20040004
 diff --git a/arch/arm/mach-k3/am62x/Kconfig b/arch/arm/mach-k3/am62x/Kconfig
-index c3677a55089..3c5a87137f5 100644
+index 8b0cdd74f4f..de6a6f6d96e 100644
 --- a/arch/arm/mach-k3/am62x/Kconfig
 +++ b/arch/arm/mach-k3/am62x/Kconfig
-@@ -66,6 +66,7 @@ config TARGET_VERDIN_AM62_R5
+@@ -65,6 +65,7 @@ config TARGET_VERDIN_AM62_R5
  endchoice
  
  source "board/beagle/beagleplay/Kconfig"
@@ -3265,13 +3266,13 @@ index c3677a55089..3c5a87137f5 100644
  source "board/toradex/verdin-am62/Kconfig"
 diff --git a/board/bytesatwork/bytedevkit/Kconfig b/board/bytesatwork/bytedevkit/Kconfig
 new file mode 100644
-index 00000000000..2f1c73a45ca
+index 00000000000..5329bb4ca63
 --- /dev/null
 +++ b/board/bytesatwork/bytedevkit/Kconfig
 @@ -0,0 +1,77 @@
 +# SPDX-License-Identifier: GPL-2.0+
 +#
-+# Copyright (C) 2024 bytesatwork AG - https://www.bytesatwork.io
++# Copyright (C) 2025 bytesatwork AG - https://www.bytesatwork.io
 +#
 +# Based on ti/am62x/Kconfig
 +# Copyright (C) 2020-2022 Texas Instruments Incorporated - https://www.ti.com/
@@ -3348,13 +3349,13 @@ index 00000000000..2f1c73a45ca
 +endif
 diff --git a/board/bytesatwork/bytedevkit/Makefile b/board/bytesatwork/bytedevkit/Makefile
 new file mode 100644
-index 00000000000..dca4cab9cd9
+index 00000000000..82a08015378
 --- /dev/null
 +++ b/board/bytesatwork/bytedevkit/Makefile
 @@ -0,0 +1,9 @@
 +# SPDX-License-Identifier: GPL-2.0+
 +#
-+# Copyright (C) 2024 bytesatwork AG - https://www.bytesatwork.io
++# Copyright (C) 2025 bytesatwork AG - https://www.bytesatwork.io
 +#
 +# Based on ti/am62x/Makefile
 +# Copyright (C) 2020-2022 Texas Instruments Incorporated - https://www.ti.com/
@@ -3363,7 +3364,7 @@ index 00000000000..dca4cab9cd9
 +obj-y	+= am62x_bytedevkit.o
 diff --git a/board/bytesatwork/bytedevkit/README.md b/board/bytesatwork/bytedevkit/README.md
 new file mode 100644
-index 00000000000..3bc301f1491
+index 00000000000..9bc815f8724
 --- /dev/null
 +++ b/board/bytesatwork/bytedevkit/README.md
 @@ -0,0 +1,56 @@
@@ -3375,34 +3376,34 @@ index 00000000000..3bc301f1491
 +
 +## Install and get Dependencies
 +
-+[Cross toolchain](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/10_01_10_04/exports/docs/linux/Overview/GCC_ToolChain.html#location-in-sdk)
++[Cross toolchain](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/linux/Overview/GCC_ToolChain.html#location-in-sdk)
 +
-+[TI-linux-firmware](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/10_01_10_04/exports/docs/devices/AM62X/linux/Release_Specific_Release_Notes.html#ti-linux-firmware)
++[TI-linux-firmware](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/devices/AM62X/linux/Release_Specific_Release_Notes.html#ti-linux-firmware)
 +
-+[TF-A](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/10_01_10_04/exports/docs/devices/AM62X/linux/Release_Specific_Release_Notes.html#tf-a)
++[TF-A](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/devices/AM62X/linux/Release_Specific_Release_Notes.html#tf-a)
 +
-+[OP-TEE](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/10_01_10_04/exports/docs/devices/AM62X/linux/Release_Specific_Release_Notes.html#op-tee)
++[OP-TEE](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/devices/AM62X/linux/Release_Specific_Release_Notes.html#op-tee)
 +
 +## Build TF-A
 +
-+[TI TF-A build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/10_01_10_04/exports/docs/linux/Foundational_Components_ATF.html#arm-trusted-firmware-a)
++[TI TF-A build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/linux/Foundational_Components_ATF.html#arm-trusted-firmware-a)
 +
 +## Build OP-TEE
 +
-+[TI OP-TEE build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/10_01_10_04/exports/docs/linux/Foundational_Components_OPTEE.html#op-tee)
++[TI OP-TEE build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/linux/Foundational_Components_OPTEE.html#op-tee)
 +
 +## Build u-boot
 +
 +You should have downloaded `TI-linux-firmware` and built [TF-A](#build-tf-a), [OP-TEE OS](#build-op-tee) already.
 +
-+[TI u-boot build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/10_01_10_04/exports/docs/linux/Foundational_Components/U-Boot/UG-General-Info.html#build-u-boot)
++[TI u-boot build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/linux/Foundational_Components/U-Boot/UG-General-Info.html#build-u-boot)
 +
 +**IMPORTANT:** Use `am62x_bytedevkit_r5_defconfig` or `am62x_bytedevkit_a53_defconfig` instead of the TI defconfigs.
 +
 +**NOTE:** Clean command: `make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- O=build-a53 distclean`
 +
 +Copy the related files to SD card, see end of section
-+[TI u-boot build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/10_01_10_04/exports/docs/linux/Foundational_Components/U-Boot/UG-General-Info.html#build-u-boot)
++[TI u-boot build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/linux/Foundational_Components/U-Boot/UG-General-Info.html#build-u-boot)
 +
 +## Prepare eMMC boot
 +
@@ -3425,13 +3426,13 @@ index 00000000000..3bc301f1491
 +```
 diff --git a/board/bytesatwork/bytedevkit/am62x_bytedevkit.c b/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
 new file mode 100644
-index 00000000000..a104d14e5b5
+index 00000000000..14db20c20dc
 --- /dev/null
 +++ b/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
-@@ -0,0 +1,169 @@
+@@ -0,0 +1,170 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
-+ * Copyright (C) 2024 bytesatwork AG - https://www.bytesatwork.io
++ * Copyright (C) 2025 bytesatwork AG - https://www.bytesatwork.io
 + *
 + * Based on ti/am62x/evm.c
 + * Copyright (C) 2020-2022 Texas Instruments Incorporated - https://www.ti.com/
@@ -3579,6 +3580,7 @@ index 00000000000..a104d14e5b5
 +
 +	return 0;
 +}
++
 +EVENT_SPY_SIMPLE(EVT_LAST_STAGE_INIT, last_stage_init);
 +
 +#ifdef CONFIG_SPL_BOARD_INIT
@@ -5032,17 +5034,16 @@ index 00000000000..088b2dbaf11
 +        rsvd: [0, 0, 0, 0]
 diff --git a/configs/am62x_bytedevkit_a53_defconfig b/configs/am62x_bytedevkit_a53_defconfig
 new file mode 100644
-index 00000000000..6fa7c0ca643
+index 00000000000..e10436e5df7
 --- /dev/null
 +++ b/configs/am62x_bytedevkit_a53_defconfig
-@@ -0,0 +1,163 @@
+@@ -0,0 +1,160 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_K3=y
 +CONFIG_SYS_MALLOC_F_LEN=0x8000
 +CONFIG_SPL_GPIO=y
 +CONFIG_SPL_LIBCOMMON_SUPPORT=y
 +CONFIG_SPL_LIBGENERIC_SUPPORT=y
-+CONFIG_NR_DRAM_BANKS=2
 +CONFIG_SOC_K3_AM625=y
 +CONFIG_K3_ATF_LOAD_ADDR=0x9e780000
 +CONFIG_TARGET_AM62X_BYTEDEVKIT_A53=y
@@ -5053,13 +5054,17 @@ index 00000000000..6fa7c0ca643
 +CONFIG_ENV_OFFSET=0xC0000
 +CONFIG_DM_GPIO=y
 +CONFIG_DEFAULT_DEVICE_TREE="k3-am625-bytedevkit"
-+CONFIG_SPL_TEXT_BASE=0x80080000
 +CONFIG_OF_LIBFDT_OVERLAY=y
 +CONFIG_DM_RESET=y
 +CONFIG_SPL_MMC=y
 +CONFIG_SPL_SERIAL=y
 +CONFIG_SPL_DRIVERS_MISC=y
 +CONFIG_SPL_STACK_R_ADDR=0x82000000
++CONFIG_SPL_TEXT_BASE=0x80080000
++CONFIG_SPL_HAS_BSS_LINKER_SECTION=y
++CONFIG_SPL_BSS_START_ADDR=0x80c80000
++CONFIG_SPL_BSS_MAX_SIZE=0x80000
++CONFIG_SPL_STACK_R=y
 +CONFIG_SPL_SIZE_LIMIT=0x80000
 +CONFIG_SPL_SIZE_LIMIT_PROVIDE_STACK=0x800
 +CONFIG_ENV_OFFSET_REDUND=0xE0000
@@ -5076,15 +5081,11 @@ index 00000000000..6fa7c0ca643
 +CONFIG_BLOBLIST=y
 +CONFIG_BLOBLIST_ADDR=0x80D00000
 +CONFIG_SPL_MAX_SIZE=0x80000
-+CONFIG_SPL_HAS_BSS_LINKER_SECTION=y
-+CONFIG_SPL_BSS_START_ADDR=0x80c80000
-+CONFIG_SPL_BSS_MAX_SIZE=0x80000
 +CONFIG_SPL_SYS_REPORT_STACK_F_USAGE=y
 +CONFIG_SPL_BOARD_INIT=y
 +CONFIG_SPL_SYS_MALLOC_SIMPLE=y
-+CONFIG_SPL_STACK_R=y
 +CONFIG_SPL_SYS_MALLOC=y
-+CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR=y
++CONFIG_SPL_SYS_MMCSD_RAW_MODE=y
 +CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR=0x1000
 +CONFIG_SPL_DMA=y
 +CONFIG_SPL_ENV_SUPPORT=y
@@ -5095,7 +5096,6 @@ index 00000000000..6fa7c0ca643
 +CONFIG_SPL_NET=y
 +CONFIG_SPL_NET_VCI_STRING="AM62X U-Boot A53 SPL"
 +CONFIG_SPL_POWER_DOMAIN=y
-+CONFIG_SPL_RAM_SUPPORT=y
 +CONFIG_SPL_RAM_DEVICE=y
 +CONFIG_SPL_THERMAL=y
 +CONFIG_SPL_YMODEM_SUPPORT=y
@@ -5123,7 +5123,6 @@ index 00000000000..6fa7c0ca643
 +CONFIG_SPL_DM_SEQ_ALIAS=y
 +CONFIG_REGMAP=y
 +CONFIG_SPL_REGMAP=y
-+CONFIG_SPL_SYSCON=y
 +CONFIG_SPL_OF_TRANSLATE=y
 +CONFIG_CLK=y
 +CONFIG_SPL_CLK=y
@@ -5201,16 +5200,15 @@ index 00000000000..6fa7c0ca643
 +CONFIG_LIBAVB=y
 diff --git a/configs/am62x_bytedevkit_r5_defconfig b/configs/am62x_bytedevkit_r5_defconfig
 new file mode 100644
-index 00000000000..640ae7c2e69
+index 00000000000..83ba657303a
 --- /dev/null
 +++ b/configs/am62x_bytedevkit_r5_defconfig
-@@ -0,0 +1,143 @@
+@@ -0,0 +1,139 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_K3=y
 +CONFIG_SYS_MALLOC_F_LEN=0x9000
 +CONFIG_SPL_LIBCOMMON_SUPPORT=y
 +CONFIG_SPL_LIBGENERIC_SUPPORT=y
-+CONFIG_NR_DRAM_BANKS=2
 +CONFIG_SOC_K3_AM625=y
 +CONFIG_TARGET_AM62X_BYTEDEVKIT_R5=y
 +CONFIG_HAS_CUSTOM_SYS_INIT_SP_ADDR=y
@@ -5219,13 +5217,17 @@ index 00000000000..640ae7c2e69
 +CONFIG_ENV_OFFSET=0xC0000
 +CONFIG_DM_GPIO=y
 +CONFIG_DEFAULT_DEVICE_TREE="k3-am625-r5-bytedevkit"
-+CONFIG_SPL_TEXT_BASE=0x43c00000
 +CONFIG_DM_RESET=y
 +CONFIG_SPL_MMC=y
 +CONFIG_SPL_SERIAL=y
 +CONFIG_SPL_DRIVERS_MISC=y
 +CONFIG_SPL_STACK_R_ADDR=0x82000000
 +CONFIG_SPL_SYS_MALLOC_F_LEN=0x7000
++CONFIG_SPL_TEXT_BASE=0x43c00000
++CONFIG_SPL_HAS_BSS_LINKER_SECTION=y
++CONFIG_SPL_BSS_START_ADDR=0x43c3b000
++CONFIG_SPL_BSS_MAX_SIZE=0x3000
++CONFIG_SPL_STACK_R=y
 +CONFIG_SPL_SIZE_LIMIT=0x3A7F0
 +CONFIG_SPL_SIZE_LIMIT_PROVIDE_STACK=0x3500
 +CONFIG_ENV_OFFSET_REDUND=0xE0000
@@ -5239,19 +5241,15 @@ index 00000000000..640ae7c2e69
 +CONFIG_SPL_SIZE_LIMIT_SUBTRACT_MALLOC=y
 +CONFIG_SPL_MAX_SIZE=0x3B000
 +CONFIG_SPL_PAD_TO=0x0
-+CONFIG_SPL_HAS_BSS_LINKER_SECTION=y
-+CONFIG_SPL_BSS_START_ADDR=0x43c3b000
-+CONFIG_SPL_BSS_MAX_SIZE=0x3000
 +CONFIG_SPL_SYS_REPORT_STACK_F_USAGE=y
 +CONFIG_SPL_BOARD_INIT=y
 +CONFIG_SPL_SYS_MALLOC_SIMPLE=y
-+CONFIG_SPL_STACK_R=y
 +CONFIG_SPL_SEPARATE_BSS=y
 +CONFIG_SPL_SYS_MALLOC=y
 +CONFIG_SPL_HAS_CUSTOM_MALLOC_START=y
 +CONFIG_SPL_CUSTOM_SYS_MALLOC_ADDR=0x84000000
 +CONFIG_SPL_EARLY_BSS=y
-+CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_USE_SECTOR=y
++CONFIG_SPL_SYS_MMCSD_RAW_MODE=y
 +CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR=0x400
 +CONFIG_SPL_ENV_SUPPORT=y
 +CONFIG_SPL_I2C=y
@@ -5259,7 +5257,6 @@ index 00000000000..640ae7c2e69
 +CONFIG_SPL_NET=y
 +CONFIG_SPL_DM_RESET=y
 +CONFIG_SPL_POWER_DOMAIN=y
-+CONFIG_SPL_RAM_SUPPORT=y
 +CONFIG_SPL_RAM_DEVICE=y
 +CONFIG_SPL_REMOTEPROC=y
 +CONFIG_HUSH_PARSER=y
@@ -5334,8 +5331,6 @@ index 00000000000..640ae7c2e69
 +CONFIG_USB_EHCI_HCD=y
 +CONFIG_USB_EHCI_GENERIC=y
 +CONFIG_USB_DWC2=y
-+CONFIG_USB_CDNS3=y
-+CONFIG_USB_CDNS3_HOST=y
 +CONFIG_USB_DWC3=y
 +CONFIG_USB_DWC3_GENERIC=y
 +CONFIG_SPL_USB_DWC3_GENERIC=y
@@ -5350,13 +5345,13 @@ index 00000000000..640ae7c2e69
 +CONFIG_SPL_LIB_RATIONAL=y
 diff --git a/include/configs/am62x_bytedevkit.h b/include/configs/am62x_bytedevkit.h
 new file mode 100644
-index 00000000000..8ca2e4aec22
+index 00000000000..3474200e4af
 --- /dev/null
 +++ b/include/configs/am62x_bytedevkit.h
 @@ -0,0 +1,69 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
 +/*
-+ * Copyright (C) 2024 bytesatwork AG - https://www.bytesatwork.io
++ * Copyright (C) 2025 bytesatwork AG - https://www.bytesatwork.io
 + *
 + * Based on am62x_evm.h
 + * Copyright (C) 2020-2022 Texas Instruments Incorporated - https://www.ti.com/
@@ -5372,7 +5367,7 @@ index 00000000000..8ca2e4aec22
 +
 +#define CFG_EXTRA_ENV_SETTINGS \
 +	"console=ttyS2,115200n8\0" \
-+	"dtbfile=" CONFIG_DEFAULT_DEVICE_TREE ".dtb\0" \
++	"dtbfile=k3-am625-bytedevkit-2-2.dtb\0" \
 +	"kernelfile=Image\0" \
 +	"loadaddr=0x82000000\0" \
 +	"dtbaddr=0x88000000\0" \
@@ -5423,6 +5418,3 @@ index 00000000000..8ca2e4aec22
 +	"\0"
 +
 +#endif /* __CONFIG_AM62X_BYTEDEVKIT_H */
--- 
-2.39.5
-

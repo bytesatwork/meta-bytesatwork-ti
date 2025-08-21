@@ -1,10 +1,9 @@
-From a229a565463bad61f779a4b2b8f7371424957cc4 Mon Sep 17 00:00:00 2001
+From 894e10135885dbebfa377ccb1441fefabc11f180 Mon Sep 17 00:00:00 2001
 From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
 Date: Wed, 28 Jun 2023 11:51:54 +0200
-Subject: [PATCH] board: bytedevkit: introduce bawconfig
+Subject: [PATCH] bytesatwork: am62x: Introduce bawconfig
 
-Configure defaults for bytesatwork tool to store production data
-in EEPROM.
+Enable bytesatwork tool to store production data in EEPROM.
 
 Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
 ---
@@ -15,7 +14,7 @@ Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
  4 files changed, 18 insertions(+)
 
 diff --git a/board/bytesatwork/bytedevkit/Kconfig b/board/bytesatwork/bytedevkit/Kconfig
-index 2f1c73a45ca..360b08841da 100644
+index 5329bb4ca63..1798b95371d 100644
 --- a/board/bytesatwork/bytedevkit/Kconfig
 +++ b/board/bytesatwork/bytedevkit/Kconfig
 @@ -67,6 +67,8 @@ config BAW_COMMON_CMD_OPTIONS
@@ -28,7 +27,7 @@ index 2f1c73a45ca..360b08841da 100644
  
  if TARGET_AM62X_BYTEDEVKIT_R5
 diff --git a/board/bytesatwork/bytedevkit/Makefile b/board/bytesatwork/bytedevkit/Makefile
-index dca4cab9cd9..9764e336853 100644
+index 82a08015378..fdc406d25ee 100644
 --- a/board/bytesatwork/bytedevkit/Makefile
 +++ b/board/bytesatwork/bytedevkit/Makefile
 @@ -7,3 +7,4 @@
@@ -37,7 +36,7 @@ index dca4cab9cd9..9764e336853 100644
  obj-y	+= am62x_bytedevkit.o
 +obj-y	+= ../baw_config/
 diff --git a/board/bytesatwork/bytedevkit/am62x_bytedevkit.c b/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
-index a104d14e5b5..140594b7ece 100644
+index 14db20c20dc..8d6ea0c1877 100644
 --- a/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
 +++ b/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
 @@ -18,6 +18,8 @@
@@ -62,7 +61,7 @@ index a104d14e5b5..140594b7ece 100644
  	return 0;
  }
  #endif
-@@ -165,5 +173,7 @@ void spl_board_init(void)
+@@ -166,5 +174,7 @@ void spl_board_init(void)
  	       MCU_CTRL_DEVICE_CLKOUT_32K_CTRL);
  
  	enable_caches();
@@ -71,7 +70,7 @@ index a104d14e5b5..140594b7ece 100644
  }
  #endif
 diff --git a/include/configs/am62x_bytedevkit.h b/include/configs/am62x_bytedevkit.h
-index 8ca2e4aec22..c54cf296ab5 100644
+index 3474200e4af..42e77a8972a 100644
 --- a/include/configs/am62x_bytedevkit.h
 +++ b/include/configs/am62x_bytedevkit.h
 @@ -14,6 +14,11 @@
@@ -85,7 +84,4 @@ index 8ca2e4aec22..c54cf296ab5 100644
 +
  #define CFG_EXTRA_ENV_SETTINGS \
  	"console=ttyS2,115200n8\0" \
- 	"dtbfile=" CONFIG_DEFAULT_DEVICE_TREE ".dtb\0" \
--- 
-2.39.5
-
+ 	"dtbfile=k3-am625-bytedevkit-2-2.dtb\0" \

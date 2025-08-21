@@ -1,11 +1,11 @@
-From 20e6aa44f768f37e5e5679b3232a4989bb5da7c9 Mon Sep 17 00:00:00 2001
-From: Michael Meister <michael.meister@bytesatwork.ch>
-Date: Mon, 11 Jul 2022 16:02:24 +0200
+From 72dc2ea7ffe3838c1ebc03eebd21edf552770c3a Mon Sep 17 00:00:00 2001
+From: Simone Schwizer <simone.schwizer@bytesatwork.ch>
+Date: Tue, 29 Jul 2025 09:14:28 +0200
 Subject: [PATCH] github: workflows: Add action to analyze patches
 
 Add github action running checkpatch on pull request.
 
-Signed-off-by: Michael Meister <michael.meister@bytesatwork.ch>
+Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
 ---
  .checkpatch.conf                 |   2 +-
  .github/workflows/checkpatch.yml | 120 +++++++++++++++++++++++++++++++
@@ -153,15 +153,15 @@ index 00000000000..dc75adb9e0a
 +            ./scripts/checkpatch.pl --no-tree ${{ matrix.patch }}
 +          fi
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 8f92de928c5..93ecfea8836 100644
+index 8c6c0c2a4bc..d3ec8c7c3b3 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
-@@ -255,6 +255,13 @@ F:	doc/README.bcm7xxx
+@@ -261,6 +261,13 @@ F:	doc/README.bcm7xxx
  F:	drivers/mmc/bcmstb_sdhci.c
  F:	drivers/spi/bcmstb_spi.c
  
 +ARM BYTESATWORK BYTEDEVKIT AM62X
-+M:	Rico Ganahl <rico.ganahl@bytesatwork.ch>
++M:	Simone Schwizer <simone.schwizer@bytesatwork.ch>
 +S:	Maintained
 +W:	https://www.bytesatwork.io/
 +T:	git https://github.com/bytesatwork/u-boot-ti.git
@@ -170,6 +170,3 @@ index 8f92de928c5..93ecfea8836 100644
  ARM CORTINA ACCESS CAxxxx
  M:	Alex Nemirovsky <alex.nemirovsky@cortina-access.com>
  S:	Supported
--- 
-2.39.5
-

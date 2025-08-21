@@ -1,11 +1,12 @@
-From fce2516ba2f8b44498456d28f57091d155175f2f Mon Sep 17 00:00:00 2001
+From 551eae0f37c252208629ea06d0651765f45baf33 Mon Sep 17 00:00:00 2001
 From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
 Date: Wed, 2 Feb 2022 09:16:56 +0100
-Subject: [PATCH] board: bytesatwork: import bawconfig
+Subject: [PATCH] board: bytesatwork: Import bawconfig
 
 Bytesatwork tool to store production data in EEPROM.
 
 Used cherry picked commits:
+
 3578ec17f4 bytesatwork: m2config: verbatim import
 42230a9c17 bytesatwork: m2config: rename to baw config
 7daca48726 bytesatwork: bawconfig: init config to zero
@@ -26,17 +27,19 @@ cac51ab069 bytesatwork: bawconfig: add ti am62x revision
 97c39a73a1 bytesatwork: bawconfig: introduce nxp imx8mp
 7a56df4a0d bytesatwork: bawconfig: introduce ti am62px
 08d0ffb1a8 bytesatwork: bawconfig: introduce Kconfig, unify copyrights
-c4ef2a83a6 bytesatwork: bawconfig: add HW revisions and RAM types
-8e8ee20896 bytesatwork: bawconfig: add I2C config options
-81f05f22c8e bytesatwork: bawconfig: add imx8mp 6GB ram type
-ce864843561 bytesatwork: bawconfig: Remove common.h includes
-4d95af5b93d bytesatwork: bawconfig: Add legacy i2c support for SPL
+8e0064a4da bytesatwork: bawconfig: add HW revisions and RAM types
+fd901fb676 bytesatwork: bawconfig: add I2C config options
+81f05f22c8 bytesatwork: bawconfig: add imx8mp 6GB ram type
+ce86484356 bytesatwork: bawconfig: Remove common.h includes
+4d95af5b93 bytesatwork: bawconfig: Add legacy i2c support for SPL
+c5701c8eda bytesatwork: bawconfig: Update attribute unused to
+7351ba8ff7 bytesatwork: bawconfig: Add maintainer
 
 Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
 Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
 ---
  board/bytesatwork/baw_config/Kconfig          |  72 ++++
- board/bytesatwork/baw_config/MAINTAINERS      |   6 +
+ board/bytesatwork/baw_config/MAINTAINERS      |   7 +
  board/bytesatwork/baw_config/Makefile         |  15 +
  board/bytesatwork/baw_config/README           |  71 ++++
  board/bytesatwork/baw_config/baw_config.c     |  83 +++++
@@ -48,7 +51,7 @@ Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
  board/bytesatwork/baw_config/baw_config_get.c | 104 ++++++
  board/bytesatwork/baw_config/baw_config_get.h |  13 +
  board/bytesatwork/baw_config/cmd_baw_config.c | 223 +++++++++++++
- 13 files changed, 1088 insertions(+)
+ 13 files changed, 1089 insertions(+)
  create mode 100644 board/bytesatwork/baw_config/Kconfig
  create mode 100644 board/bytesatwork/baw_config/MAINTAINERS
  create mode 100644 board/bytesatwork/baw_config/Makefile
@@ -143,12 +146,13 @@ index 00000000000..b49e5f36d8c
 +endmenu
 diff --git a/board/bytesatwork/baw_config/MAINTAINERS b/board/bytesatwork/baw_config/MAINTAINERS
 new file mode 100644
-index 00000000000..27dd16973ba
+index 00000000000..68cf2510f68
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/MAINTAINERS
-@@ -0,0 +1,6 @@
+@@ -0,0 +1,7 @@
 +BYTESATWORK BAWCONFIG
 +M:	Rico Ganahl <rico.ganahl@bytesatwork.ch>
++M:	Simone Schwizer <simone.schwizer@bytesatwork.ch>
 +S:	Maintained
 +F:	board/bytesatwork/baw_config/*
 +F:	board/bytesatwork/baw_config/Makefile
@@ -873,7 +877,7 @@ index 00000000000..c5d943f18c5
 +#endif
 diff --git a/board/bytesatwork/baw_config/baw_config_get.c b/board/bytesatwork/baw_config/baw_config_get.c
 new file mode 100644
-index 00000000000..70302bdd3de
+index 00000000000..fd43e38bb11
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/baw_config_get.c
 @@ -0,0 +1,104 @@
@@ -895,7 +899,7 @@ index 00000000000..70302bdd3de
 +
 +void baw_config_get(struct baw_config *config)
 +{
-+	u8 __attribute__((unused)) reg = 0;
++	u8 __maybe_unused reg = 0;
 +
 +	if (baw_config_eeprom_read(config) == 0) {
 +		if (IS_ENABLED(CONFIG_SPL_BUILD)) {
@@ -1229,6 +1233,3 @@ index 00000000000..b1076d424cc
 +#endif
 +#endif
 +);
--- 
-2.39.5
-

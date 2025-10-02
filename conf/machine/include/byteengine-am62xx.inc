@@ -25,5 +25,5 @@ TFA_K3_SYSTEM_SUSPEND = "1"
 
 OPTEEMACHINE = "k3-am62x"
 
-# Normally AM62 boards use ttyS2, but our Jailhouse inmate may use ttyS3, so try both
-SERIAL_CONSOLES = "115200;ttyS2 115200;ttyS3"
+# Normally AM62 boards use ttyS2
+SERIAL_CONSOLES = "115200;ttyS2"

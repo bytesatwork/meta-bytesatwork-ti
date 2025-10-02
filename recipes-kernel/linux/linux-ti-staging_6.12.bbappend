@@ -12,9 +12,11 @@ SRC_URI += " \
 	file://0006-net-ti-am65-cpsw-nuss-select-PAGE_POOL.patch \
 	file://0007-arm64-ti-k3-am625-byteengine-bytedevkit-Add-byteDEVK.patch \
 	file://0008-arm64-bytedevkit_am62x_defconfig-Add-a-basic-configu.patch \
+	file://0009-arm64-bytedevkit_am62x_defconfig-align-with-make-sav.patch \
+	file://0010-arm64-bytedevkit_am62x_defconfig-add-nftables-system.patch \
 "
 
-PR = "r0"
+PR = "r1"
 
 kernel_do_compile:prepend() {
 	oe_runmake ${KERNEL_DEFCONFIG_INTREE}

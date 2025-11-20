@@ -1,0 +1,44 @@
+From c077d54f762f548b4e0ebf288294044e6fad426e Mon Sep 17 00:00:00 2001
+From: Simone Schwizer <simone.schwizer@bytesatwork.ch>
+Date: Wed, 19 Nov 2025 15:58:14 +0100
+Subject: [PATCH] arm64: bytedevkit_am62x_defconfig: Thermal driver and
+ on-demand sched
+
+Sets default scheduler to on-demand.
+
+Enables thermal driver. This allows reading out the SoC temperature
+from the filesystem at /sys/class/thermal/thermal_zone*/temp.
+
+Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
+---
+ arch/arm64/configs/bytedevkit_am62x_defconfig | 8 ++++++--
+ 1 file changed, 6 insertions(+), 2 deletions(-)
+
+diff --git a/arch/arm64/configs/bytedevkit_am62x_defconfig b/arch/arm64/configs/bytedevkit_am62x_defconfig
+index f3f59e9e0808..10efdf7ca956 100644
+--- a/arch/arm64/configs/bytedevkit_am62x_defconfig
++++ b/arch/arm64/configs/bytedevkit_am62x_defconfig
+@@ -49,10 +49,9 @@ CONFIG_WQ_POWER_EFFICIENT_DEFAULT=y
+ CONFIG_ENERGY_MODEL=y
+ CONFIG_CPU_FREQ=y
+ CONFIG_CPU_FREQ_STAT=y
+-CONFIG_CPU_FREQ_DEFAULT_GOV_PERFORMANCE=y
++CONFIG_CPU_FREQ_DEFAULT_GOV_ONDEMAND=y
+ CONFIG_CPU_FREQ_GOV_POWERSAVE=m
+ CONFIG_CPU_FREQ_GOV_USERSPACE=y
+-CONFIG_CPU_FREQ_GOV_ONDEMAND=y
+ CONFIG_CPU_FREQ_GOV_CONSERVATIVE=m
+ CONFIG_CPU_FREQ_GOV_SCHEDUTIL=y
+ CONFIG_CPUFREQ_DT=y
+@@ -494,6 +493,11 @@ CONFIG_SENSORS_LM90=m
+ CONFIG_SENSORS_PWM_FAN=m
+ CONFIG_SENSORS_INA2XX=m
+ CONFIG_SENSORS_INA3221=m
++CONFIG_THERMAL=y
++CONFIG_THERMAL_GOV_POWER_ALLOCATOR=y
++CONFIG_CPU_THERMAL=y
++CONFIG_THERMAL_EMULATION=y
++CONFIG_K3_THERMAL=y
+ CONFIG_WATCHDOG=y
+ CONFIG_ARM_SP805_WATCHDOG=y
+ CONFIG_ARM_SBSA_WATCHDOG=y

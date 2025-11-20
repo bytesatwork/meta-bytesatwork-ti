@@ -14,9 +14,10 @@ SRC_URI += " \
 	file://0008-arm64-bytedevkit_am62x_defconfig-Add-a-basic-configu.patch \
 	file://0009-arm64-bytedevkit_am62x_defconfig-align-with-make-sav.patch \
 	file://0010-arm64-bytedevkit_am62x_defconfig-add-nftables-system.patch \
+	file://0011-arm64-bytedevkit_am62x_defconfig-Thermal-driver-and-.patch \
 "
 
-PR = "r1"
+PR = "r2"
 
 kernel_do_compile:prepend() {
 	oe_runmake ${KERNEL_DEFCONFIG_INTREE}

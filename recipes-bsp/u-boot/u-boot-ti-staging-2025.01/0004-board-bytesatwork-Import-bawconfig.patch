@@ -1,4 +1,4 @@
-From 551eae0f37c252208629ea06d0651765f45baf33 Mon Sep 17 00:00:00 2001
+From 4f8ed5ab892bf7e7ddacd3e167a5941c74a9318a Mon Sep 17 00:00:00 2001
 From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
 Date: Wed, 2 Feb 2022 09:16:56 +0100
 Subject: [PATCH] board: bytesatwork: Import bawconfig
@@ -34,6 +34,10 @@ ce86484356 bytesatwork: bawconfig: Remove common.h includes
 4d95af5b93 bytesatwork: bawconfig: Add legacy i2c support for SPL
 c5701c8eda bytesatwork: bawconfig: Update attribute unused to
 7351ba8ff7 bytesatwork: bawconfig: Add maintainer
+032f569ed0 bytesatwork: bawconfig: Add imx8mp HW revision and RAM type
+3e9758e8bc bytesatwork: bawconfig: Update STM32MP1 target name
+de8bc8ca31 bytesatwork: bawconfig: Remove HW dependencies
+23bc62ffe9 bytesatwork: bawconfig: Add stm32mp2 HW revision and ram type
 
 Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
 Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
@@ -42,16 +46,16 @@ Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
  board/bytesatwork/baw_config/MAINTAINERS      |   7 +
  board/bytesatwork/baw_config/Makefile         |  15 +
  board/bytesatwork/baw_config/README           |  71 ++++
- board/bytesatwork/baw_config/baw_config.c     |  83 +++++
- board/bytesatwork/baw_config/baw_config.h     | 120 +++++++
+ board/bytesatwork/baw_config/baw_config.c     |  88 +++++
+ board/bytesatwork/baw_config/baw_config.h     | 125 +++++++
  .../baw_config/baw_config_builtin.c           |  15 +
  .../baw_config/baw_config_builtin.h           |  21 ++
  .../baw_config/baw_config_eeprom.c            | 307 ++++++++++++++++++
  .../baw_config/baw_config_eeprom.h            |  38 +++
- board/bytesatwork/baw_config/baw_config_get.c | 104 ++++++
+ board/bytesatwork/baw_config/baw_config_get.c |  43 +++
  board/bytesatwork/baw_config/baw_config_get.h |  13 +
  board/bytesatwork/baw_config/cmd_baw_config.c | 223 +++++++++++++
- 13 files changed, 1089 insertions(+)
+ 13 files changed, 1038 insertions(+)
  create mode 100644 board/bytesatwork/baw_config/Kconfig
  create mode 100644 board/bytesatwork/baw_config/MAINTAINERS
  create mode 100644 board/bytesatwork/baw_config/Makefile
@@ -68,7 +72,7 @@ Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
 
 diff --git a/board/bytesatwork/baw_config/Kconfig b/board/bytesatwork/baw_config/Kconfig
 new file mode 100644
-index 00000000000..b49e5f36d8c
+index 0000000000..b49e5f36d8
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/Kconfig
 @@ -0,0 +1,72 @@
@@ -146,7 +150,7 @@ index 00000000000..b49e5f36d8c
 +endmenu
 diff --git a/board/bytesatwork/baw_config/MAINTAINERS b/board/bytesatwork/baw_config/MAINTAINERS
 new file mode 100644
-index 00000000000..68cf2510f68
+index 0000000000..68cf2510f6
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/MAINTAINERS
 @@ -0,0 +1,7 @@
@@ -159,7 +163,7 @@ index 00000000000..68cf2510f68
 +F:	board/bytesatwork/baw_config/Kconfig
 diff --git a/board/bytesatwork/baw_config/Makefile b/board/bytesatwork/baw_config/Makefile
 new file mode 100644
-index 00000000000..3f02428a879
+index 0000000000..3f02428a87
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/Makefile
 @@ -0,0 +1,15 @@
@@ -180,7 +184,7 @@ index 00000000000..3f02428a879
 +obj-$(CONFIG_BAW_CONFIG_BUILTIN) += baw_config_builtin.o
 diff --git a/board/bytesatwork/baw_config/README b/board/bytesatwork/baw_config/README
 new file mode 100644
-index 00000000000..518d2a94ec8
+index 0000000000..518d2a94ec
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/README
 @@ -0,0 +1,71 @@
@@ -257,10 +261,10 @@ index 00000000000..518d2a94ec8
 +Magic is 0x6e4a. CRC is the native u-boot crc32.
 diff --git a/board/bytesatwork/baw_config/baw_config.c b/board/bytesatwork/baw_config/baw_config.c
 new file mode 100644
-index 00000000000..87024b01eb2
+index 0000000000..f223e488a6
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/baw_config.c
-@@ -0,0 +1,83 @@
+@@ -0,0 +1,88 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
@@ -286,6 +290,9 @@ index 00000000000..87024b01eb2
 +	{ M8P_PCB_REV_1_1, "M8P Rev 1.1" },
 +	{ M9_PCB_REV_1_0, "M9 Rev 1.0" },
 +	{ M9_PCB_REV_2_0, "M9 Rev 2.0" },
++	{ M7_PCB_REV_1_1, "M7 Rev 1.1" },
++	{ M10_PCB_REV_0_1, "M10 Rev 0.1" },
++	{ M10_PCB_REV_1_0, "M10 Rev 1.0" },
 +	{ -1, NULL },
 +};
 +
@@ -319,6 +326,8 @@ index 00000000000..87024b01eb2
 +	{ M9_RAM_MT53D512M16D1DS_046, "MT53D512M16D1DS-046 1 GB LPDDR4X @ 1866 MHz" },
 +	{ M9_RAM_MT53E1G16D1FW_046, "MT53E1G16D1FW-046 2 GB LPDDR4X @ 1866 MHz" },
 +	{ M7_RAM_MT53E1536M32D4DE_046, "MT53E1536M32D4DE-046 6 GB LPDDR4 @ 2000 MHz"},
++	{ M7_RAM_IS43LQ32512A_046, "IS43LQ32512A-046BLI 2GB LPDDR4 @ 2000 MHz"},
++	{ M10_RAM_MT53D512M16D1DS_046, "MT53D512M16D1DS-046 1 GB LPDDR4 @ 1200 MHz"},
 +	{ -1, NULL },
 +};
 +
@@ -346,10 +355,10 @@ index 00000000000..87024b01eb2
 +}
 diff --git a/board/bytesatwork/baw_config/baw_config.h b/board/bytesatwork/baw_config/baw_config.h
 new file mode 100644
-index 00000000000..f1f32623869
+index 0000000000..4c741db9f3
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/baw_config.h
-@@ -0,0 +1,120 @@
+@@ -0,0 +1,125 @@
 +/* SPDX-License-Identifier: GPL-2.0+ */
 +/*
 + * Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
@@ -379,6 +388,9 @@ index 00000000000..f1f32623869
 +	M8P_PCB_REV_1_1 = 14,
 +	M9_PCB_REV_1_0 = 15,
 +	M9_PCB_REV_2_0 = 16,
++	M7_PCB_REV_1_1 = 17,
++	M10_PCB_REV_0_1 = 18,
++	M10_PCB_REV_1_0 = 19,
 +};
 +
 +enum baw_config_ram {
@@ -414,6 +426,8 @@ index 00000000000..f1f32623869
 +	M9_RAM_MT53D512M16D1DS_046 = 27,
 +	M9_RAM_MT53E1G16D1FW_046 = 28,
 +	M7_RAM_MT53E1536M32D4DE_046 = 29,
++	M7_RAM_IS43LQ32512A_046 = 30,
++	M10_RAM_MT53D512M16D1DS_046 = 31,
 +};
 +
 +enum baw_config_flash {
@@ -472,7 +486,7 @@ index 00000000000..f1f32623869
 +#endif
 diff --git a/board/bytesatwork/baw_config/baw_config_builtin.c b/board/bytesatwork/baw_config/baw_config_builtin.c
 new file mode 100644
-index 00000000000..367078be8ef
+index 0000000000..367078be8e
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/baw_config_builtin.c
 @@ -0,0 +1,15 @@
@@ -493,7 +507,7 @@ index 00000000000..367078be8ef
 +}
 diff --git a/board/bytesatwork/baw_config/baw_config_builtin.h b/board/bytesatwork/baw_config/baw_config_builtin.h
 new file mode 100644
-index 00000000000..a44445955d7
+index 0000000000..a44445955d
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/baw_config_builtin.h
 @@ -0,0 +1,21 @@
@@ -520,7 +534,7 @@ index 00000000000..a44445955d7
 +#endif
 diff --git a/board/bytesatwork/baw_config/baw_config_eeprom.c b/board/bytesatwork/baw_config/baw_config_eeprom.c
 new file mode 100644
-index 00000000000..68a2fb4ea26
+index 0000000000..68a2fb4ea2
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/baw_config_eeprom.c
 @@ -0,0 +1,307 @@
@@ -833,7 +847,7 @@ index 00000000000..68a2fb4ea26
 +#endif
 diff --git a/board/bytesatwork/baw_config/baw_config_eeprom.h b/board/bytesatwork/baw_config/baw_config_eeprom.h
 new file mode 100644
-index 00000000000..c5d943f18c5
+index 0000000000..c5d943f18c
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/baw_config_eeprom.h
 @@ -0,0 +1,38 @@
@@ -877,10 +891,10 @@ index 00000000000..c5d943f18c5
 +#endif
 diff --git a/board/bytesatwork/baw_config/baw_config_get.c b/board/bytesatwork/baw_config/baw_config_get.c
 new file mode 100644
-index 00000000000..fd43e38bb11
+index 0000000000..2a8091947a
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/baw_config_get.c
-@@ -0,0 +1,104 @@
+@@ -0,0 +1,43 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2015 bytesatwork AG - https://www.bytesatwork.io
@@ -910,51 +924,6 @@ index 00000000000..fd43e38bb11
 +		return;
 +	}
 +
-+	if (IS_ENABLED(CONFIG_SPL_BUILD) && IS_ENABLED(CONFIG_TARGET_BYTEENGINE_AM335X) &&
-+	    IS_ENABLED(CONFIG_DM_I2C)) {
-+		struct udevice *pmic;
-+		struct udevice *bus;
-+		int ret;
-+
-+		ret = uclass_get_device_by_seq(UCLASS_I2C, CONFIG_BAW_CONFIG_EEPROM_BUS, &bus);
-+		if (ret) {
-+			printf("%s(): uclass_get_device_by_seq(): %d\n", __func__, ret);
-+			goto default_config;
-+		}
-+
-+		ret = dm_i2c_probe(bus, PMIC_ADDRESS, 0, &pmic);
-+		if (ret) {
-+			printf("%s(): dm_i2c_probe(): %d\n", __func__, ret);
-+			goto default_config;
-+		}
-+
-+		ret = i2c_set_chip_offset_len(pmic, 1);
-+		if (ret) {
-+			printf("%s(): i2c_set_chip_offset_len(): %d\n", __func__, ret);
-+			goto default_config;
-+		}
-+
-+		ret = dm_i2c_read(pmic, 0x20, &reg, 1);
-+		if (ret) {
-+			printf("Error: PMIC read failed\n");
-+			goto default_config;
-+		} else {
-+			if (reg == 0x05) {
-+				config->ram = M2_RAM_MT47H128M16RT25E;	/* set DDR2 */
-+				printf("DDR2 detected\n");
-+			} else if (reg == 0x01) {
-+				config->ram = M2_RAM_K4B2G1646EBIH9;	/* set legacy DDR3 */
-+				printf("DDR3 detected\n");
-+			} else {
-+				goto default_config;
-+			}
-+		}
-+
-+		return;
-+	}
-+
-+default_config:
-+
 +	if (IS_ENABLED(CONFIG_BAW_CONFIG_BUILTIN)) {
 +		config->ram = BAW_CONFIG_BUILTIN_RAM;
 +		if (IS_ENABLED(CONFIG_SPL_BUILD)) {
@@ -963,31 +932,15 @@ index 00000000000..fd43e38bb11
 +
 +			return;
 +		}
-+	} else {
-+		if (IS_ENABLED(CONFIG_TARGET_BYTEENGINE_AM335X))
-+			config->ram = M2_RAM_K4B2G1646EBIH9;	/* set default to legacy DDR3 */
-+		else if (IS_ENABLED(CONFIG_TARGET_BYTEDEVKIT))
-+			config->ram = M5_RAM_K4B4G1646DBIK0;
-+		else if (IS_ENABLED(CONFIG_TARGET_IMX8MM_BYTEDEVKIT))
-+			config->ram = M6_RAM_MT53E128M32D2DS_053;
-+		else if (IS_ENABLED(CONFIG_TARGET_AM62X_BYTEDEVKIT_A53))
-+			config->ram = M8_RAM_MT53E256M16D1DS_046;
-+		else if (IS_ENABLED(CONFIG_TARGET_AM62PX_BYTEDEVKIT_A53))
-+			config->ram = M8P_RAM_MT53E2G32D4DE_046;
-+		else if (IS_ENABLED(CONFIG_TARGET_IMX8MP_BYTEDEVKIT))
-+			config->ram = M7_RAM_MT53E1G32D2FW_046;
-+		else if (IS_ENABLED(CONFIG_TARGET_IMX93_BYTEDEVKIT))
-+			config->ram = M9_RAM_MT53D512M16D1DS_046;
 +	}
 +
 +	if (IS_ENABLED(CONFIG_SPL_BUILD)) {
-+		printf("Error: no RAM configuration found, trying fallback config ");
-+		printf("%u (%s)\n", config->ram, baw_config_get_ram_name(config->ram));
++		printf("Error: no RAM configuration found");
 +	}
 +}
 diff --git a/board/bytesatwork/baw_config/baw_config_get.h b/board/bytesatwork/baw_config/baw_config_get.h
 new file mode 100644
-index 00000000000..43ac01f14be
+index 0000000000..43ac01f14b
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/baw_config_get.h
 @@ -0,0 +1,13 @@
@@ -1006,7 +959,7 @@ index 00000000000..43ac01f14be
 +#endif
 diff --git a/board/bytesatwork/baw_config/cmd_baw_config.c b/board/bytesatwork/baw_config/cmd_baw_config.c
 new file mode 100644
-index 00000000000..b1076d424cc
+index 0000000000..b1076d424c
 --- /dev/null
 +++ b/board/bytesatwork/baw_config/cmd_baw_config.c
 @@ -0,0 +1,223 @@

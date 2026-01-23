@@ -1,4 +1,4 @@
-From 9928891546f8fb642c88cf05e70c1342d26d9019 Mon Sep 17 00:00:00 2001
+From dcb01fd530c1335e053f4adb63f2d17b894e7706 Mon Sep 17 00:00:00 2001
 From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
 Date: Mon, 18 Jul 2022 06:44:37 +0200
 Subject: [PATCH] am62x: Add AM62xx bytesatwork byteDEVKIT board
@@ -15,25 +15,25 @@ Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
 ---
  MAINTAINERS                                   |    8 +
  arch/arm/dts/Makefile                         |    4 +
- arch/arm/dts/k3-am625-bytedevkit-binman.dtsi  |  459 ++++
+ arch/arm/dts/k3-am625-bytedevkit-binman.dtsi  |  461 ++++
  arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi  |   75 +
  arch/arm/dts/k3-am625-bytedevkit.dts          |  157 ++
  arch/arm/dts/k3-am625-byteengine.dtsi         |  154 ++
- arch/arm/dts/k3-am625-r5-bytedevkit.dts       |   95 +
+ arch/arm/dts/k3-am625-r5-bytedevkit.dts       |   93 +
  .../dts/k3-am62x-byteengine-ddr-config.dtsi   | 2189 +++++++++++++++++
  arch/arm/mach-k3/am62x/Kconfig                |    1 +
  board/bytesatwork/bytedevkit/Kconfig          |   77 +
  board/bytesatwork/bytedevkit/Makefile         |    9 +
  board/bytesatwork/bytedevkit/README.md        |   56 +
- .../bytesatwork/bytedevkit/am62x_bytedevkit.c |  170 ++
+ .../bytesatwork/bytedevkit/am62x_bytedevkit.c |  124 +
  board/bytesatwork/bytedevkit/board-cfg.yaml   |   36 +
  board/bytesatwork/bytedevkit/pm-cfg.yaml      |   12 +
  board/bytesatwork/bytedevkit/rm-cfg.yaml      |  981 ++++++++
  board/bytesatwork/bytedevkit/sec-cfg.yaml     |  379 +++
- configs/am62x_bytedevkit_a53_defconfig        |  160 ++
- configs/am62x_bytedevkit_r5_defconfig         |  139 ++
+ configs/am62x_bytedevkit_a53_defconfig        |  161 ++
+ configs/am62x_bytedevkit_r5_defconfig         |  140 ++
  include/configs/am62x_bytedevkit.h            |   69 +
- 20 files changed, 5230 insertions(+)
+ 20 files changed, 5186 insertions(+)
  create mode 100644 arch/arm/dts/k3-am625-bytedevkit-binman.dtsi
  create mode 100644 arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi
  create mode 100644 arch/arm/dts/k3-am625-bytedevkit.dts
@@ -53,7 +53,7 @@ Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
  create mode 100644 include/configs/am62x_bytedevkit.h
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index e41b8d8c1e3..3f582f9b52b 100644
+index e41b8d8c1e..3f582f9b52 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
 @@ -267,7 +267,15 @@ S:	Maintained
@@ -73,10 +73,10 @@ index e41b8d8c1e3..3f582f9b52b 100644
  ARM CORTINA ACCESS CAxxxx
  M:	Alex Nemirovsky <alex.nemirovsky@cortina-access.com>
 diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
-index d46c75a1001..f77be4ca649 100644
+index 1f82daeb6c..28152dd629 100644
 --- a/arch/arm/dts/Makefile
 +++ b/arch/arm/dts/Makefile
-@@ -1182,6 +1182,10 @@ dtb-$(CONFIG_SOC_K3_AM625) += k3-am625-r5-sk.dtb \
+@@ -1183,6 +1183,10 @@ dtb-$(CONFIG_SOC_K3_AM625) += k3-am625-r5-sk.dtb \
  			      k3-am625-verdin-r5.dtb \
  			      k3-am625-r5-phycore-som-2gb.dtb
  
@@ -86,13 +86,13 @@ index d46c75a1001..f77be4ca649 100644
 +
  dtb-$(CONFIG_SOC_K3_AM62A7) += k3-am62a7-r5-sk.dtb
  
- dtb-$(CONFIG_SOC_K3_AM62P5) += k3-am62p5-r5-sk.dtb
+ dtb-$(CONFIG_SOC_K3_AM62D2) += k3-am62d2-r5-evm.dtb
 diff --git a/arch/arm/dts/k3-am625-bytedevkit-binman.dtsi b/arch/arm/dts/k3-am625-bytedevkit-binman.dtsi
 new file mode 100644
-index 00000000000..03665eaf485
+index 0000000000..7a559e3a80
 --- /dev/null
 +++ b/arch/arm/dts/k3-am625-bytedevkit-binman.dtsi
-@@ -0,0 +1,459 @@
+@@ -0,0 +1,461 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2025 bytesatwork AG - https://www.bytesatwork.io
@@ -357,7 +357,8 @@ index 00000000000..03665eaf485
 +						keyfile = "custMpk.pem";
 +					};
 +					dm: ti-dm {
-+						filename = "ti-dm.bin";
++						filename = "ti-dm/am62xx/ipc_echo_testb_mcu1_0_release_strip.xer5f";
++						optional;
 +					};
 +				};
 +
@@ -484,7 +485,8 @@ index 00000000000..03665eaf485
 +
 +				dm {
 +					ti-dm {
-+						filename = "ti-dm.bin";
++						filename = "ti-dm/am62xx/ipc_echo_testb_mcu1_0_release_strip.xer5f";
++						optional;
 +					};
 +				};
 +
@@ -554,7 +556,7 @@ index 00000000000..03665eaf485
 +#endif
 diff --git a/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi b/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi
 new file mode 100644
-index 00000000000..e2db83722f7
+index 0000000000..e2db83722f
 --- /dev/null
 +++ b/arch/arm/dts/k3-am625-bytedevkit-u-boot.dtsi
 @@ -0,0 +1,75 @@
@@ -635,7 +637,7 @@ index 00000000000..e2db83722f7
 +};
 diff --git a/arch/arm/dts/k3-am625-bytedevkit.dts b/arch/arm/dts/k3-am625-bytedevkit.dts
 new file mode 100644
-index 00000000000..169409b3f40
+index 0000000000..169409b3f4
 --- /dev/null
 +++ b/arch/arm/dts/k3-am625-bytedevkit.dts
 @@ -0,0 +1,157 @@
@@ -798,7 +800,7 @@ index 00000000000..169409b3f40
 +};
 diff --git a/arch/arm/dts/k3-am625-byteengine.dtsi b/arch/arm/dts/k3-am625-byteengine.dtsi
 new file mode 100644
-index 00000000000..c55c6addd93
+index 0000000000..c55c6addd9
 --- /dev/null
 +++ b/arch/arm/dts/k3-am625-byteengine.dtsi
 @@ -0,0 +1,154 @@
@@ -958,10 +960,10 @@ index 00000000000..c55c6addd93
 +};
 diff --git a/arch/arm/dts/k3-am625-r5-bytedevkit.dts b/arch/arm/dts/k3-am625-r5-bytedevkit.dts
 new file mode 100644
-index 00000000000..d18dbbc6e3a
+index 0000000000..ae067f8c51
 --- /dev/null
 +++ b/arch/arm/dts/k3-am625-r5-bytedevkit.dts
-@@ -0,0 +1,95 @@
+@@ -0,0 +1,93 @@
 +// SPDX-License-Identifier: GPL-2.0
 +/*
 + * Copyright (C) 2025 bytesatwork AG - https://www.bytesatwork.io
@@ -1009,7 +1011,8 @@ index 00000000000..d18dbbc6e3a
 +				<&k3_pds 135 TI_SCI_PD_EXCLUSIVE>,
 +				<&k3_pds 166 TI_SCI_PD_EXCLUSIVE>;
 +		resets = <&k3_reset 135 0>;
-+		clocks = <&k3_clks 61 0>;
++		clocks = <&k3_clks 61 0>, <&k3_clks 135 0>;
++		clock-names = "gtc", "core";
 +		assigned-clocks = <&k3_clks 61 0>, <&k3_clks 135 0>;
 +		assigned-clock-parents = <&k3_clks 61 2>;
 +		assigned-clock-rates = <200000000>, <1200000000>;
@@ -1047,19 +1050,16 @@ index 00000000000..d18dbbc6e3a
 +&cbass_main {
 +	sysctrler: sysctrler {
 +		compatible = "ti,am654-system-controller";
-+		mboxes= <&secure_proxy_main 1>, <&secure_proxy_main 0>, <&secure_proxy_sa3 0>;
++		mboxes= <&secure_proxy_main 1>,
++			<&secure_proxy_main 0>,
++			<&secure_proxy_sa3 0>;
 +		mbox-names = "tx", "rx", "boot_notify";
 +		bootph-pre-ram;
 +	};
 +};
-+
-+&main_pktdma {
-+	ti,sci = <&dm_tifs>;
-+	bootph-all;
-+};
 diff --git a/arch/arm/dts/k3-am62x-byteengine-ddr-config.dtsi b/arch/arm/dts/k3-am62x-byteengine-ddr-config.dtsi
 new file mode 100644
-index 00000000000..35fffc609bf
+index 0000000000..35fffc609b
 --- /dev/null
 +++ b/arch/arm/dts/k3-am62x-byteengine-ddr-config.dtsi
 @@ -0,0 +1,2189 @@
@@ -3253,7 +3253,7 @@ index 00000000000..35fffc609bf
 +#define DDRSS_PHY_1404_DATA 0x0089FF00
 +#define DDRSS_PHY_1405_DATA 0x20040004
 diff --git a/arch/arm/mach-k3/am62x/Kconfig b/arch/arm/mach-k3/am62x/Kconfig
-index 8b0cdd74f4f..de6a6f6d96e 100644
+index 8b0cdd74f4..de6a6f6d96 100644
 --- a/arch/arm/mach-k3/am62x/Kconfig
 +++ b/arch/arm/mach-k3/am62x/Kconfig
 @@ -65,6 +65,7 @@ config TARGET_VERDIN_AM62_R5
@@ -3266,7 +3266,7 @@ index 8b0cdd74f4f..de6a6f6d96e 100644
  source "board/toradex/verdin-am62/Kconfig"
 diff --git a/board/bytesatwork/bytedevkit/Kconfig b/board/bytesatwork/bytedevkit/Kconfig
 new file mode 100644
-index 00000000000..5329bb4ca63
+index 0000000000..5329bb4ca6
 --- /dev/null
 +++ b/board/bytesatwork/bytedevkit/Kconfig
 @@ -0,0 +1,77 @@
@@ -3349,7 +3349,7 @@ index 00000000000..5329bb4ca63
 +endif
 diff --git a/board/bytesatwork/bytedevkit/Makefile b/board/bytesatwork/bytedevkit/Makefile
 new file mode 100644
-index 00000000000..82a08015378
+index 0000000000..82a0801537
 --- /dev/null
 +++ b/board/bytesatwork/bytedevkit/Makefile
 @@ -0,0 +1,9 @@
@@ -3364,7 +3364,7 @@ index 00000000000..82a08015378
 +obj-y	+= am62x_bytedevkit.o
 diff --git a/board/bytesatwork/bytedevkit/README.md b/board/bytesatwork/bytedevkit/README.md
 new file mode 100644
-index 00000000000..9bc815f8724
+index 0000000000..9bc815f872
 --- /dev/null
 +++ b/board/bytesatwork/bytedevkit/README.md
 @@ -0,0 +1,56 @@
@@ -3426,10 +3426,10 @@ index 00000000000..9bc815f8724
 +```
 diff --git a/board/bytesatwork/bytedevkit/am62x_bytedevkit.c b/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
 new file mode 100644
-index 00000000000..14db20c20dc
+index 0000000000..c32eab20ac
 --- /dev/null
 +++ b/board/bytesatwork/bytedevkit/am62x_bytedevkit.c
-@@ -0,0 +1,170 @@
+@@ -0,0 +1,124 @@
 +// SPDX-License-Identifier: GPL-2.0+
 +/*
 + * Copyright (C) 2025 bytesatwork AG - https://www.bytesatwork.io
@@ -3449,6 +3449,7 @@ index 00000000000..14db20c20dc
 +#include <env.h>
 +#include <net.h>
 +#include <cpu_func.h>
++#include <mach/k3-ddr.h>
 +
 +DECLARE_GLOBAL_DATA_PTR;
 +
@@ -3457,19 +3458,25 @@ index 00000000000..14db20c20dc
 +	return 0;
 +}
 +
-+/* Copied from board/ti/common/k3-ddr-init.c */
++/* Copied from board/ti/common/k3-ddr.c */
 +int dram_init(void)
 +{
 +	s32 ret;
 +
 +	ret = fdtdec_setup_mem_size_base_lowest();
-+	if (ret)
++	if (ret) {
 +		printf("Error setting up mem size and base. %d\n", ret);
++		return ret;
++	}
++
++	ret = k3_mem_map_init();
++	if (ret)
++		printf("Error setting up MMU table. %d\n", ret);
 +
 +	return ret;
 +}
 +
-+/* Copied from board/ti/common/k3-ddr-init.c */
++/* Copied from board/ti/common/k3-ddr.c */
 +int dram_init_banksize(void)
 +{
 +	s32 ret;
@@ -3482,67 +3489,14 @@ index 00000000000..14db20c20dc
 +}
 +
 +#if defined(CONFIG_SPL_BUILD)
-+
-+/* Copied from board/ti/common/k3-ddr-init.c */
-+static void fixup_ddr_driver_for_ecc(struct spl_image_info *spl_image)
-+{
-+	struct udevice *dev;
-+	int ret, ctr = 1;
-+
-+	dram_init_banksize();
-+
-+	ret = uclass_get_device(UCLASS_RAM, 0, &dev);
-+	if (ret)
-+		panic("Cannnot get RAM device for ddr size fixup: %d\n", ret);
-+
-+	ret = k3_ddrss_ddr_fdt_fixup(dev, spl_image->fdt_addr, gd->bd);
-+	if (ret)
-+		printf("Error fixing up ddr node for ECC use! %d\n", ret);
-+
-+	dram_init_banksize();
-+
-+	ret = uclass_next_device_err(&dev);
-+
-+	while (!ret) {
-+		ret = k3_ddrss_ddr_fdt_fixup(dev, spl_image->fdt_addr, gd->bd);
-+		if (ret)
-+			printf("Error fixing up ddr node %d for ECC use! %d\n", ctr, ret);
-+
-+		dram_init_banksize();
-+		ret = uclass_next_device_err(&dev);
-+		ctr++;
-+	}
-+}
-+
-+/* Copied from board/ti/common/k3-ddr-init.c */
-+static void fixup_memory_node(struct spl_image_info *spl_image)
-+{
-+	u64 start[CONFIG_NR_DRAM_BANKS];
-+	u64 size[CONFIG_NR_DRAM_BANKS];
-+	int bank;
-+	int ret;
-+
-+	dram_init();
-+	dram_init_banksize();
-+
-+	for (bank = 0; bank < CONFIG_NR_DRAM_BANKS; bank++) {
-+		start[bank] = gd->bd->bi_dram[bank].start;
-+		size[bank] = gd->bd->bi_dram[bank].size;
-+	}
-+
-+	ret = fdt_fixup_memory_banks(spl_image->fdt_addr, start, size,
-+				     CONFIG_NR_DRAM_BANKS);
-+
-+	if (ret)
-+		printf("Error fixing up memory node! %d\n", ret);
-+}
-+
 +void spl_perform_fixups(struct spl_image_info *spl_image)
 +{
-+	if (IS_ENABLED(CONFIG_K3_DDRSS) && IS_ENABLED(CONFIG_K3_INLINE_ECC))
-+		fixup_ddr_driver_for_ecc(spl_image);
-+	else
++	if (IS_ENABLED(CONFIG_K3_DDRSS)) {
++		if (IS_ENABLED(CONFIG_K3_INLINE_ECC))
++			fixup_ddr_driver_for_ecc(spl_image);
++	} else {
 +		fixup_memory_node(spl_image);
++	}
 +}
 +#endif
 +
@@ -3602,7 +3556,7 @@ index 00000000000..14db20c20dc
 +#endif
 diff --git a/board/bytesatwork/bytedevkit/board-cfg.yaml b/board/bytesatwork/bytedevkit/board-cfg.yaml
 new file mode 100644
-index 00000000000..45c89dd15f1
+index 0000000000..45c89dd15f
 --- /dev/null
 +++ b/board/bytesatwork/bytedevkit/board-cfg.yaml
 @@ -0,0 +1,36 @@
@@ -3644,7 +3598,7 @@ index 00000000000..45c89dd15f1
 +        trace_src_enables: 0x00
 diff --git a/board/bytesatwork/bytedevkit/pm-cfg.yaml b/board/bytesatwork/bytedevkit/pm-cfg.yaml
 new file mode 100644
-index 00000000000..9853a25eb85
+index 0000000000..9853a25eb8
 --- /dev/null
 +++ b/board/bytesatwork/bytedevkit/pm-cfg.yaml
 @@ -0,0 +1,12 @@
@@ -3662,7 +3616,7 @@ index 00000000000..9853a25eb85
 +        boardcfg_abi_min: 0x1
 diff --git a/board/bytesatwork/bytedevkit/rm-cfg.yaml b/board/bytesatwork/bytedevkit/rm-cfg.yaml
 new file mode 100644
-index 00000000000..725f7c83f0d
+index 0000000000..725f7c83f0
 --- /dev/null
 +++ b/board/bytesatwork/bytedevkit/rm-cfg.yaml
 @@ -0,0 +1,981 @@
@@ -4649,7 +4603,7 @@ index 00000000000..725f7c83f0d
 +            reserved: 0
 diff --git a/board/bytesatwork/bytedevkit/sec-cfg.yaml b/board/bytesatwork/bytedevkit/sec-cfg.yaml
 new file mode 100644
-index 00000000000..088b2dbaf11
+index 0000000000..088b2dbaf1
 --- /dev/null
 +++ b/board/bytesatwork/bytedevkit/sec-cfg.yaml
 @@ -0,0 +1,379 @@
@@ -5034,16 +4988,17 @@ index 00000000000..088b2dbaf11
 +        rsvd: [0, 0, 0, 0]
 diff --git a/configs/am62x_bytedevkit_a53_defconfig b/configs/am62x_bytedevkit_a53_defconfig
 new file mode 100644
-index 00000000000..e10436e5df7
+index 0000000000..989bc01eea
 --- /dev/null
 +++ b/configs/am62x_bytedevkit_a53_defconfig
-@@ -0,0 +1,160 @@
+@@ -0,0 +1,161 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_K3=y
 +CONFIG_SYS_MALLOC_F_LEN=0x8000
 +CONFIG_SPL_GPIO=y
 +CONFIG_SPL_LIBCOMMON_SUPPORT=y
 +CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_NR_DRAM_BANKS=1
 +CONFIG_SOC_K3_AM625=y
 +CONFIG_K3_ATF_LOAD_ADDR=0x9e780000
 +CONFIG_TARGET_AM62X_BYTEDEVKIT_A53=y
@@ -5200,15 +5155,16 @@ index 00000000000..e10436e5df7
 +CONFIG_LIBAVB=y
 diff --git a/configs/am62x_bytedevkit_r5_defconfig b/configs/am62x_bytedevkit_r5_defconfig
 new file mode 100644
-index 00000000000..83ba657303a
+index 0000000000..9989228429
 --- /dev/null
 +++ b/configs/am62x_bytedevkit_r5_defconfig
-@@ -0,0 +1,139 @@
+@@ -0,0 +1,140 @@
 +CONFIG_ARM=y
 +CONFIG_ARCH_K3=y
 +CONFIG_SYS_MALLOC_F_LEN=0x9000
 +CONFIG_SPL_LIBCOMMON_SUPPORT=y
 +CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_NR_DRAM_BANKS=1
 +CONFIG_SOC_K3_AM625=y
 +CONFIG_TARGET_AM62X_BYTEDEVKIT_R5=y
 +CONFIG_HAS_CUSTOM_SYS_INIT_SP_ADDR=y
@@ -5345,7 +5301,7 @@ index 00000000000..83ba657303a
 +CONFIG_SPL_LIB_RATIONAL=y
 diff --git a/include/configs/am62x_bytedevkit.h b/include/configs/am62x_bytedevkit.h
 new file mode 100644
-index 00000000000..3474200e4af
+index 0000000000..8f81c73513
 --- /dev/null
 +++ b/include/configs/am62x_bytedevkit.h
 @@ -0,0 +1,69 @@
@@ -5380,7 +5336,7 @@ index 00000000000..3474200e4af
 +	"args_generic=setenv bootargs console=${console} " \
 +		"earlycon=ns16550a,mmio32,0x02800000 ${mtdparts} " \
 +		"root=/dev/mmcblk${mmc_dev}p${mmc_part} " \
-+		"rootfstype=ext4 rootwait ${bootargs_append}; " \
++		"rootfstype=ext4 rootwait quiet ${bootargs_append}; " \
 +	"\0" \
 +	"dtb_fixups=fdt addr ${dtbaddr}; fdt resize 0x10000; " \
 +		"setexpr second_mac gsub ':' ' ' $eth1addr; " \

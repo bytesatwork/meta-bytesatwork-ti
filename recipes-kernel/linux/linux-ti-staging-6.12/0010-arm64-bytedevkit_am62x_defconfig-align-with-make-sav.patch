@@ -1,4 +1,4 @@
-From 125d3d239f40daf5a53b995717f41506ca2b4d1b Mon Sep 17 00:00:00 2001
+From 076e2d1fa76e86b3758951fb987649046b60d2d9 Mon Sep 17 00:00:00 2001
 From: Alexander Forsch <alexander.forsch@bytesatwork.ch>
 Date: Thu, 2 Oct 2025 15:13:45 +0200
 Subject: [PATCH] arm64: bytedevkit_am62x_defconfig: align with make
@@ -12,7 +12,7 @@ Signed-off-by: Alexander Forsch <alexander.forsch@bytesatwork.ch>
  1 file changed, 8 insertions(+), 71 deletions(-)
 
 diff --git a/arch/arm64/configs/bytedevkit_am62x_defconfig b/arch/arm64/configs/bytedevkit_am62x_defconfig
-index d57a5877ccb0..b4aaacc56ebe 100644
+index d57a5877cc..b4aaacc56e 100644
 --- a/arch/arm64/configs/bytedevkit_am62x_defconfig
 +++ b/arch/arm64/configs/bytedevkit_am62x_defconfig
 @@ -19,14 +19,13 @@ CONFIG_CPUSETS=y

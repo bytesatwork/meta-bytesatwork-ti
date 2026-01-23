@@ -1,4 +1,4 @@
-From 6235eeb82c7e3d113b8fa88c92d180a6b10f7eef Mon Sep 17 00:00:00 2001
+From 281ac7d032b86c355e35be144589c01a6eea4565 Mon Sep 17 00:00:00 2001
 From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 Date: Mon, 11 Jul 2022 16:02:24 +0200
 Subject: [PATCH] github: workflows: Add action to analyze patches
@@ -16,7 +16,7 @@ Signed-off-by: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 
 diff --git a/.checkpatch.conf b/.checkpatch.conf
 new file mode 100644
-index 000000000000..433d9264673c
+index 0000000000..433d926467
 --- /dev/null
 +++ b/.checkpatch.conf
 @@ -0,0 +1,2 @@
@@ -24,7 +24,7 @@ index 000000000000..433d9264673c
 +--min-conf-desc-length=1
 diff --git a/.github/workflows/checkpatch.yml b/.github/workflows/checkpatch.yml
 new file mode 100644
-index 000000000000..dc75adb9e0ac
+index 0000000000..dc75adb9e0
 --- /dev/null
 +++ b/.github/workflows/checkpatch.yml
 @@ -0,0 +1,120 @@
@@ -149,7 +149,7 @@ index 000000000000..dc75adb9e0ac
 +            ./scripts/checkpatch.pl --no-tree ${{ matrix.patch }}
 +          fi
 diff --git a/MAINTAINERS b/MAINTAINERS
-index e3f47be27db4..b7746890ce4e 100644
+index 548732beda..05b903b81c 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
 @@ -4892,6 +4892,11 @@ S:	Maintained

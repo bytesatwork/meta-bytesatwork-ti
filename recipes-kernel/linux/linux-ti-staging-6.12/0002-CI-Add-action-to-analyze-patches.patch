@@ -1,0 +1,39 @@
+From b72511f631178e125469cde87555d3697b0c4014 Mon Sep 17 00:00:00 2001
+From: Alexander Forsch <alexander.forsch@bytesatwork.ch>
+Date: Tue, 27 Jan 2026 09:22:12 +0100
+Subject: [PATCH] CI: Add action to analyze patches
+
+Add gitlab CI to run checkpatch on merge requests.
+
+Signed-off-by: Alexander Forsch <alexander.forsch@bytesatwork.ch>
+---
+ .gitlab-ci.yml | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
+ create mode 100644 .gitlab-ci.yml
+
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+new file mode 100644
+index 0000000000..6d1db8da16
+--- /dev/null
++++ b/.gitlab-ci.yml
+@@ -0,0 +1,20 @@
++stages:
++  - checkpatch
++
++variables:
++  CHECKPATCH: "scripts/checkpatch.pl"
++
++checkpatch-mr:
++  stage: checkpatch
++  rules:
++    - if: $CI_MERGE_REQUEST_IID
++      when: always
++    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
++      when: always
++    - when: never
++  script:
++    - |
++      git remote set-url origin "$CI_REPOSITORY_URL" || exit 1
++      git fetch --no-tags --prune origin '+refs/heads/*:refs/remotes/origin/*' || exit 1
++      "./${CHECKPATCH}" --git ${CI_MERGE_REQUEST_TARGET_BRANCH_SHA:-$CI_MERGE_REQUEST_DIFF_BASE_SHA}..${CI_MERGE_REQUEST_SOURCE_BRANCH_SHA:-$CI_COMMIT_SHA}
++  allow_failure: false

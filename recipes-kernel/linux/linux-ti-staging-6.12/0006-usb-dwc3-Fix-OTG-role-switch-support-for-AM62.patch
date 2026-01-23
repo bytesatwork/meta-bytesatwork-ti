@@ -1,4 +1,4 @@
-From b40fed0aa2fe60bb81be0c22ae0afaad5a8f2e13 Mon Sep 17 00:00:00 2001
+From cfa53de443c5a3dfb8bf72d99c5bc59026485f77 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Stephan=20D=C3=BCnner?= <stephan.duenner@bytesatwork.ch>
 Date: Wed, 22 Feb 2023 09:17:57 +0100
 Subject: [PATCH] usb: dwc3: Fix OTG role switch support for AM62
@@ -18,7 +18,7 @@ Signed-off-by: Stephan Dünner <stephan.duenner@bytesatwork.ch>
  1 file changed, 2 insertions(+)
 
 diff --git a/drivers/usb/dwc3/drd.c b/drivers/usb/dwc3/drd.c
-index d76ae676783c..cdef409be17f 100644
+index 7977860932..5480eaf094 100644
 --- a/drivers/usb/dwc3/drd.c
 +++ b/drivers/usb/dwc3/drd.c
 @@ -541,9 +541,11 @@ int dwc3_drd_init(struct dwc3 *dwc)

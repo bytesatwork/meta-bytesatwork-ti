@@ -1,4 +1,4 @@
-From cba53add050b3170be52dee6c12007aa98a8d06e Mon Sep 17 00:00:00 2001
+From 9b68644183c5a42523e45cd707e7dca99f597bc6 Mon Sep 17 00:00:00 2001
 From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 Date: Tue, 6 Sep 2022 18:11:13 +0200
 Subject: [PATCH] arm64: bytedevkit_am62x_defconfig: Add a basic configuration
@@ -17,7 +17,7 @@ Signed-off-by: Stephan Dünner <stephan.duenner@bytesatwork.ch>
  create mode 100644 arch/arm64/configs/bytedevkit_am62x_defconfig
 
 diff --git a/MAINTAINERS b/MAINTAINERS
-index 2ab8cc748dc2..6dafa9dfba4e 100644
+index 60b4085b60..d79c25849f 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
 @@ -4899,6 +4899,7 @@ F:	.github/workflows/checkpatch.yml
@@ -30,7 +30,7 @@ index 2ab8cc748dc2..6dafa9dfba4e 100644
  M:	Clemens Ladisch <clemens@ladisch.de>
 diff --git a/arch/arm64/configs/bytedevkit_am62x_defconfig b/arch/arm64/configs/bytedevkit_am62x_defconfig
 new file mode 100644
-index 000000000000..d57a5877ccb0
+index 0000000000..d57a5877cc
 --- /dev/null
 +++ b/arch/arm64/configs/bytedevkit_am62x_defconfig
 @@ -0,0 +1,896 @@

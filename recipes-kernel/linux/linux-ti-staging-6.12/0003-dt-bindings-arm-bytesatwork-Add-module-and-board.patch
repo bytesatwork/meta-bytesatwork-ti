@@ -1,4 +1,4 @@
-From 544509927c93e0e916cef4862d5a8eb176e62e9a Mon Sep 17 00:00:00 2001
+From 0042097410c09b0aed18c39e6c934fb3a18b1ee8 Mon Sep 17 00:00:00 2001
 From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 Date: Thu, 14 Jul 2022 10:14:39 +0200
 Subject: [PATCH] dt-bindings: arm: bytesatwork: Add module and board
@@ -16,7 +16,7 @@ Signed-off-by: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 
 diff --git a/Documentation/devicetree/bindings/arm/bytesatwork/bytesatwork.yaml b/Documentation/devicetree/bindings/arm/bytesatwork/bytesatwork.yaml
 new file mode 100644
-index 000000000000..2587e61c70e4
+index 0000000000..2587e61c70
 --- /dev/null
 +++ b/Documentation/devicetree/bindings/arm/bytesatwork/bytesatwork.yaml
 @@ -0,0 +1,30 @@
@@ -51,7 +51,7 @@ index 000000000000..2587e61c70e4
 +
 +...
 diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-index fbfce9b4ae6b..685c570feb37 100644
+index af9a8d43b2..1fc29df1e3 100644
 --- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
 +++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
 @@ -238,6 +238,8 @@ patternProperties:
@@ -64,7 +64,7 @@ index fbfce9b4ae6b..685c570feb37 100644
      description: CalAmp Corp.
    "^calao,.*":
 diff --git a/MAINTAINERS b/MAINTAINERS
-index b7746890ce4e..3e75b45be03b 100644
+index 05b903b81c..01aeea6672 100644
 --- a/MAINTAINERS
 +++ b/MAINTAINERS
 @@ -4896,6 +4896,7 @@ BYTESATWORK MODULES AND BOARDS

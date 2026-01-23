@@ -1,4 +1,4 @@
-From 85d0f0c1b24b13b280ee624b26edbe123ab82f54 Mon Sep 17 00:00:00 2001
+From 9d05da91b2d4434590766adf317cb6c21379dd24 Mon Sep 17 00:00:00 2001
 From: Daniel Ammann <daniel.ammann@bytesatwork.ch>
 Date: Wed, 24 May 2023 10:16:10 +0200
 Subject: [PATCH] dt-bindings: display: simple: Add Youritech ET050WV05
@@ -13,7 +13,7 @@ Signed-off-by: Daniel Ammann <daniel.ammann@bytesatwork.ch>
  2 files changed, 4 insertions(+)
 
 diff --git a/Documentation/devicetree/bindings/display/panel/panel-simple.yaml b/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
-index 0763367dce0a..8822e877d9b1 100644
+index 0763367dce..8822e877d9 100644
 --- a/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
 +++ b/Documentation/devicetree/bindings/display/panel/panel-simple.yaml
 @@ -307,6 +307,8 @@ properties:
@@ -26,10 +26,10 @@ index 0763367dce0a..8822e877d9b1 100644
  if:
    not:
 diff --git a/Documentation/devicetree/bindings/vendor-prefixes.yaml b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-index 685c570feb37..7078d3e4d318 100644
+index 1fc29df1e3..93dfac8131 100644
 --- a/Documentation/devicetree/bindings/vendor-prefixes.yaml
 +++ b/Documentation/devicetree/bindings/vendor-prefixes.yaml
-@@ -1709,6 +1709,8 @@ patternProperties:
+@@ -1713,6 +1713,8 @@ patternProperties:
      description: YSH & ATIL
    "^yones-toptech,.*":
      description: Yones Toptech Co., Ltd.

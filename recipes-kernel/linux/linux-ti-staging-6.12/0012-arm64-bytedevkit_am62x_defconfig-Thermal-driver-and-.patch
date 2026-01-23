@@ -1,4 +1,4 @@
-From c077d54f762f548b4e0ebf288294044e6fad426e Mon Sep 17 00:00:00 2001
+From a2236dedc50cfa0a701dc3c5265c1fa9c882f0d2 Mon Sep 17 00:00:00 2001
 From: Simone Schwizer <simone.schwizer@bytesatwork.ch>
 Date: Wed, 19 Nov 2025 15:58:14 +0100
 Subject: [PATCH] arm64: bytedevkit_am62x_defconfig: Thermal driver and
@@ -15,7 +15,7 @@ Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
  1 file changed, 6 insertions(+), 2 deletions(-)
 
 diff --git a/arch/arm64/configs/bytedevkit_am62x_defconfig b/arch/arm64/configs/bytedevkit_am62x_defconfig
-index f3f59e9e0808..10efdf7ca956 100644
+index f3f59e9e08..10efdf7ca9 100644
 --- a/arch/arm64/configs/bytedevkit_am62x_defconfig
 +++ b/arch/arm64/configs/bytedevkit_am62x_defconfig
 @@ -49,10 +49,9 @@ CONFIG_WQ_POWER_EFFICIENT_DEFAULT=y

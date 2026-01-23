@@ -1,4 +1,4 @@
-From c1cf49deb2d4d5108bd67faf6e3cf2990d1ace36 Mon Sep 17 00:00:00 2001
+From abcbfefa03e86d6512e31cb3fe0931b6e2a43473 Mon Sep 17 00:00:00 2001
 From: =?UTF-8?q?Stephan=20D=C3=BCnner?= <stephan.duenner@bytesatwork.ch>
 Date: Fri, 2 Jun 2023 13:06:13 +0200
 Subject: [PATCH] drm/panel: simple: Add Youritech ET050WV05 panel
@@ -14,10 +14,10 @@ Signed-off-by: Stephan Dünner <stephan.duenner@bytesatwork.ch>
  1 file changed, 30 insertions(+)
 
 diff --git a/drivers/gpu/drm/panel/panel-simple.c b/drivers/gpu/drm/panel/panel-simple.c
-index 29838b6de12b..b338f5a51a79 100644
+index cc05e43670..8b6799dcf7 100644
 --- a/drivers/gpu/drm/panel/panel-simple.c
 +++ b/drivers/gpu/drm/panel/panel-simple.c
-@@ -4613,6 +4613,33 @@ static const struct panel_desc mchp_ac69t88a = {
+@@ -4615,6 +4615,33 @@ static const struct panel_desc mchp_ac69t88a = {
  	},
  	.bus_flags = DRM_BUS_FLAG_DE_HIGH,
  	.bus_format = MEDIA_BUS_FMT_RGB888_1X7X4_JEIDA,
@@ -51,7 +51,7 @@ index 29838b6de12b..b338f5a51a79 100644
  	.connector_type = DRM_MODE_CONNECTOR_LVDS,
  };
  
-@@ -5105,6 +5132,9 @@ static const struct of_device_id platform_of_match[] = {
+@@ -5107,6 +5134,9 @@ static const struct of_device_id platform_of_match[] = {
  	}, {
  		.compatible = "microchip,ac69t88a",
  		.data = &mchp_ac69t88a,

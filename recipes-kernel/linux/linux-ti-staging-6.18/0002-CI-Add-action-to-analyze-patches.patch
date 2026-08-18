@@ -1,0 +1,52 @@
+From 273be25255e0b2031e4f415529f9f3307aa9d1f3 Mon Sep 17 00:00:00 2001
+From: Alexander Forsch <alexander.forsch@bytesatwork.ch>
+Date: Tue, 27 Jan 2026 09:22:12 +0100
+Subject: [PATCH] CI: Add action to analyze patches
+
+Add gitlab CI to run checkpatch on merge requests.
+
+Signed-off-by: Alexander Forsch <alexander.forsch@bytesatwork.ch>
+---
+ .gitlab-ci.yml | 20 ++++++++++++++++++++
+ MAINTAINERS    |  1 +
+ 2 files changed, 21 insertions(+)
+ create mode 100644 .gitlab-ci.yml
+
+diff --git a/.gitlab-ci.yml b/.gitlab-ci.yml
+new file mode 100644
+index 000000000000..6d1db8da166c
+--- /dev/null
++++ b/.gitlab-ci.yml
+@@ -0,0 +1,20 @@
++stages:
++  - checkpatch
++
++variables:
++  CHECKPATCH: "scripts/checkpatch.pl"
++
++checkpatch-mr:
++  stage: checkpatch
++  rules:
++    - if: $CI_MERGE_REQUEST_IID
++      when: always
++    - if: '$CI_PIPELINE_SOURCE == "merge_request_event"'
++      when: always
++    - when: never
++  script:
++    - |
++      git remote set-url origin "$CI_REPOSITORY_URL" || exit 1
++      git fetch --no-tags --prune origin '+refs/heads/*:refs/remotes/origin/*' || exit 1
++      "./${CHECKPATCH}" --git ${CI_MERGE_REQUEST_TARGET_BRANCH_SHA:-$CI_MERGE_REQUEST_DIFF_BASE_SHA}..${CI_MERGE_REQUEST_SOURCE_BRANCH_SHA:-$CI_COMMIT_SHA}
++  allow_failure: false
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 6ba1922843de..9a9a3dd3951b 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -5384,6 +5384,7 @@ BYTESATWORK MODULES AND BOARDS
+ M:	Daniel Ammann <daniel.ammann@bytesatwork.ch>
+ S:	Maintained
+ F:	.github/workflows/checkpatch.yml
++F:	.gitlab-ci.yml
+ 
+ C-MEDIA CMI8788 DRIVER
+ M:	Clemens Ladisch <clemens@ladisch.de>

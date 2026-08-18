@@ -1,0 +1,388 @@
+From 5916f513c0769f0e9b451951f983f59add9a72cc Mon Sep 17 00:00:00 2001
+From: Alexander Forsch <alexander.forsch@bytesatwork.ch>
+Date: Mon, 17 Aug 2026 15:12:20 +0200
+Subject: [PATCH] arm64: dts: ti: k3-am625-bytedevkit: Rename BDK device trees
+ by revision
+
+Use explicit revision suffixes for ByteDevKit device trees.
+Drop support for bdk2-r1 (k3-am625-bytedevkit.dts).
+
+Signed-off-by: Alexander Forsch <alexander.forsch@bytesatwork.ch>
+---
+ MAINTAINERS                                   |   3 +-
+ arch/arm64/boot/dts/ti/Makefile               |   3 +-
+ ...t-2-2.dts => k3-am625-bytedevkit-v2-0.dts} |   2 +-
+ .../arm64/boot/dts/ti/k3-am625-bytedevkit.dts | 318 ------------------
+ 4 files changed, 3 insertions(+), 323 deletions(-)
+ rename arch/arm64/boot/dts/ti/{k3-am625-bytedevkit-2-2.dts => k3-am625-bytedevkit-v2-0.dts} (99%)
+ delete mode 100644 arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 34d65b115936..b1b31c0ee18d 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -5386,8 +5386,7 @@ S:	Maintained
+ F:	.github/workflows/checkpatch.yml
+ F:	.gitlab-ci.yml
+ F:	Documentation/devicetree/bindings/arm/bytesatwork/bytesatwork.yaml
+-F:	arch/arm64/boot/dts/ti/k3-am625-bytedevkit-2-2.dtb
+-F:	arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dtb
++F:	arch/arm64/boot/dts/ti/k3-am625-bytedevkit-v2-0.dtb
+ F:	arch/arm64/boot/dts/ti/k3-am625-byteengine.dtsi
+ F:	arch/arm64/configs/bytedevkit_am62x_defconfig
+ 
+diff --git a/arch/arm64/boot/dts/ti/Makefile b/arch/arm64/boot/dts/ti/Makefile
+index 9d4387d7c76f..d881f5c7b891 100644
+--- a/arch/arm64/boot/dts/ti/Makefile
++++ b/arch/arm64/boot/dts/ti/Makefile
+@@ -13,9 +13,8 @@ dtb-$(CONFIG_ARCH_K3) += k3-am625-beagleplay.dtb
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-beagleplay-csi2-ov5640.dtbo
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-beagleplay-csi2-tevi-ov5640.dtbo
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-beagleplay-lincolntech-lcd185-panel.dtbo
++dtb-$(CONFIG_ARCH_K3) += k3-am625-bytedevkit-v2-0.dtb
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-minimal.dtb
+-dtb-$(CONFIG_ARCH_K3) += k3-am625-bytedevkit.dtb
+-dtb-$(CONFIG_ARCH_K3) += k3-am625-bytedevkit-2-2.dtb
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-phyboard-lyra-rdk.dtb
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-sk.dtb
+ dtb-$(CONFIG_ARCH_K3) += k3-am625-sk-m2-cc3351.dtbo
+diff --git a/arch/arm64/boot/dts/ti/k3-am625-bytedevkit-2-2.dts b/arch/arm64/boot/dts/ti/k3-am625-bytedevkit-v2-0.dts
+similarity index 99%
+rename from arch/arm64/boot/dts/ti/k3-am625-bytedevkit-2-2.dts
+rename to arch/arm64/boot/dts/ti/k3-am625-bytedevkit-v2-0.dts
+index 62a14591981b..e61c8959bbf5 100644
+--- a/arch/arm64/boot/dts/ti/k3-am625-bytedevkit-2-2.dts
++++ b/arch/arm64/boot/dts/ti/k3-am625-bytedevkit-v2-0.dts
+@@ -14,7 +14,7 @@
+ 
+ / {
+ 	compatible = "bytesatwork,bytedevkit-am62x", "bytesatwork,byteengine-am62x", "ti,am625";
+-	model = "bytesatwork byteDEVKIT 2.2 with byteENGINE AM62x";
++	model = "bytesatwork byteDEVKIT-2 Rev2.2 with byteENGINE AM62x";
+ 
+ 	aliases {
+ 		serial2 = &main_uart0;
+diff --git a/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts b/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts
+deleted file mode 100644
+index 0f6654bdd491..000000000000
+--- a/arch/arm64/boot/dts/ti/k3-am625-bytedevkit.dts
++++ /dev/null
+@@ -1,318 +0,0 @@
+-// SPDX-License-Identifier: GPL-2.0
+-/*
+- * Copyright (C) 2024 bytesatwork AG - https://www.bytesatwork.io
+- *
+- * based on k3-am625-sk.dts:
+- *
+- * Copyright (C) 2021-2022 Texas Instruments Incorporated - https://www.ti.com/
+- */
+-
+-/dts-v1/;
+-
+-#include <dt-bindings/gpio/gpio.h>
+-#include "k3-am625-byteengine.dtsi"
+-
+-/ {
+-	compatible = "bytesatwork,bytedevkit-am62x", "bytesatwork,byteengine-am62x", "ti,am625";
+-	model = "bytesatwork byteDEVKIT with byteENGINE AM62x";
+-
+-	aliases {
+-		serial2 = &main_uart0;
+-		mmc1 = &sdhci1;
+-		usb0 = &usb0;
+-		usb1 = &usb1;
+-	};
+-
+-	chosen {
+-		stdout-path = "serial2:115200n8";
+-		bootargs = "console=ttyS2,115200n8 earlycon=ns16550a,mmio32,0x02800000";
+-	};
+-
+-	extcon_usb1: extcon-usb1 {
+-		compatible = "linux,extcon-usb-gpio";
+-		id-gpios = <&main_gpio1 8 GPIO_ACTIVE_HIGH>;
+-		pinctrl-names = "default";
+-		pinctrl-0 = <&main_usb1_gpio_id_pins_default>;
+-		status = "okay";
+-	};
+-
+-	display0: display {
+-		compatible = "youritech,et050WV05";
+-		backlight = <&lcd_bl>;
+-		enable-gpios = <&main_gpio0 77 GPIO_ACTIVE_HIGH>, <&main_gpio0 78 GPIO_ACTIVE_HIGH>;
+-		status = "okay";
+-
+-		ports {
+-			#address-cells = <1>;
+-			#size-cells = <0>;
+-
+-			port@0 {
+-				reg = <0>;
+-				lcd_in0: endpoint {
+-					remote-endpoint = <&oldi_0_out>;
+-				};
+-			};
+-			port@1 {
+-				reg = <1>;
+-				lcd_in1: endpoint {
+-					remote-endpoint = <&oldi_1_out>;
+-				};
+-			};
+-		};
+-	};
+-
+-	lcd_bl: backlight {
+-		compatible = "gpio-backlight";
+-		gpios = <&main_gpio1 13 GPIO_ACTIVE_HIGH>;
+-		default-on;
+-	};
+-};
+-
+-&main_pmx0 {
+-	main_uart0_pins_default: main-uart0-pins-default {
+-		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x1c8, PIN_INPUT, 0) /* (D14) UART0_RXD */
+-			AM62X_IOPAD(0x1cc, PIN_OUTPUT, 0) /* (E14) UART0_TXD */
+-		>;
+-	};
+-
+-	main_i2c1_pins_default: main-i2c1-pins-default {
+-		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x1e8, PIN_INPUT, 0) /* (B17) I2C1_SCL */
+-			AM62X_IOPAD(0x1ec, PIN_INPUT, 0) /* (A17) I2C1_SDA */
+-		>;
+-	};
+-
+-	main_mmc1_pins_default: main-mmc1-pins-default {
+-		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x23c, PIN_INPUT, 0) /* (A21) MMC1_CMD */
+-			AM62X_IOPAD(0x234, PIN_INPUT, 0) /* (B22) MMC1_CLK */
+-			AM62X_IOPAD(0x230, PIN_INPUT, 0) /* (A22) MMC1_DAT0 */
+-			AM62X_IOPAD(0x22c, PIN_INPUT, 0) /* (B21) MMC1_DAT1 */
+-			AM62X_IOPAD(0x228, PIN_INPUT, 0) /* (C21) MMC1_DAT2 */
+-			AM62X_IOPAD(0x224, PIN_INPUT, 0) /* (D22) MMC1_DAT3 */
+-			AM62X_IOPAD(0x240, PIN_INPUT, 0) /* (D17) MMC1_SDCD */
+-		>;
+-	};
+-
+-	main_mdio1_pins_default: main-mdio1-pins-default {
+-		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x160, PIN_OUTPUT, 0) /* (AD24) MDIO0_MDC */
+-			AM62X_IOPAD(0x15c, PIN_INPUT, 0) /* (AB22) MDIO0_MDIO */
+-		>;
+-	};
+-
+-	main_rmii1_pins_default: main-rmii1-pins-default {
+-		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x14c, PIN_INPUT, 1) /* (AB17) RMII1_RD0 */
+-			AM62X_IOPAD(0x150, PIN_INPUT, 1) /* (AC17) RMII1_RD1 */
+-			AM62X_IOPAD(0x148, PIN_INPUT, 1) /* (AD17) RMII1_REF_CLK */
+-			AM62X_IOPAD(0x134, PIN_OUTPUT, 1) /* (AE20) RMII1_TD0 */
+-			AM62X_IOPAD(0x138, PIN_OUTPUT, 1) /* (AD20) RMII1_TD1 */
+-			AM62X_IOPAD(0x130, PIN_INPUT, 1) /* (AE19) RMII1_CRS_DV */
+-			AM62X_IOPAD(0x12c, PIN_OUTPUT, 1) /* (AD19) RMII1_TX_EN */
+-		>;
+-	};
+-
+-	main_rmii2_pins_default: main-rmii2-pins-default {
+-		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x184, PIN_INPUT, 1) /* (AE23) RMII2_RD0 */
+-			AM62X_IOPAD(0x188, PIN_INPUT, 1) /* (AB20) RMII2_RD1 */
+-			AM62X_IOPAD(0x180, PIN_INPUT, 1) /* (AD23) RMII2_REF_CLK */
+-			AM62X_IOPAD(0x16c, PIN_OUTPUT, 1) /* (Y18) RMII2_TD0 */
+-			AM62X_IOPAD(0x170, PIN_OUTPUT, 1) /* (AA18) RMII2_TD1 */
+-			AM62X_IOPAD(0x168, PIN_INPUT, 1) /* (AE21) RMII2_CRS_DV */
+-			AM62X_IOPAD(0x164, PIN_OUTPUT, 1) /* (AA19) RMII2_TX_EN */
+-		>;
+-	};
+-
+-	main_usb0_pins_default: main-usb0-pins-default {
+-		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x0254, PIN_OUTPUT, 0) /* (C20) USB0_DRVVBUS */
+-		>;
+-	};
+-
+-	main_usb1_pins_default: main-usb1-pins-default {
+-		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x0258, PIN_OUTPUT, 0) /* (F18) USB1_DRVVBUS */
+-		>;
+-	};
+-
+-	main_usb1_gpio_id_pins_default: main-usb1-gpio-id-pins-default {
+-		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x0198, PIN_INPUT, 0) /* (A19) MCASP0_AXR2 */
+-		>;
+-	};
+-
+-	oldi0_pins_default: oldi0-pins-default {
+-		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x260, PIN_OUTPUT, 0) /* (AA5) OLDI0_A0N */
+-			AM62X_IOPAD(0x25c, PIN_OUTPUT, 0) /* (Y6) OLDI0_A0P */
+-			AM62X_IOPAD(0x268, PIN_OUTPUT, 0) /* (AD3) OLDI0_A1N */
+-			AM62X_IOPAD(0x264, PIN_OUTPUT, 0) /* (AB4) OLDI0_A1P */
+-			AM62X_IOPAD(0x270, PIN_OUTPUT, 0) /* (Y8) OLDI0_A2N */
+-			AM62X_IOPAD(0x26c, PIN_OUTPUT, 0) /* (AA8) OLDI0_A2P */
+-			AM62X_IOPAD(0x278, PIN_OUTPUT, 0) /* (AB6) OLDI0_A3N */
+-			AM62X_IOPAD(0x274, PIN_OUTPUT, 0) /* (AA7) OLDI0_A3P */
+-			AM62X_IOPAD(0x2a0, PIN_OUTPUT, 0) /* (AD4) OLDI0_CLK0N */
+-			AM62X_IOPAD(0x29c, PIN_OUTPUT, 0) /* (AE3) OLDI0_CLK0P */
+-			AM62X_IOPAD(0x13c, PIN_OUTPUT, 7) /* (AA15) GPIO0_77 Display enable */
+-			AM62X_IOPAD(0x140, PIN_OUTPUT, 7) /* (AA15) GPIO0_78 Display reset */
+-			AM62X_IOPAD(0x1ac, PIN_OUTPUT, 7) /* (B18) GPIO1_13 Display1 pwm */
+-			AM62X_IOPAD(0x19c, PIN_OUTPUT, 7) /* (B18) GPIO1_9 Display2 pwm */
+-			AM62X_IOPAD(0x174, PIN_OUTPUT, 7) /* (AD21) GPIO0_91 Display2 enable */
+-		>;
+-	};
+-
+-	touch_pins_default: touch-pins-default {
+-		pinctrl-single,pins = <
+-			AM62X_IOPAD(0x1d0, PIN_OUTPUT, 7) /* (A15) GPIO1_22 UART0_CTSN Touch Rst */
+-			AM62X_IOPAD(0x1d4, PIN_INPUT, 7) /* (B15) GPIO1_23 UART0_RTSN Touch Int */
+-		>;
+-	};
+-};
+-
+-&main_uart0 {
+-	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&main_uart0_pins_default>;
+-};
+-
+-/* SD/MMC */
+-&sdhci1 {
+-	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&main_mmc1_pins_default>;
+-	ti,driver-strength-ohm = <50>;
+-	disable-wp;
+-	no-1-8-v;
+-};
+-
+-&usb0 {
+-	dr_mode = "host";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&main_usb0_pins_default>;
+-	status = "okay";
+-};
+-
+-&usb1 {
+-	dr_mode = "otg";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&main_usb1_pins_default>;
+-	extcon = <&extcon_usb1>;
+-	usb-role-switch;
+-	status = "okay";
+-};
+-
+-&cpsw3g {
+-	status = "okay";
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&main_mdio1_pins_default
+-		     &main_rmii1_pins_default
+-		     &main_rmii2_pins_default>;
+-};
+-
+-&cpsw_port1 {
+-	phy-mode = "rmii";
+-	phy-handle = <&cpsw3g_phy0>;
+-	status = "okay";
+-};
+-
+-&cpsw_port2 {
+-	phy-mode = "rmii";
+-	phy-handle = <&cpsw3g_phy1>;
+-	status = "okay";
+-};
+-
+-&cpsw3g_mdio {
+-	status = "okay";
+-
+-	cpsw3g_phy0: ethernet-phy@0 {
+-		reg = <0>;
+-	};
+-
+-	cpsw3g_phy1: ethernet-phy@3 {
+-		reg = <3>;
+-	};
+-};
+-
+-&dss {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&oldi0_pins_default>;
+-	status = "okay";
+-};
+-
+-&oldi0 {
+-	status = "okay";
+-};
+-
+-&oldi1 {
+-	status = "okay";
+-};
+-
+-&oldi0_port0 {
+-	oldi_0_in: endpoint {
+-		remote-endpoint = <&dpi0_out0>;
+-	};
+-};
+-
+-&oldi0_port1 {
+-	oldi_0_out: endpoint {
+-		remote-endpoint = <&lcd_in0>;
+-	};
+-};
+-
+-&oldi1_port0 {
+-	oldi_1_in: endpoint {
+-		remote-endpoint = <&dpi0_out1>;
+-	};
+-};
+-
+-&oldi1_port1 {
+-	oldi_1_out: endpoint {
+-		remote-endpoint = <&lcd_in1>;
+-	};
+-};
+-
+-&dss_ports {
+-	#address-cells = <1>;
+-	#size-cells = <0>;
+-	status = "okay";
+-
+-	port@0 {
+-		reg = <0>;
+-		#address-cells = <1>;
+-		#size-cells = <0>;
+-
+-		dpi0_out0: endpoint@0 {
+-			reg = <0>;
+-			remote-endpoint = <&oldi_0_in>;
+-		};
+-		dpi0_out1: endpoint@1 {
+-			reg = <1>;
+-			remote-endpoint = <&oldi_1_in>;
+-		};
+-	};
+-};
+-
+-&main_i2c1 {
+-	pinctrl-names = "default";
+-	pinctrl-0 = <&main_i2c1_pins_default
+-		     &touch_pins_default>;
+-	clock-frequency = <400000>;
+-	status = "okay";
+-
+-	gt911@5d {
+-		compatible = "goodix,gt911";
+-		reg = <0x5d>;
+-		interrupt-parent = <&main_gpio1>;
+-		interrupts = <23 0>;
+-		irq-gpios = <&main_gpio1 23 0>;
+-		reset-gpios = <&main_gpio1 22 0>;
+-	};
+-
+-	eeprom: eeprom@57 {
+-		compatible = "atmel,24c256";
+-		reg = <0x57>;
+-	};
+-};

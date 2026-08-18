@@ -1,0 +1,93 @@
+From 1d97bc0d4e236ee19ad172b06816043b670770bf Mon Sep 17 00:00:00 2001
+From: Simone Schwizer <simone.schwizer@bytesatwork.ch>
+Date: Mon, 17 Aug 2026 09:00:27 +0200
+Subject: [PATCH] bytesatwork: am62lx: Introduce bawconfig
+
+Enable bytesatwork tool to store production data in EEPROM.
+
+Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
+---
+ board/bytesatwork/bytedevkit_am62lx/Kconfig             | 2 ++
+ board/bytesatwork/bytedevkit_am62lx/Makefile            | 1 +
+ board/bytesatwork/bytedevkit_am62lx/am62lx_bytedevkit.c | 7 +++++++
+ configs/am62lx_bytedevkit_defconfig                     | 3 +++
+ include/configs/am62lx_bytedevkit.h                     | 5 +++++
+ 5 files changed, 18 insertions(+)
+
+diff --git a/board/bytesatwork/bytedevkit_am62lx/Kconfig b/board/bytesatwork/bytedevkit_am62lx/Kconfig
+index b47d6f7c9e6..f456a6477ee 100644
+--- a/board/bytesatwork/bytedevkit_am62lx/Kconfig
++++ b/board/bytesatwork/bytedevkit_am62lx/Kconfig
+@@ -56,6 +56,8 @@ config BAW_COMMON_CMD_OPTIONS
+ 	imply CMD_TIME
+ 	imply CMD_USB if USB
+ 
++source "board/bytesatwork/baw_config/Kconfig"
++
+ endif
+ 
+ 
+diff --git a/board/bytesatwork/bytedevkit_am62lx/Makefile b/board/bytesatwork/bytedevkit_am62lx/Makefile
+index 8b8126236ea..3cfc8e993a6 100644
+--- a/board/bytesatwork/bytedevkit_am62lx/Makefile
++++ b/board/bytesatwork/bytedevkit_am62lx/Makefile
+@@ -5,3 +5,4 @@
+ 
+ obj-y	+= am62lx_bytedevkit.o
+ obj-y	+= ../../ti/common/
++obj-y	+= ../baw_config/
+diff --git a/board/bytesatwork/bytedevkit_am62lx/am62lx_bytedevkit.c b/board/bytesatwork/bytedevkit_am62lx/am62lx_bytedevkit.c
+index f54499dbda4..23072162349 100644
+--- a/board/bytesatwork/bytedevkit_am62lx/am62lx_bytedevkit.c
++++ b/board/bytesatwork/bytedevkit_am62lx/am62lx_bytedevkit.c
+@@ -15,6 +15,7 @@
+ #include <spl.h>
+ 
+ #include "../../ti/common/fdt_ops.h"
++#include "../baw_config/baw_config_eeprom.h"
+ 
+ int board_init(void)
+ {
+@@ -24,6 +25,12 @@ int board_init(void)
+ #if IS_ENABLED(CONFIG_BOARD_LATE_INIT)
+ int board_late_init(void)
+ {
++	int ret;
++
++	ret = baw_config_eeprom_init();
++	if (ret)
++		printf("Initialize byteENGINE EEPROM failed! (%d)\n", ret);
++
+ 	ti_set_fdt_env(NULL, NULL);
+ 	return 0;
+ }
+diff --git a/configs/am62lx_bytedevkit_defconfig b/configs/am62lx_bytedevkit_defconfig
+index 92162795511..7b263b998c1 100644
+--- a/configs/am62lx_bytedevkit_defconfig
++++ b/configs/am62lx_bytedevkit_defconfig
+@@ -8,6 +8,9 @@ CONFIG_SPL_LIBCOMMON_SUPPORT=y
+ CONFIG_SPL_LIBGENERIC_SUPPORT=y
+ CONFIG_ENV_SOURCE_FILE="bytedevkit_am62lx"
+ CONFIG_SOC_K3_AM62L3=y
++CONFIG_BAW_COMMON_CMD_OPTIONS=y
++CONFIG_BAW_CONFIG_EEPROM_MAX_WRITE=32
++CONFIG_BAW_CONFIG_EEPROM_WRITE_DELAY_MS=5
+ CONFIG_TARGET_AM62LX_BYTEDEVKIT=y
+ CONFIG_HAS_CUSTOM_SYS_INIT_SP_ADDR=y
+ CONFIG_CUSTOM_SYS_INIT_SP_ADDR=0x82080000
+diff --git a/include/configs/am62lx_bytedevkit.h b/include/configs/am62lx_bytedevkit.h
+index ecb9624e0e3..8f571fa5e81 100644
+--- a/include/configs/am62lx_bytedevkit.h
++++ b/include/configs/am62lx_bytedevkit.h
+@@ -30,6 +30,11 @@
+ #define CFG_SYS_NAND_ECCBYTES        14
+ /*-- end NAND config --*/
+ 
++/* baw config built in defaults */
++#define BAW_CONFIG_BUILTIN_PCB 10
++#define BAW_CONFIG_BUILTIN_RAM 14
++#define BAW_CONFIG_BUILTIN_FLASH 3
++
+ #define CFG_EXTRA_ENV_SETTINGS \
+ 	"console=ttyS0,115200n8\0" \
+ 	"dtbfile=k3-am62lx-bytedevkit.dtb\0" \

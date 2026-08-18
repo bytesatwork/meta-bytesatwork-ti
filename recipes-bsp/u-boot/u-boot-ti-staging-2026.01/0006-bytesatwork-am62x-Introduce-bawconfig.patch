@@ -1,0 +1,88 @@
+From c7e21f1218bae6322b8c5748f37f9a8cd1f5d7ae Mon Sep 17 00:00:00 2001
+From: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+Date: Wed, 28 Jun 2023 11:51:54 +0200
+Subject: [PATCH] bytesatwork: am62x: Introduce bawconfig
+
+Enable bytesatwork tool to store production data in EEPROM.
+
+Signed-off-by: Rico Ganahl <rico.ganahl@bytesatwork.ch>
+(cherry picked from commit 71647d78dfbcc1b9293340277bff048376547d03)
+---
+ board/bytesatwork/bytedevkit_am62x/Kconfig            |  2 ++
+ board/bytesatwork/bytedevkit_am62x/Makefile           |  1 +
+ board/bytesatwork/bytedevkit_am62x/am62x_bytedevkit.c | 10 ++++++++++
+ include/configs/am62x_bytedevkit.h                    |  5 +++++
+ 4 files changed, 18 insertions(+)
+
+diff --git a/board/bytesatwork/bytedevkit_am62x/Kconfig b/board/bytesatwork/bytedevkit_am62x/Kconfig
+index e2747672a7c..de15a7adde5 100644
+--- a/board/bytesatwork/bytedevkit_am62x/Kconfig
++++ b/board/bytesatwork/bytedevkit_am62x/Kconfig
+@@ -67,6 +67,8 @@ config BAW_COMMON_CMD_OPTIONS
+ 	imply CMD_TIME
+ 	imply CMD_USB if USB
+ 
++source "board/bytesatwork/baw_config/Kconfig"
++
+ endif
+ 
+ if TARGET_AM62X_BYTEDEVKIT_R5
+diff --git a/board/bytesatwork/bytedevkit_am62x/Makefile b/board/bytesatwork/bytedevkit_am62x/Makefile
+index ff10fe27fa8..b8056d434da 100644
+--- a/board/bytesatwork/bytedevkit_am62x/Makefile
++++ b/board/bytesatwork/bytedevkit_am62x/Makefile
+@@ -7,3 +7,4 @@
+ #	Suman Anna <s-anna@ti.com>
+ 
+ obj-y	+= am62x_bytedevkit.o
++obj-y	+= ../baw_config/
+diff --git a/board/bytesatwork/bytedevkit_am62x/am62x_bytedevkit.c b/board/bytesatwork/bytedevkit_am62x/am62x_bytedevkit.c
+index f8edc5a41e5..2e6e14ea2bf 100644
+--- a/board/bytesatwork/bytedevkit_am62x/am62x_bytedevkit.c
++++ b/board/bytesatwork/bytedevkit_am62x/am62x_bytedevkit.c
+@@ -19,6 +19,8 @@
+ #include <cpu_func.h>
+ #include <mach/k3-ddr.h>
+ 
++#include "../baw_config/baw_config_eeprom.h"
++
+ DECLARE_GLOBAL_DATA_PTR;
+ 
+ int board_init(void)
+@@ -65,6 +67,12 @@ void spl_perform_fixups(struct spl_image_info *spl_image)
+ #ifdef CONFIG_BOARD_LATE_INIT
+ int board_late_init(void)
+ {
++	int ret;
++
++	ret = baw_config_eeprom_init();
++	if (ret)
++		printf("Initialize byteENGINE EEPROM failed! (%d)\n", ret);
++
+ 	return 0;
+ }
+ #endif
+@@ -114,5 +122,7 @@ void spl_board_init(void)
+ 	       MCU_CTRL_DEVICE_CLKOUT_32K_CTRL);
+ 
+ 	enable_caches();
++
++	baw_config_eeprom_init();
+ }
+ #endif
+diff --git a/include/configs/am62x_bytedevkit.h b/include/configs/am62x_bytedevkit.h
+index 021a85398b4..6f0d716fae0 100644
+--- a/include/configs/am62x_bytedevkit.h
++++ b/include/configs/am62x_bytedevkit.h
+@@ -14,6 +14,11 @@
+ #define CFG_SYS_SDRAM_BASE1		0x880000000
+ #define CFG_SYS_SDRAM_BASE		0x80000000
+ 
++/* baw config built in defaults */
++#define BAW_CONFIG_BUILTIN_PCB 10
++#define BAW_CONFIG_BUILTIN_RAM 14
++#define BAW_CONFIG_BUILTIN_FLASH 3
++
+ #define CFG_EXTRA_ENV_SETTINGS \
+ 	"console=ttyS2,115200n8\0" \
+ 	"dtbfile=k3-am625-bytedevkit.dtb\0" \

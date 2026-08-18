@@ -1,0 +1,30 @@
+From d33e56ab778b4f36fd572848f80a7e0ad37b9f4d Mon Sep 17 00:00:00 2001
+From: Simone Schwizer <simone.schwizer@bytesatwork.ch>
+Date: Mon, 31 Aug 2026 11:34:19 +0200
+Subject: [PATCH] cmd: fuse: Prevent segfault
+
+A segmentation fault occurs when running the command fuse without
+arguments. The strcmp compares NULL to writebuff and u-boot crashes.
+
+Adding check, if op exists and printing command usage in case no
+arguments are given.
+
+Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
+---
+ cmd/fuse.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/cmd/fuse.c b/cmd/fuse.c
+index e2206cdf0d5..42b84da353b 100644
+--- a/cmd/fuse.c
++++ b/cmd/fuse.c
+@@ -44,6 +44,9 @@ static int do_fuse(struct cmd_tbl *cmdtp, int flag, int argc,
+ 	argc -= 2 + confirmed;
+ 	argv += 2 + confirmed;
+ 
++	if (!op)
++		return CMD_RET_USAGE;
++
+ 	if (IS_ENABLED(CONFIG_CMD_FUSE_WRITEBUFF) && !strcmp(op, "writebuff")) {
+ 		if (argc == 1)
+ 			addr = simple_strtoul(argv[0], NULL, 16);

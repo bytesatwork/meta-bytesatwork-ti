@@ -1,0 +1,1351 @@
+From 87fe62f712408f266eb788c0dcb294406fc88375 Mon Sep 17 00:00:00 2001
+From: Simone Schwizer <simone.schwizer@bytesatwork.ch>
+Date: Mon, 20 Jul 2026 14:10:24 +0200
+Subject: [PATCH] am62lx: Add AM62Lx bytesatwork byteDEVKIT board
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Add basic AM62Lx bytesatwork byteDEVKIT board support.
+
+Signed-off-by: Stephan Dünner <stephan.duenner@bytesatwork.ch>
+Signed-off-by: Simone Schwizer <simone.schwizer@bytesatwork.ch>
+---
+ MAINTAINERS                                   |   1 +
+ arch/arm/dts/Makefile                         |   2 +
+ arch/arm/dts/k3-am62l3-bytedevkit-u-boot.dtsi |  29 ++
+ arch/arm/dts/k3-am62l3-bytedevkit.dts         | 252 ++++++++++++
+ arch/arm/dts/k3-am62l3-byteengine.dtsi        | 103 +++++
+ arch/arm/mach-k3/am62lx/Kconfig               |   1 +
+ board/bytesatwork/bytedevkit_am62lx/Kconfig   |  61 +++
+ board/bytesatwork/bytedevkit_am62lx/Makefile  |   7 +
+ board/bytesatwork/bytedevkit_am62lx/README.md |  56 +++
+ .../bytedevkit_am62lx/am62lx_bytedevkit.c     |  30 ++
+ .../bytedevkit_am62lx/board-cfg.yaml          |  36 ++
+ .../bytedevkit_am62lx/sec-cfg.yaml            | 384 ++++++++++++++++++
+ configs/am62lx_bytedevkit_defconfig           | 172 ++++++++
+ include/configs/am62lx_bytedevkit.h           |  79 ++++
+ 14 files changed, 1213 insertions(+)
+ create mode 100644 arch/arm/dts/k3-am62l3-bytedevkit-u-boot.dtsi
+ create mode 100644 arch/arm/dts/k3-am62l3-bytedevkit.dts
+ create mode 100644 arch/arm/dts/k3-am62l3-byteengine.dtsi
+ create mode 100644 board/bytesatwork/bytedevkit_am62lx/Kconfig
+ create mode 100644 board/bytesatwork/bytedevkit_am62lx/Makefile
+ create mode 100644 board/bytesatwork/bytedevkit_am62lx/README.md
+ create mode 100644 board/bytesatwork/bytedevkit_am62lx/am62lx_bytedevkit.c
+ create mode 100644 board/bytesatwork/bytedevkit_am62lx/board-cfg.yaml
+ create mode 100644 board/bytesatwork/bytedevkit_am62lx/sec-cfg.yaml
+ create mode 100644 configs/am62lx_bytedevkit_defconfig
+ create mode 100644 include/configs/am62lx_bytedevkit.h
+
+diff --git a/MAINTAINERS b/MAINTAINERS
+index 43832c440ee..b442786e2da 100644
+--- a/MAINTAINERS
++++ b/MAINTAINERS
+@@ -276,6 +276,7 @@ F:	arch/arm/dts/k3-am62*bytedevkit*
+ F:	arch/arm/dts/k3-am62*byteengine*
+ F:	arch/arm/dts/k3-am625-bytedevkit-binman.dtsi
+ F:	board/bytesatwork/
++F:	board/bytesatwork/bytedevkit_am62lx/
+ F:	board/bytesatwork/bytedevkit_am62x/
+ F:	cmd/cpuinfo.c
+ F:	configs/*bytedevkit*_defconfig
+diff --git a/arch/arm/dts/Makefile b/arch/arm/dts/Makefile
+index 583d2b98be7..5b01f5419af 100644
+--- a/arch/arm/dts/Makefile
++++ b/arch/arm/dts/Makefile
+@@ -1109,6 +1109,8 @@ dtb-$(CONFIG_SOC_K3_AM625) += k3-am625-r5-sk.dtb \
+ 			      k3-am625-bytedevkit.dtb \
+ 			      k3-am625-r5-bytedevkit.dtb
+ 
++dtb-$(CONFIG_SOC_K3_AM62L3) += k3-am62l3-bytedevkit.dtb
++
+ dtb-$(CONFIG_SOC_K3_AM62A7) += \
+ 	k3-am62a7-r5-sk.dtb \
+ 	k3-am62a7-r5-phycore-som-2gb.dtb
+diff --git a/arch/arm/dts/k3-am62l3-bytedevkit-u-boot.dtsi b/arch/arm/dts/k3-am62l3-bytedevkit-u-boot.dtsi
+new file mode 100644
+index 00000000000..8b2d906d909
+--- /dev/null
++++ b/arch/arm/dts/k3-am62l3-bytedevkit-u-boot.dtsi
+@@ -0,0 +1,29 @@
++// SPDX-License-Identifier: GPL-2.0
++/*
++ * Copyright (C) 2026 bytesatwork AG - https://www.bytesatwork.io
++ *
++ * Based on k3-am62l3-evm-u-boot.dtsi
++ * Copyright (C) 2024 Texas Instruments Incorporated - https://www.ti.com/
++ */
++
++#include "k3-am62l3-evm-binman.dtsi"
++
++/ {
++	aliases {
++		mmc1 = &sdhci1;
++	};
++};
++
++&scmi {
++	bootph-all;
++};
++
++&ospi0 {
++	flash@0 {
++		spi-max-frequency = <25000000>;
++	};
++
++	flash@3 {
++		spi-max-frequency = <25000000>;
++	};
++};
+diff --git a/arch/arm/dts/k3-am62l3-bytedevkit.dts b/arch/arm/dts/k3-am62l3-bytedevkit.dts
+new file mode 100644
+index 00000000000..9b1a3b5fde0
+--- /dev/null
++++ b/arch/arm/dts/k3-am62l3-bytedevkit.dts
+@@ -0,0 +1,252 @@
++// SPDX-License-Identifier: GPL-2.0-only or MIT
++/*
++ * Copyright (C) 2026 bytesatwork AG - https://www.bytesatwork.io
++ *
++ * Based on dts/upstream/src/arm64/ti/k3-am62l3-evm.dts
++ * Copyright (C) 2025 Texas Instruments Incorporated - https://www.ti.com/
++ */
++
++/dts-v1/;
++
++#include "k3-am62l3-byteengine.dtsi"
++
++/ {
++	compatible = "ti,am62lx-bytedevkit", "ti,am62l3";
++	model = "bytesatwork byteDEVKIT with byteENGINE AM62Lx";
++
++	aliases {
++		mmc0 = &sdhci0;
++		mmc1 = &sdhci1;
++	};
++
++	chosen {
++		stdout-path = &uart0;
++	};
++};
++
++&gpio0 {
++	bootph-all;
++};
++
++&i2c0 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c0_pins_default>;
++	clock-frequency = <400000>;
++	status = "okay";
++};
++
++&i2c1 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c1_pins_default>;
++	clock-frequency = <100000>;
++	status = "okay";
++};
++
++&i2c2 {
++	pinctrl-names = "default";
++	pinctrl-0 = <&i2c2_pins_default>;
++	clock-frequency = <400000>;
++	status = "okay";
++};
++
++&pmx0 {
++	i2c0_pins_default: i2c0-default-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x01cc, PIN_INPUT_PULLUP, 0) /* (B7) I2C0_SCL */
++			AM62LX_IOPAD(0x01d0, PIN_INPUT_PULLUP, 0) /* (A7) I2C0_SDA */
++		>;
++		bootph-all;
++	};
++
++	i2c1_pins_default: i2c1-default-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x01d4, PIN_INPUT_PULLUP, 0) /* (D7) I2C1_SCL */
++			AM62LX_IOPAD(0x01d8, PIN_INPUT_PULLUP, 0) /* (A6) I2C1_SDA */
++		>;
++		bootph-all;
++	};
++
++	i2c2_pins_default: i2c2-default-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x01dc, PIN_INPUT_PULLUP, 0) /* (B8) I2C2_SCL */
++			AM62LX_IOPAD(0x01e0, PIN_INPUT_PULLUP, 0) /* (D8) I2C2_SDA */
++		>;
++	};
++
++	mmc1_pins_default: mmc1-default-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x0230, PIN_INPUT, 0) /* (Y3) MMC1_CMD */
++			AM62LX_IOPAD(0x0228, PIN_OUTPUT, 0) /* (Y2) MMC1_CLK */
++			AM62LX_IOPAD(0x0224, PIN_INPUT, 0) /* (AA1) MMC1_DAT0 */
++			AM62LX_IOPAD(0x0220, PIN_INPUT, 0) /* (Y4) MMC1_DAT1 */
++			AM62LX_IOPAD(0x021c, PIN_INPUT, 0) /* (AA2) MMC1_DAT2 */
++			AM62LX_IOPAD(0x0218, PIN_INPUT, 0) /* (AB2) MMC1_DAT3 */
++			AM62LX_IOPAD(0x0234, PIN_INPUT, 0) /* (B6) MMC1_SDCD */
++		>;
++		bootph-all;
++	};
++
++	rgmii1_pins_default: rgmii1-default-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x0138, PIN_INPUT, 0) /* (Y8) RGMII1_RD0 */
++			AM62LX_IOPAD(0x013c, PIN_INPUT, 0) /* (AA6) RGMII1_RD1 */
++			AM62LX_IOPAD(0x0140, PIN_INPUT, 0) /* (AA8) RGMII1_RD2 */
++			AM62LX_IOPAD(0x0144, PIN_INPUT, 0) /* (W8) RGMII1_RD3 */
++			AM62LX_IOPAD(0x0134, PIN_INPUT, 0) /* (Y7) RGMII1_RXC */
++			AM62LX_IOPAD(0x0130, PIN_INPUT, 0) /* (Y6) RGMII1_RX_CTL */
++			AM62LX_IOPAD(0x0120, PIN_OUTPUT, 0) /* (AC10) RGMII1_TD0 */
++			AM62LX_IOPAD(0x0124, PIN_OUTPUT, 0) /* (W13) RGMII1_TD1 */
++			AM62LX_IOPAD(0x0128, PIN_OUTPUT, 0) /* (Y11) RGMII1_TD2 */
++			AM62LX_IOPAD(0x012c, PIN_OUTPUT, 0) /* (AA11) RGMII1_TD3 */
++			AM62LX_IOPAD(0x011c, PIN_OUTPUT, 0) /* (W11) RGMII1_TXC */
++			AM62LX_IOPAD(0x0118, PIN_OUTPUT, 0) /* (AB11) RGMII1_TX_CTL */
++		>;
++	};
++
++	rgmii2_pins_default: rgmii2-default-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x0170, PIN_INPUT, 0) /* (AB9) RGMII2_RD0 */
++			AM62LX_IOPAD(0x0174, PIN_INPUT, 0) /* (AC9) RGMII2_RD1 */
++			AM62LX_IOPAD(0x0178, PIN_INPUT, 0) /* (AB10) RGMII2_RD2 */
++			AM62LX_IOPAD(0x017c, PIN_INPUT, 0) /* (AB8) RGMII2_RD3 */
++			AM62LX_IOPAD(0x016c, PIN_INPUT, 0) /* (AC7) RGMII2_RXC */
++			AM62LX_IOPAD(0x0168, PIN_INPUT, 0) /* (AC8) RGMII2_RX_CTL */
++			AM62LX_IOPAD(0x0158, PIN_OUTPUT, 0) /* (AC12) RGMII2_TD0 */
++			AM62LX_IOPAD(0x015c, PIN_OUTPUT, 0) /* (AB13) RGMII2_TD1 */
++			AM62LX_IOPAD(0x0160, PIN_OUTPUT, 0) /* (AA12) RGMII2_TD2 */
++			AM62LX_IOPAD(0x0164, PIN_OUTPUT, 0) /* (AA13) RGMII2_TD3 */
++			AM62LX_IOPAD(0x0154, PIN_OUTPUT, 0) /* (Y13) RGMII2_TXC */
++			AM62LX_IOPAD(0x0150, PIN_OUTPUT, 0) /* (AB12) RGMII2_TX_CTL */
++		>;
++	};
++
++	mdio1_pins_default: mdio1-default-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x014c, PIN_OUTPUT, 0) /* (AC15) MDIO0_MDC */
++			AM62LX_IOPAD(0x0148, PIN_INPUT, 0) /* (AC13) MDIO0_MDIO */
++		>;
++	};
++
++	uart0_pins_default: uart0-default-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x01b4, PIN_INPUT, 0) /* (D13) UART0_RXD */
++			AM62LX_IOPAD(0x01b8, PIN_OUTPUT, 0) /* (C13) UART0_TXD */
++		>;
++		bootph-all;
++	};
++
++	uart0_pins_wakeup: uart0-wakeup-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x01b4, PIN_INPUT | PIN_WKUP_EN, 0) /* (D13) UART0_RXD */
++			AM62LX_IOPAD(0x01b8, PIN_OUTPUT, 0) /* (C13) UART0_TXD */
++		>;
++	};
++
++	usb1_default_pins: usb1-default-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x0248, PIN_INPUT | PIN_DS_PULLUD_ENABLE | PIN_DS_PULL_UP, 0) /* (A5) USB1_DRVVBUS */
++		>;
++	};
++
++	usr_button_pins_default: usr-button-default-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x01ac, PIN_INPUT, 7) /* (E12) SPI0_D0.GPIO0_90 */
++		>;
++	};
++};
++
++&sdhci1 {
++	/* SD/MMC */
++	pinctrl-names = "default";
++	pinctrl-0 = <&mmc1_pins_default>;
++	cap-sd-highspeed;
++	max-frequency = <50000000>;
++	sd-uhs-sdr25;
++	sd-uhs-sdr50;
++	disable-wp;
++	status = "okay";
++	bootph-all;
++};
++
++&tscadc0 {
++	status = "okay";
++
++	adc {
++		ti,adc-channels = <0 1 2 3>;
++	};
++};
++
++&cpsw3g {
++	pinctrl-names = "default";
++	pinctrl-0 = <&rgmii1_pins_default>,
++		    <&rgmii2_pins_default>;
++	status = "okay";
++};
++
++&cpsw_port1 {
++	phy-mode = "rgmii-rxid";
++	phy-handle = <&cpsw3g_phy0>;
++};
++
++&cpsw_port2 {
++	phy-mode = "rgmii-rxid";
++	phy-handle = <&cpsw3g_phy1>;
++};
++
++&cpsw3g_mdio {
++	pinctrl-names = "default";
++	pinctrl-0 = <&mdio1_pins_default>;
++	status = "okay";
++
++	cpsw3g_phy0: ethernet-phy@0 {
++		reg = <0>;
++		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
++		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
++		ti,min-output-impedance;
++	};
++
++	cpsw3g_phy1: ethernet-phy@1 {
++		reg = <1>;
++		ti,rx-internal-delay = <DP83867_RGMIIDCTL_2_00_NS>;
++		ti,fifo-depth = <DP83867_PHYCR_FIFO_DEPTH_4_B_NIB>;
++		ti,min-output-impedance;
++	};
++};
++
++&uart0 {
++	pinctrl-0 = <&uart0_pins_default>;
++	pinctrl-1 = <&uart0_pins_wakeup>;
++	pinctrl-names = "default", "wakeup";
++	wakeup-source;
++	status = "okay";
++	bootph-all;
++};
++
++&usbss0 {
++	status = "okay";
++	ti,vbus-divider;
++};
++
++&usb0 {
++	usb-role-switch;
++	bootph-all;
++};
++
++&usbss1 {
++	status = "okay";
++	ti,vbus-divider;
++};
++
++&usb1 {
++	dr_mode = "host";
++	pinctrl-names = "default";
++	pinctrl-0 = <&usb1_default_pins>;
++};
++
++&main_bcdma {
++	bootph-all;
++};
++
++&main_pktdma {
++	bootph-all;
++};
+diff --git a/arch/arm/dts/k3-am62l3-byteengine.dtsi b/arch/arm/dts/k3-am62l3-byteengine.dtsi
+new file mode 100644
+index 00000000000..557eb0d3775
+--- /dev/null
++++ b/arch/arm/dts/k3-am62l3-byteengine.dtsi
+@@ -0,0 +1,103 @@
++// SPDX-License-Identifier: GPL-2.0-only or MIT
++/*
++ * Copyright (C) 2026 bytesatwork AG - https://www.bytesatwork.io
++ *
++ * Based on dts/upstream/src/arm64/ti/k3-am62l3-evm.dts
++ * Copyright (C) 2025 Texas Instruments Incorporated - https://www.ti.com/
++ */
++
++#include <dt-bindings/gpio/gpio.h>
++#include <dt-bindings/input/input.h>
++#include <dt-bindings/leds/common.h>
++#include <dt-bindings/net/ti-dp83867.h>
++#include <dt-bindings/thermal/thermal.h>
++
++#include "k3-am62l3.dtsi"
++#include "k3-pinctrl.h"
++
++/ {
++	aliases {
++		mmc0 = &sdhci0;
++	};
++
++	memory@80000000 {
++		reg = <0x00000000 0x80000000 0x00000000 0x80000000>;
++		device_type = "memory";
++		bootph-all;
++	};
++
++	vdd_mmc1: regulator-2 {
++		/* TPS22918DBVR */
++		compatible = "regulator-fixed";
++		regulator-name = "vdd_mmc1";
++		regulator-min-microvolt = <3300000>;
++		regulator-max-microvolt = <3300000>;
++		regulator-boot-on;
++		bootph-all;
++	};
++
++	thermal-zones {
++		wkup0-thermal {
++			polling-delay-passive = <250>;	/* milliSeconds */
++			polling-delay = <500>;		/* milliSeconds */
++			thermal-sensors = <&vtm0 0>;
++
++			trips {
++				crit0 {
++					temperature = <125000>;
++					hysteresis = <2000>;
++					type = "critical";
++				};
++			};
++		};
++	};
++};
++
++&pmx0 {
++	mmc0_pins_default: mmc0-default-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x0214, PIN_INPUT, 0) /* (D2) MMC0_CMD */
++			AM62LX_IOPAD(0x020c, PIN_OUTPUT, 0) /* (B2) MMC0_CLK */
++			AM62LX_IOPAD(0x0208, PIN_INPUT, 0) /* (D3) MMC0_DAT0 */
++			AM62LX_IOPAD(0x0204, PIN_INPUT_PULLUP, 0) /* (D4) MMC0_DAT1 */
++			AM62LX_IOPAD(0x0200, PIN_INPUT_PULLUP, 0) /* (C1) MMC0_DAT2 */
++			AM62LX_IOPAD(0x01fc, PIN_INPUT_PULLUP, 0) /* (C2) MMC0_DAT3 */
++			AM62LX_IOPAD(0x01f8, PIN_INPUT_PULLUP, 0) /* (C4) MMC0_DAT4 */
++			AM62LX_IOPAD(0x01f4, PIN_INPUT_PULLUP, 0) /* (B3) MMC0_DAT5 */
++			AM62LX_IOPAD(0x01f0, PIN_INPUT_PULLUP, 0) /* (A3) MMC0_DAT6 */
++			AM62LX_IOPAD(0x01ec, PIN_INPUT_PULLUP, 0) /* (B4) MMC0_DAT7 */
++		>;
++		bootph-all;
++	};
++
++	wkup_i2c0_default_pins: wkup-i2c0-default-pins {
++		pinctrl-single,pins = <
++			AM62LX_IOPAD(0x0010, PIN_INPUT_PULLUP, 0) /* (AB22) WKUP_I2C0_SCL */
++			AM62LX_IOPAD(0x0014, PIN_INPUT_PULLUP, 0) /* (AA22) WKUP_I2C0_SDA */
++		>;
++	};
++};
++
++&sdhci0 {
++	/* eMMC */
++	pinctrl-names = "default";
++	pinctrl-0 = <&mmc0_pins_default>;
++	non-removable;
++	status = "okay";
++	bootph-all;
++};
++
++&wkup_i2c0 {
++	clock-frequency = <400000>;
++	pinctrl-names = "default";
++	pinctrl-0 = <&wkup_i2c0_default_pins>;
++	status = "okay";
++
++	internal_eeprom: eeprom@50 {
++		bootph-pre-ram;
++		compatible = "atmel,24c64";
++		reg = <0x50>;
++		size = <0x2000>; /* 8 KiB */
++		pagesize = <32>;
++	};
++};
+diff --git a/arch/arm/mach-k3/am62lx/Kconfig b/arch/arm/mach-k3/am62lx/Kconfig
+index 1d89fe4e0b0..b8c834af1f4 100644
+--- a/arch/arm/mach-k3/am62lx/Kconfig
++++ b/arch/arm/mach-k3/am62lx/Kconfig
+@@ -19,5 +19,6 @@ config TARGET_AM62L3_EVM
+ endchoice
+ 
+ source "board/ti/am62lx/Kconfig"
++source "board/bytesatwork/bytedevkit_am62lx/Kconfig"
+ 
+ endif
+diff --git a/board/bytesatwork/bytedevkit_am62lx/Kconfig b/board/bytesatwork/bytedevkit_am62lx/Kconfig
+new file mode 100644
+index 00000000000..b47d6f7c9e6
+--- /dev/null
++++ b/board/bytesatwork/bytedevkit_am62lx/Kconfig
+@@ -0,0 +1,61 @@
++# SPDX-License-Identifier: GPL-2.0+
++#
++# Copyright (C) 2026 bytesatwork AG - https://www.bytesatwork.io
++#
++# Based on ti/am62lx/Kconfig
++# Copyright (C) 2025 Texas Instruments Incorporated - https://www.ti.com/
++#
++
++choice
++	prompt "bytes at work TI AM62Lx based boards"
++	optional
++
++config TARGET_AM62LX_BYTEDEVKIT
++	bool "byteENGINE-AM62Lx on byteDEVKIT"
++	select ARM64
++	select BINMAN
++	select OF_SYSTEM_SETUP
++
++endchoice
++
++if TARGET_AM62LX_BYTEDEVKIT
++
++config SYS_BOARD
++       default "bytedevkit_am62lx"
++
++config SYS_VENDOR
++       default "bytesatwork"
++
++config SYS_CONFIG_NAME
++       default "am62lx_bytedevkit"
++
++config BAW_COMMON_CMD_OPTIONS
++	bool "Enable bytesatwork cmd options"
++	imply CMD_ASKENV
++	imply CRC32_VERIFY if ARCH_KEYSTONE
++	imply CMD_DFU if USB_GADGET_DOWNLOAD
++	imply CMD_DHCP
++	imply CMD_EEPROM
++	imply CMD_EXT2
++	imply CMD_EXT4
++	imply CMD_EXT4_WRITE
++	imply CMD_FAT
++	imply FAT_WRITE if CMD_FAT
++	imply CMD_FS_GENERIC
++	imply CMD_GPIO
++	imply CMD_GPT
++	imply CMD_I2C
++	imply CMD_MII
++	imply CMD_MMC
++	imply CMD_PART
++	imply CMD_PING
++	imply CMD_PMIC if DM_PMIC
++	imply CMD_REGULATOR if DM_REGULATOR
++	imply CMD_SF if SPI_FLASH
++	imply CMD_SPI
++	imply CMD_TIME
++	imply CMD_USB if USB
++
++endif
++
++
+diff --git a/board/bytesatwork/bytedevkit_am62lx/Makefile b/board/bytesatwork/bytedevkit_am62lx/Makefile
+new file mode 100644
+index 00000000000..8b8126236ea
+--- /dev/null
++++ b/board/bytesatwork/bytedevkit_am62lx/Makefile
+@@ -0,0 +1,7 @@
++# SPDX-License-Identifier: GPL-2.0+
++#
++# Copyright (C) 2026 bytesatwork AG - https://www.bytesatwork.io
++#
++
++obj-y	+= am62lx_bytedevkit.o
++obj-y	+= ../../ti/common/
+diff --git a/board/bytesatwork/bytedevkit_am62lx/README.md b/board/bytesatwork/bytedevkit_am62lx/README.md
+new file mode 100644
+index 00000000000..1ca81da0c78
+--- /dev/null
++++ b/board/bytesatwork/bytedevkit_am62lx/README.md
+@@ -0,0 +1,56 @@
++# Bytes at work byteENGINE AM62L3 on byteDEVKIT
++
++This file describes how to build u-boot for the byteENGINE AM62L3 module mounted
++on the byteDEVKIT.
++
++
++## Install and get Dependencies
++
++[Cross toolchain](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/linux/Overview/GCC_ToolChain.html#location-in-sdk)
++
++[TI-linux-firmware](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/devices/AM62X/linux/Release_Specific_Release_Notes.html#ti-linux-firmware)
++
++[TF-A](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/devices/AM62X/linux/Release_Specific_Release_Notes.html#tf-a)
++
++[OP-TEE](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/devices/AM62X/linux/Release_Specific_Release_Notes.html#op-tee)
++
++## Build TF-A
++
++[TI TF-A build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/linux/Foundational_Components_ATF.html#arm-trusted-firmware-a)
++
++## Build OP-TEE
++
++[TI OP-TEE build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/linux/Foundational_Components_OPTEE.html#op-tee)
++
++## Build u-boot
++
++You should have downloaded `TI-linux-firmware` and built [TF-A](#build-tf-a), [OP-TEE OS](#build-op-tee) already.
++
++[TI u-boot build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/linux/Foundational_Components/U-Boot/UG-General-Info.html#build-u-boot)
++
++**IMPORTANT:** Use `am62x_bytedevkit_r5_defconfig` or `am62lx_bytedevkit_defconfig` instead of the TI defconfigs.
++
++**NOTE:** Clean command: `make ARCH=arm CROSS_COMPILE=aarch64-linux-gnu- O=build-a53 distclean`
++
++Copy the related files to SD card, see end of section
++[TI u-boot build instructions](https://software-dl.ti.com/processor-sdk-linux/esd/AM62X/11_00_09_04/exports/docs/linux/Foundational_Components/U-Boot/UG-General-Info.html#build-u-boot)
++
++## Prepare eMMC boot
++
++Program the `tiboot3.bin`, `tispl.bin` and `u-boot.img` from the SD card to the
++eMMC.
++
++```log
++=> run update_emmc
++```
++
++The bootloader needs to be stored in the boot0 hardware partition of the eMMC.
++The layout of boot0 is defined so that it fits within 4 MiB, defined in blocks
++of 512 Bytes:
++
++```txt
++                start   end     size    size
++tiboot3.bin     0x0000  0x0400  0x0400   512 KiB
++tispl.bin       0x0400  0x1000  0x0C00  1536 KiB
++u-boot.img      0x1000  0x2000  0x1000  2048 KiB
++```
+diff --git a/board/bytesatwork/bytedevkit_am62lx/am62lx_bytedevkit.c b/board/bytesatwork/bytedevkit_am62lx/am62lx_bytedevkit.c
+new file mode 100644
+index 00000000000..f54499dbda4
+--- /dev/null
++++ b/board/bytesatwork/bytedevkit_am62lx/am62lx_bytedevkit.c
+@@ -0,0 +1,30 @@
++// SPDX-License-Identifier: GPL-2.0+
++/*
++ * Copyright (C) 2026 bytesatwork AG - https://www.bytesatwork.io
++ *
++ * Based on ti/am62lx/evm.c
++ * Copyright (C) 2020-2022 Texas Instruments Incorporated - https://www.ti.com/
++ *
++ */
++
++#include <asm/arch/hardware.h>
++#include <asm/io.h>
++#include <dm/uclass.h>
++#include <env.h>
++#include <fdt_support.h>
++#include <spl.h>
++
++#include "../../ti/common/fdt_ops.h"
++
++int board_init(void)
++{
++	return 0;
++}
++
++#if IS_ENABLED(CONFIG_BOARD_LATE_INIT)
++int board_late_init(void)
++{
++	ti_set_fdt_env(NULL, NULL);
++	return 0;
++}
++#endif
+diff --git a/board/bytesatwork/bytedevkit_am62lx/board-cfg.yaml b/board/bytesatwork/bytedevkit_am62lx/board-cfg.yaml
+new file mode 100644
+index 00000000000..eb3016b5930
+--- /dev/null
++++ b/board/bytesatwork/bytedevkit_am62lx/board-cfg.yaml
+@@ -0,0 +1,36 @@
++# SPDX-License-Identifier: GPL-2.0+
++#
++# Copyright (C) 2026 bytesatwork AG - https://www.bytesatwork.io
++#
++# Based on ti/am62lx/board-cfg.yaml
++# Copyright (C) 2025 Texas Instruments Incorporated - https://www.ti.com/
++#
++# Board configuration for the emulated AM62Lx
++#
++---
++board-cfg:
++  rev:
++    boardcfg_abi_maj: 0x0
++    boardcfg_abi_min: 0x1
++
++  control:
++    subhdr:
++      magic: 0xC1D3
++      size: 7
++    main_isolation_enable: 0x5A
++    main_isolation_hostid: 0x2
++
++  bm_writer_cfg:
++    subhdr:
++      magic: 0x7D8A
++      size: 5
++    allowed_host: 10
++
++  reserved: [0, 0, 0, 0, 0, 0, 0]
++
++  debug_cfg:
++    subhdr:
++      magic: 0x020C
++      size: 8
++    trace_dst_enables: 0x00
++    trace_src_enables: 0x00
+diff --git a/board/bytesatwork/bytedevkit_am62lx/sec-cfg.yaml b/board/bytesatwork/bytedevkit_am62lx/sec-cfg.yaml
+new file mode 100644
+index 00000000000..d2b6b007f3f
+--- /dev/null
++++ b/board/bytesatwork/bytedevkit_am62lx/sec-cfg.yaml
+@@ -0,0 +1,384 @@
++# SPDX-License-Identifier: GPL-2.0+
++#
++# Copyright (C) 2026 bytesatwork AG - https://www.bytesatwork.io
++#
++# Based on ti/am62lx/sec-cfg.yaml
++# Copyright (C) 2025 Texas Instruments Incorporated - https://www.ti.com/
++#
++# Security management configuration for AM62Lx
++#
++---
++
++sec-cfg:
++    rev:
++        boardcfg_abi_maj: 0x0
++        boardcfg_abi_min: 0x1
++
++    processor_acl_list:
++        subhdr:
++            magic: 0xF1EA
++            size: 164
++
++        proc_acl_entries:
++            -  # 1
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 2
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 3
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 4
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 5
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 6
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 7
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 8
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 9
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 10
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 11
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 12
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 13
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 14
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 15
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 16
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 17
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 18
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 19
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 20
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 21
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 22
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 23
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 24
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 25
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 26
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 27
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 28
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 29
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 30
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 31
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++            -  # 32
++                processor_id: 0
++                proc_access_master: 0
++                proc_access_secondary: [0, 0, 0]
++    host_hierarchy:
++        subhdr:
++            magic: 0x8D27
++            size: 68
++        host_hierarchy_entries:
++            -  # 1
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 2
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 3
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 4
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 5
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 6
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 7
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 8
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 9
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 10
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 11
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 12
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 13
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 14
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 15
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 16
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 17
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 18
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 19
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 20
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 21
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 22
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 23
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 24
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 25
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 26
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 27
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 28
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 29
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 30
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 31
++                host_id: 0
++                supervisor_host_id: 0
++            -  # 32
++                host_id: 0
++                supervisor_host_id: 0
++    otp_config:
++        subhdr:
++            magic: 0x4081
++            size: 69
++        otp_entry:
++            -  # 1
++                host_id: 10
++                host_perms: 2
++            -  # 2
++                host_id: 10
++                host_perms: 2
++            -  # 3
++                host_id: 10
++                host_perms: 2
++            -  # 4
++                host_id: 10
++                host_perms: 2
++            -  # 5
++                host_id: 10
++                host_perms: 2
++            -  # 6
++                host_id: 10
++                host_perms: 2
++            -  # 7
++                host_id: 10
++                host_perms: 2
++            -  # 8
++                host_id: 10
++                host_perms: 2
++            -  # 9
++                host_id: 10
++                host_perms: 2
++            -  # 10
++                host_id: 10
++                host_perms: 2
++            -  # 11
++                host_id: 10
++                host_perms: 2
++            -  # 12
++                host_id: 10
++                host_perms: 2
++            -  # 13
++                host_id: 10
++                host_perms: 2
++            -  # 14
++                host_id: 10
++                host_perms: 2
++            -  # 15
++                host_id: 10
++                host_perms: 2
++            -  # 16
++                host_id: 10
++                host_perms: 2
++            -  # 17
++                host_id: 10
++                host_perms: 2
++            -  # 18
++                host_id: 10
++                host_perms: 2
++            -  # 19
++                host_id: 10
++                host_perms: 2
++            -  # 20
++                host_id: 10
++                host_perms: 2
++            -  # 21
++                host_id: 10
++                host_perms: 2
++            -  # 22
++                host_id: 10
++                host_perms: 2
++            -  # 23
++                host_id: 10
++                host_perms: 2
++            -  # 24
++                host_id: 10
++                host_perms: 2
++            -  # 25
++                host_id: 10
++                host_perms: 2
++            -  # 26
++                host_id: 10
++                host_perms: 2
++            -  # 27
++                host_id: 10
++                host_perms: 2
++            -  # 28
++                host_id: 10
++                host_perms: 2
++            -  # 29
++                host_id: 10
++                host_perms: 2
++            -  # 30
++                host_id: 10
++                host_perms: 2
++            -  # 31
++                host_id: 10
++                host_perms: 2
++            -  # 32
++                host_id: 10
++                host_perms: 2
++        write_host_id: 10
++    dkek_config:
++        subhdr:
++            magic: 0x5170
++            size: 12
++        allowed_hosts: [128, 0, 0, 0]
++        allow_dkek_export_tisci: 0x5A
++        rsvd: [0, 0, 0]
++    sa2ul_cfg:
++        subhdr:
++            magic: 0x0
++            size: 0
++        auth_resource_owner: 0
++        enable_saul_psil_global_config_writes: 0x0
++        rsvd: [0, 0]
++    sec_dbg_config:
++        subhdr:
++            magic: 0x42AF
++            size: 16
++        allow_jtag_unlock: 0x5A
++        allow_wildcard_unlock: 0x5A
++        allowed_debug_level_rsvd: 0
++        rsvd: 0
++        min_cert_rev: 0x0
++        jtag_unlock_hosts: [0, 0, 0, 0]
++    sec_handover_cfg:
++        subhdr:
++            magic: 0x0
++            size: 10
++        handover_msg_sender: 0
++        handover_to_host_id: 0
++        rsvd: [0, 0, 0, 0]
+diff --git a/configs/am62lx_bytedevkit_defconfig b/configs/am62lx_bytedevkit_defconfig
+new file mode 100644
+index 00000000000..92162795511
+--- /dev/null
++++ b/configs/am62lx_bytedevkit_defconfig
+@@ -0,0 +1,172 @@
++CONFIG_ARM=y
++CONFIG_ARCH_K3=y
++CONFIG_TEXT_BASE=0x84000000
++CONFIG_SYS_MALLOC_LEN=0x1800000
++CONFIG_SYS_MALLOC_F_LEN=0x8000
++CONFIG_SPL_GPIO=y
++CONFIG_SPL_LIBCOMMON_SUPPORT=y
++CONFIG_SPL_LIBGENERIC_SUPPORT=y
++CONFIG_ENV_SOURCE_FILE="bytedevkit_am62lx"
++CONFIG_SOC_K3_AM62L3=y
++CONFIG_TARGET_AM62LX_BYTEDEVKIT=y
++CONFIG_HAS_CUSTOM_SYS_INIT_SP_ADDR=y
++CONFIG_CUSTOM_SYS_INIT_SP_ADDR=0x82080000
++CONFIG_SF_DEFAULT_SPEED=25000000
++CONFIG_SF_DEFAULT_MODE=0
++CONFIG_ENV_SIZE=0x20000
++CONFIG_ENV_OFFSET=0xC0000
++CONFIG_DM_GPIO=y
++CONFIG_SPL_DM_SPI=y
++CONFIG_DEFAULT_DEVICE_TREE="k3-am62l3-bytedevkit"
++CONFIG_OF_LIBFDT_OVERLAY=y
++CONFIG_DM_RESET=y
++CONFIG_SPL_MMC=y
++CONFIG_SPL_SERIAL=y
++CONFIG_SPL_STACK_R_ADDR=0x82400000
++CONFIG_SPL_TEXT_BASE=0x82000000
++CONFIG_SPL_HAS_BSS_LINKER_SECTION=y
++CONFIG_SPL_BSS_START_ADDR=0x82050000
++CONFIG_SPL_BSS_MAX_SIZE=0x20000
++CONFIG_SPL_STACK_R=y
++CONFIG_SPL_STACK_R_MALLOC_SIMPLE_LEN=0x380000
++CONFIG_SYS_LOAD_ADDR=0x84000000
++CONFIG_SPL_SIZE_LIMIT=0x50000
++CONFIG_SPL_SIZE_LIMIT_PROVIDE_STACK=0x800
++CONFIG_ENV_OFFSET_REDUND=0xE0000
++CONFIG_SPL_FS_FAT=y
++CONFIG_SPL_LIBDISK_SUPPORT=y
++CONFIG_SPL_SPI_FLASH_SUPPORT=y
++CONFIG_SPL_SPI=y
++# CONFIG_PSCI_RESET is not set
++# CONFIG_SYS_MALLOC_CLEAR_ON_INIT is not set
++CONFIG_STACK_SIZE=0x400000
++CONFIG_EFI_SET_TIME=y
++CONFIG_SPL_FIT_SIGNATURE=y
++CONFIG_SPL_LOAD_FIT_ADDRESS=0x85000000
++CONFIG_BOOTSTD_FULL=y
++CONFIG_BOOTCOMMAND="run bsp_bootcmd"
++CONFIG_BOARD_LATE_INIT=y
++CONFIG_SPL_MAX_SIZE=0x58000
++CONFIG_SPL_SYS_REPORT_STACK_F_USAGE=y
++# CONFIG_SPL_BINMAN_SYMBOLS is not set
++CONFIG_SPL_SYS_MALLOC_SIMPLE=y
++CONFIG_SPL_SYS_MMCSD_RAW_MODE=y
++CONFIG_SYS_MMCSD_RAW_MODE_U_BOOT_SECTOR=0x1400
++CONFIG_SPL_DMA=y
++CONFIG_SPL_ENV_SUPPORT=y
++CONFIG_SPL_FS_LOAD_PAYLOAD_NAME="u-boot.img"
++CONFIG_SPL_I2C=y
++CONFIG_SPL_DM_MAILBOX=y
++CONFIG_SPL_MTD=y
++CONFIG_SPL_MTD_LOAD=y
++CONFIG_SPL_NAND_SPI_SUPPORT=y
++CONFIG_SPL_DM_SPI_FLASH=y
++CONFIG_SPL_POWER_DOMAIN=y
++CONFIG_SPL_RAM_DEVICE=y
++# CONFIG_SPL_SPI_FLASH_TINY is not set
++CONFIG_SPL_SPI_FLASH_SFDP_SUPPORT=y
++CONFIG_SPL_SPI_LOAD=y
++CONFIG_SYS_SPI_U_BOOT_OFFS=0x280000
++CONFIG_SPL_YMODEM_SUPPORT=y
++CONFIG_CMD_BOOTEFI_SELFTEST=y
++CONFIG_CMD_ERASEENV=y
++CONFIG_CMD_NVEDIT_EFI=y
++CONFIG_CMD_MEMINFO=y
++CONFIG_CMD_CLK=y
++CONFIG_CMD_FUSE=y
++CONFIG_CMD_FUSE_WRITEBUFF=y
++CONFIG_CMD_MTD=y
++CONFIG_CMD_USB_MASS_STORAGE=y
++CONFIG_CMD_EFIDEBUG=y
++CONFIG_CMD_MTDPARTS=y
++CONFIG_CMD_UBI=y
++CONFIG_OF_CONTROL=y
++CONFIG_SPL_OF_CONTROL=y
++CONFIG_ENV_IS_IN_MMC=y
++CONFIG_ENV_REDUNDANT=y
++CONFIG_ENV_MMC_DEVICE_INDEX=0
++CONFIG_VERSION_VARIABLE=y
++CONFIG_NET_RANDOM_ETHADDR=y
++CONFIG_SPL_DM=y
++CONFIG_SPL_DM_DEVICE_REMOVE=y
++CONFIG_SPL_DM_SEQ_ALIAS=y
++CONFIG_REGMAP=y
++CONFIG_SPL_REGMAP=y
++CONFIG_SPL_OF_TRANSLATE=y
++CONFIG_CLK=y
++CONFIG_SPL_CLK=y
++CONFIG_DFU_MMC=y
++CONFIG_DFU_MTD=y
++CONFIG_DFU_RAM=y
++CONFIG_DFU_SF=y
++CONFIG_SYS_DFU_DATA_BUF_SIZE=0x40000
++CONFIG_SYS_DFU_MAX_FILE_SIZE=0x800000
++CONFIG_DMA_CHANNELS=y
++CONFIG_TI_K3_UDMA_V2=y
++# CONFIG_SCMI_AGENT_OPTEE is not set
++CONFIG_SPL_DM_GPIO_LOOKUP_LABEL=y
++CONFIG_DA8XX_GPIO=y
++CONFIG_DM_PCA953X=y
++CONFIG_SPL_DM_PCA953X=y
++CONFIG_DM_I2C=y
++CONFIG_SYS_I2C_OMAP24XX=y
++CONFIG_DM_MAILBOX=y
++CONFIG_K3_SEC_PROXY=y
++CONFIG_K3_FUSE=y
++CONFIG_SUPPORT_EMMC_BOOT=y
++CONFIG_MMC_SDHCI=y
++CONFIG_MMC_SDHCI_ADMA=y
++CONFIG_SPL_MMC_SDHCI_ADMA=y
++CONFIG_MMC_SDHCI_AM654=y
++CONFIG_MTD=y
++CONFIG_DM_MTD=y
++CONFIG_MTD_SPI_NAND=y
++CONFIG_DM_SPI_FLASH=y
++CONFIG_SPI_FLASH_SFDP_SUPPORT=y
++CONFIG_SPI_FLASH_SOFT_RESET=y
++CONFIG_SPI_FLASH_SOFT_RESET_ON_BOOT=y
++CONFIG_SPI_FLASH_SPANSION=y
++CONFIG_SPI_FLASH_S28HX_T=y
++CONFIG_SPI_FLASH_STMICRO=y
++CONFIG_SPI_FLASH_MT35XU=y
++CONFIG_PHY_TI_DP83867=y
++CONFIG_PHY_FIXED=y
++CONFIG_TI_AM65_CPSW_NUSS=y
++CONFIG_PHY=y
++CONFIG_PINCTRL=y
++CONFIG_SPL_PINCTRL=y
++CONFIG_PINCTRL_SINGLE=y
++CONFIG_POWER_DOMAIN=y
++CONFIG_DM_REGULATOR=y
++CONFIG_SPL_DM_REGULATOR=y
++CONFIG_DM_REGULATOR_FIXED=y
++CONFIG_SPL_DM_REGULATOR_FIXED=y
++CONFIG_DM_RTC=y
++CONFIG_RTC_EMULATION=y
++CONFIG_DM_SERIAL=y
++CONFIG_SOC_DEVICE=y
++CONFIG_SOC_DEVICE_TI_K3=y
++CONFIG_SOC_TI=y
++CONFIG_SPI=y
++CONFIG_DM_SPI=y
++CONFIG_CADENCE_QSPI=y
++CONFIG_SYSRESET=y
++CONFIG_SPL_SYSRESET=y
++CONFIG_USB=y
++CONFIG_DM_USB_GADGET=y
++CONFIG_SPL_DM_USB_GADGET=y
++CONFIG_USB_XHCI_HCD=y
++CONFIG_USB_DWC3=y
++CONFIG_USB_DWC3_GENERIC=y
++CONFIG_SPL_USB_DWC3_GENERIC=y
++CONFIG_SPL_USB_DWC3_AM62=y
++CONFIG_USB_DWC3_AM62=y
++CONFIG_USB_GADGET=y
++CONFIG_SPL_USB_GADGET=y
++CONFIG_USB_GADGET_MANUFACTURER="Texas Instruments"
++CONFIG_USB_GADGET_VENDOR_NUM=0x0451
++CONFIG_USB_GADGET_PRODUCT_NUM=0x6165
++CONFIG_USB_GADGET_DOWNLOAD=y
++CONFIG_SPL_DFU=y
++CONFIG_FS_FAT_MAX_CLUSTSIZE=16384
++CONFIG_ZSTD=y
+diff --git a/include/configs/am62lx_bytedevkit.h b/include/configs/am62lx_bytedevkit.h
+new file mode 100644
+index 00000000000..ecb9624e0e3
+--- /dev/null
++++ b/include/configs/am62lx_bytedevkit.h
+@@ -0,0 +1,79 @@
++/* SPDX-License-Identifier: GPL-2.0+ */
++/*
++ * Configuration header file for K3 AM62L SoC family
++ *
++ * Copyright (C) 2026 bytesatwork AG - https://www.bytesatwork.io
++ *
++ * Based on include/configs/am62l3_evm.h
++ * Copyright (C) 2025 Texas Instruments Incorporated - https://www.ti.com/
++ *
++ */
++
++#ifndef __CONFIG_AM62LX_BYTEDEVKIT_H
++#define __CONFIG_AM62LX_BYTEDEVKIT_H
++
++#include <configs/ti_armv7_common.h>
++
++/* NAND Driver config */
++#define CFG_SYS_NAND_BASE            0x51000000
++
++#define CFG_SYS_NAND_ECCPOS		{ 2, 3, 4, 5, 6, 7, 8, 9, \
++					 10, 11, 12, 13, 14, 15, 16, 17, \
++					 18, 19, 20, 21, 22, 23, 24, 25, \
++					 26, 27, 28, 29, 30, 31, 32, 33, \
++					 34, 35, 36, 37, 38, 39, 40, 41, \
++					 42, 43, 44, 45, 46, 47, 48, 49, \
++					 50, 51, 52, 53, 54, 55, 56, 57, }
++
++#define CFG_SYS_NAND_ECCSIZE         512
++
++#define CFG_SYS_NAND_ECCBYTES        14
++/*-- end NAND config --*/
++
++#define CFG_EXTRA_ENV_SETTINGS \
++	"console=ttyS0,115200n8\0" \
++	"dtbfile=k3-am62lx-bytedevkit.dtb\0" \
++	"kernelfile=Image\0" \
++	"loadaddr=0x82000000\0" \
++	"dtbaddr=0x88000000\0" \
++	"bootdir=/boot\0" \
++	"mmc_dev=1\0" \
++	"mmc_part=2\0" \
++	"mmc_root=/dev/mmcblk1p2\0" \
++	"args_mmc=setenv mmc_dev 1; setenv mmc_part 2;\0" \
++	"args_emmc=setenv mmc_dev 0; setenv mmc_part 1;\0" \
++	"args_generic=setenv bootargs console=${console} " \
++		"earlycon=ns16550a,mmio32,0x02800000 ${mtdparts} " \
++		"root=/dev/mmcblk${mmc_dev}p${mmc_part} " \
++		"rootfstype=ext4 rootwait quiet ${bootargs_append}; " \
++	"\0" \
++	"mmc_boot=echo Booting from SD/MMC ...; run args_mmc; run generic_boot\0" \
++	"emmc_boot=echo Booting from eMMC ...; run args_emmc; run generic_boot\0" \
++	"generic_boot=" \
++		"run args_generic; " \
++		"load mmc ${mmc_dev}:${mmc_part} ${loadaddr} ${bootdir}/${kernelfile} || exit; " \
++		"load mmc ${mmc_dev}:${mmc_part} ${dtbaddr} ${bootdir}/${dtbfile} || exit; " \
++		"booti ${loadaddr} - ${dtbaddr}; " \
++	"\0" \
++	"update_emmc=echo Writing bootloader to eMMC; " \
++		"mmc dev 0 1; " \
++		"load mmc 1:2 ${loadaddr} tiboot3.bin; " \
++		"mmc write ${loadaddr} 0x0 0x400; " \
++		"load mmc 1:2 ${loadaddr} tispl.bin; " \
++		"mmc write ${loadaddr} 0x400 0x1000; " \
++		"load mmc 1:2 ${loadaddr} u-boot.img; " \
++		"mmc write ${loadaddr} 0x1400 0xC00; " \
++		"mmc dev 0 0; " \
++	"\0" \
++	"dfu_alt_info_ram=tispl.bin ram 0x80080000 0x200000;" \
++		"u-boot.img ram 0x81000000 0x400000" \
++	"\0" \
++	"bsp_bootcmd=echo Running BSP bootcmd ...; " \
++		"if mmc dev 1; then " \
++			"run mmc_boot; " \
++		"else; " \
++			"run emmc_boot; " \
++		"fi; " \
++	"\0"
++
++#endif /* __CONFIG_AM62LX_BYTEDEVKIT_H */
